@@ -1,3 +1,6 @@
 [submodule "cgal"]
 	path = cgal
 	url = https://github.com/CGAL/cgal.git
+[submodule "fastjet"]
+	path = fastjet
+	url = https://gitlab.com/fastjet/fastjet.git
