@@ -12,7 +12,7 @@ from typing import List
 # -- Project information -----------------------------------------------------
 
 project = "fastjet"
-copyright = "2021, Scikit-HEP"
+copyright = "2021, The Scikit-HEP admins"
 author = "Aryan Roy"
 
 
