@@ -85,7 +85,7 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
                 env["FC"] = "gfortran"
 
             print("Running autogen.sh")  # noqa T001
-            subprocess.run([str(DIR / "autogen.sh")], cwd=FASTJET, env=env, check=True)
+            subprocess.run([str(FASTJET / "autogen.sh")], cwd=FASTJET, env=env, check=True)
 
             args = [
                 f"--prefix={str(PYTHON / '_fastjet_core')}",
@@ -98,7 +98,7 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
             ]
             print("Running configure " + " ".join(args))  # noqa T001
             subprocess.run(
-                [str(DIR / "configure")] + args, cwd=FASTJET, check=True, env=env
+                [str(FASTJET / "configure")] + args, cwd=FASTJET, check=True, env=env
             )
 
             subprocess.run(["make", "-O3", "-j"], cwd=FASTJET, check=True)
