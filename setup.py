@@ -42,6 +42,13 @@ def get_version():
     return g["__version__"]
 
 
+def tree(x):
+    print(("{} (dir)" if os.path.isdir(x) else "{}").format(x))  # noqa T001
+    if os.path.isdir(x):
+        for y in os.listdir(x):
+            tree(os.path.join(x, y))
+
+
 class FastJetBuild(setuptools.command.build_ext.build_ext):
     def build_extensions(self):
         if not os.path.exists(self.build_temp):
@@ -51,12 +58,16 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
             zip_filename = DIR / pathlib.Path(CGAL_ZIP).parts[-1]
 
             with urllib.request.urlopen(CGAL_ZIP) as http_obj:
+                print(f"Downloading {CGAL_ZIP} to {zip_filename}")  # noqa T001
                 with open(zip_filename, "wb") as file_obj:
                     shutil.copyfileobj(http_obj, file_obj)
 
             with zipfile.ZipFile(zip_filename) as zip_obj:
                 cgal_dirname = zip_obj.namelist()[0]
+                print(f"Unzipping {zip_filename} to {cgal_dirname}")  # noqa T001
                 zip_obj.extractall(DIR)
+
+            tree(cgal_dirname)
 
             env = os.environ.copy()
             env["NOCONFIGURE"] = "1"
@@ -85,6 +96,15 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
 
             subprocess.run(["make", "all", "-j"], cwd=FASTJET, check=True)
             subprocess.run(["make", "install"], cwd=FASTJET, check=True)
+
+            for pythondir in glob.glob(str(PYTHON / "_fastjet_core" / "lib" / "python*")):
+                pythondir = pathlib.Path(pythondir)
+                shutil.copyfile(
+                    pythondir / "site-packages" / "fastjet.py", PYTHON / "_swig.py"
+                )
+                for sharedobj in glob.glob(str(pythondir / "site-packages" / "*.so*")):
+                    sharedobj = pathlib.Path(sharedobj)
+                    shutil.copyfile(sharedobj, PYTHON / sharedobj.parts[-1])
 
         setuptools.command.build_ext.build_ext.build_extensions(self)
 
