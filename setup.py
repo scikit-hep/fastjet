@@ -97,7 +97,9 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
             subprocess.run(["make", "all", "-j"], cwd=FASTJET, check=True)
             subprocess.run(["make", "install"], cwd=FASTJET, check=True)
 
-            for pythondir in glob.glob(str(PYTHON / "_fastjet_core" / "lib" / "python*")):
+            for pythondir in glob.glob(
+                str(PYTHON / "_fastjet_core" / "lib" / "python*")
+            ):
                 pythondir = pathlib.Path(pythondir)
                 shutil.copyfile(
                     pythondir / "site-packages" / "fastjet.py", PYTHON / "_swig.py"
