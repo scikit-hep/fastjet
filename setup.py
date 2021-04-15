@@ -42,13 +42,6 @@ def get_version():
     return g["__version__"]
 
 
-def tree(x):
-    print(("{} (dir)" if os.path.isdir(x) else "{}").format(x))  # noqa T001
-    if os.path.isdir(x):
-        for y in os.listdir(x):
-            tree(os.path.join(x, y))
-
-
 class FastJetBuild(setuptools.command.build_ext.build_ext):
     def build_extensions(self):
         if not os.path.exists(self.build_temp):
@@ -64,11 +57,10 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
 
             with zipfile.ZipFile(zip_filename) as zip_obj:
                 cgal_dirname = zip_obj.namelist()[0]
-                print(f"Unzipping {zip_filename} to {cgal_dirname}")  # noqa T001
+                print(  # noqa T001
+                    f"Unzipping {zip_filename} to {str(DIR / cgal_dirname)}"
+                )
                 zip_obj.extractall(DIR)
-
-            print(f"Listing of {str(DIR / cgal_dirname)}")  # noqa T001
-            tree(str(DIR / cgal_dirname))
 
             env = os.environ.copy()
             env["NOCONFIGURE"] = "1"
@@ -84,9 +76,9 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
             args = [
                 f"--prefix={PYTHON / '_fastjet_core'}",
                 "--enable-allplugins",
-                "--enable-cgal",
-                "--enable-cgal-header-only",
-                f"--with-cgaldir={DIR / cgal_dirname}",
+                # "--enable-cgal",
+                # "--enable-cgal-header-only",
+                # f"--with-cgaldir={DIR / cgal_dirname}",
                 "--enable-swig",
                 "--enable-pyext",
             ]
