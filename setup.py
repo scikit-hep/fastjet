@@ -62,6 +62,20 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
                 )
                 zip_obj.extractall(DIR)
 
+            subprocess.run(
+                [
+                    "ls",
+                    "-l",
+                    str(
+                        DIR
+                        / cgal_dirname
+                        / "include"
+                        / "CGAL"
+                        / "Exact_predicates_inexact_constructions_kernel.h"
+                    ),
+                ]
+            )
+
             env = os.environ.copy()
             env["NOCONFIGURE"] = "1"
             env["PYTHON"] = sys.executable
@@ -70,22 +84,24 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
             if sys.platform.startswith("darwin"):
                 env["FC"] = "gfortran"
 
-            print("Running ./autogen.sh")  # noqa T001
-            subprocess.run(["./autogen.sh"], cwd=FASTJET, env=env, check=True)
+            print("Running autogen.sh")  # noqa T001
+            subprocess.run([str(DIR / "autogen.sh")], cwd=FASTJET, env=env, check=True)
 
             args = [
-                f"--prefix={PYTHON / '_fastjet_core'}",
+                f"--prefix={str(PYTHON / '_fastjet_core')}",
                 "--enable-allplugins",
-                # "--enable-cgal",
-                # "--enable-cgal-header-only",
-                # f"--with-cgaldir={DIR / cgal_dirname}",
+                "--enable-cgal",
+                "--enable-cgal-header-only",
+                f"--with-cgaldir={str(DIR / cgal_dirname)}",
                 "--enable-swig",
                 "--enable-pyext",
             ]
-            print("Running ./configure " + " ".join(args))  # noqa T001
-            subprocess.run(["./configure"] + args, cwd=FASTJET, check=True, env=env)
+            print("Running configure " + " ".join(args))  # noqa T001
+            subprocess.run(
+                [str(DIR / "configure")] + args, cwd=FASTJET, check=True, env=env
+            )
 
-            subprocess.run(["make"], cwd=FASTJET, check=True)
+            subprocess.run(["make", "-O3", "-j"], cwd=FASTJET, check=True)
             subprocess.run(["make", "install"], cwd=FASTJET, check=True)
 
             for pythondir in glob.glob(
