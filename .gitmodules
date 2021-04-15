@@ -1,5 +1,5 @@
 [submodule "fastjet"]
-	path = fastjet
+	path = fastjet-core
 	url = https://gitlab.com/fastjet/fastjet.git
 [submodule "pybind11"]
 	path = pybind11
