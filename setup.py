@@ -80,12 +80,12 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
             env["NOCONFIGURE"] = "1"
             env["PYTHON"] = sys.executable
             env["PYTHON_INCLUDE"] = f'-I{sysconfig.get_path("include")}'
-            env["CXXFLAGS"] = "-Bstatic -lgmp -lgfortran -Bdynamic"
+            env["CXXFLAGS"] = "-O3 -Bstatic -lgmp -lgfortran -Bdynamic"
             if sys.platform.startswith("darwin"):
                 env["FC"] = "gfortran"
 
             print("Running autogen.sh")  # noqa T001
-            subprocess.run([str(FASTJET / "autogen.sh")], cwd=FASTJET, env=env, check=True)
+            subprocess.run(["./autogen.sh"], cwd=FASTJET, env=env, check=True)
 
             args = [
                 f"--prefix={str(PYTHON / '_fastjet_core')}",
@@ -98,10 +98,10 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
             ]
             print("Running configure " + " ".join(args))  # noqa T001
             subprocess.run(
-                [str(FASTJET / "configure")] + args, cwd=FASTJET, check=True, env=env
+                ["./configure"] + args, cwd=FASTJET, check=True, env=env
             )
 
-            subprocess.run(["make", "-O3", "-j"], cwd=FASTJET, check=True)
+            subprocess.run(["make", "-j"], cwd=FASTJET, check=True)
             subprocess.run(["make", "install"], cwd=FASTJET, check=True)
 
             for pythondir in glob.glob(
