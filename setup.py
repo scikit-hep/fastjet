@@ -67,7 +67,8 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
                 print(f"Unzipping {zip_filename} to {cgal_dirname}")  # noqa T001
                 zip_obj.extractall(DIR)
 
-            tree(cgal_dirname)
+            print(f"Listing of {str(DIR / cgal_dirname)}")  # noqa T001
+            tree(str(DIR / cgal_dirname))
 
             env = os.environ.copy()
             env["NOCONFIGURE"] = "1"
@@ -77,24 +78,22 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
             if sys.platform.startswith("darwin"):
                 env["FC"] = "gfortran"
 
+            print("Running ./autogen.sh")  # noqa T001
             subprocess.run(["./autogen.sh"], cwd=FASTJET, env=env, check=True)
-            subprocess.run(
-                [
-                    "./configure",
-                    f"--prefix={PYTHON / '_fastjet_core'}",
-                    "--enable-allplugins",
-                    "--enable-cgal",
-                    "--enable-cgal-header-only",
-                    f"--with-cgaldir={DIR / cgal_dirname}",
-                    "--enable-swig",
-                    "--enable-pyext",
-                ],
-                cwd=FASTJET,
-                check=True,
-                env=env,
-            )
 
-            subprocess.run(["make", "all", "-j"], cwd=FASTJET, check=True)
+            args = [
+                f"--prefix={PYTHON / '_fastjet_core'}",
+                "--enable-allplugins",
+                "--enable-cgal",
+                "--enable-cgal-header-only",
+                f"--with-cgaldir={DIR / cgal_dirname}",
+                "--enable-swig",
+                "--enable-pyext",
+            ]
+            print("Running ./configure " + " ".join(args))  # noqa T001
+            subprocess.run(["./configure"] + args, cwd=FASTJET, check=True, env=env)
+
+            subprocess.run(["make"], cwd=FASTJET, check=True)
             subprocess.run(["make", "install"], cwd=FASTJET, check=True)
 
             for pythondir in glob.glob(
