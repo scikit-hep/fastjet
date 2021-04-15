@@ -1,3 +1,6 @@
-include fastjet
-include pybind11
+graft fastjet
+graft pybind11
+graft src
+graft tests
 include LICENSE README.md pyproject.toml setup.py setup.cfg
+global-exclude .git .gitmodules
