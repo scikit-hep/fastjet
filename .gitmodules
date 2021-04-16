@@ -1,8 +1,5 @@
-[submodule "cgal"]
-	path = cgal
-	url = https://github.com/CGAL/cgal.git
 [submodule "fastjet"]
-	path = fastjet
+	path = fastjet-core
 	url = https://gitlab.com/fastjet/fastjet.git
 [submodule "pybind11"]
 	path = pybind11
