@@ -92,9 +92,9 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
             args = [
                 f"--prefix={str(PYTHON / '_fastjet_core')}",
                 "--enable-allplugins",
-                "--enable-cgal",
-                "--enable-cgal-header-only",
-                f"--with-cgaldir={str(DIR / cgal_dirname)}",
+                # "--enable-cgal",
+                # "--enable-cgal-header-only",
+                # f"--with-cgaldir={str(DIR / cgal_dirname)}",
                 "--enable-swig",
                 "--enable-pyext",
             ]
