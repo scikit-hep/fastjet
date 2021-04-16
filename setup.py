@@ -31,7 +31,6 @@ import setuptools.command.install
 CGAL_ZIP = (
     "https://github.com/CGAL/cgal/releases/download/v5.2.1/CGAL-5.2.1-library.zip"
 )
-cgal_dirname = "CGAL-5.2.1"
 
 DIR = pathlib.Path(__file__).parent.resolve()
 FASTJET = DIR / "fastjet-core"
@@ -53,39 +52,17 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
         if not (PYTHON / "_fastjet_core").exists():
             zip_filename = DIR / pathlib.Path(CGAL_ZIP).parts[-1]
 
-            # with urllib.request.urlopen(CGAL_ZIP) as http_obj:
-            #     print(f"Downloading {CGAL_ZIP} to {zip_filename}")  # noqa T001
-            #     with open(zip_filename, "wb") as file_obj:
-            #         shutil.copyfileobj(http_obj, file_obj)
+            with urllib.request.urlopen(CGAL_ZIP) as http_obj:
+                print(f"Downloading {CGAL_ZIP} to {zip_filename}")  # noqa T001
+                with open(zip_filename, "wb") as file_obj:
+                    shutil.copyfileobj(http_obj, file_obj)
 
-            print(f"Downloading {CGAL_ZIP} to {zip_filename}")  # noqa T001
-            subprocess.run(["wget", CGAL_ZIP], cwd=DIR, check=True)
-
-            # with zipfile.ZipFile(zip_filename) as zip_obj:
-            #     cgal_dirname = zip_obj.namelist()[0]
-            #     print(  # noqa T001
-            #         f"Unzipping {zip_filename} to {str(DIR / cgal_dirname)}"
-            #     )
-            #     zip_obj.extractall(DIR)
-
-            print(f"Unzipping {zip_filename} to {str(DIR / cgal_dirname)}")  # noqa T001
-            subprocess.run(["unzip", str(zip_filename)], cwd=DIR, check=True)
-
-            subprocess.run(
-                [
-                    "chmod",
-                    "664",
-                    str(
-                        DIR
-                        / cgal_dirname
-                        / "include"
-                        / "CGAL"
-                        / "Exact_predicates_inexact_constructions_kernel.h"
-                    ),
-                ],
-                cwd=DIR,
-                check=True,
-            )
+            with zipfile.ZipFile(zip_filename) as zip_obj:
+                cgal_dirname = zip_obj.namelist()[0]
+                print(  # noqa T001
+                    f"Unzipping {zip_filename} to {str(DIR / cgal_dirname)}"
+                )
+                zip_obj.extractall(DIR)
 
             subprocess.run(
                 [
