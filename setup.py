@@ -20,11 +20,13 @@ import shutil
 import subprocess
 import sys
 import sysconfig
-import urllib.request
-import zipfile
 
 import setuptools.command.build_ext
 import setuptools.command.install
+
+# import urllib.request
+# import zipfile
+
 
 CGAL_ZIP = (
     "https://github.com/CGAL/cgal/releases/download/v5.2.1/CGAL-5.2.1-library.zip"
@@ -99,14 +101,12 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
                 "--enable-allplugins",
                 "--enable-cgal",
                 "--enable-cgal-header-only",
-                f"--with-cgaldir={str(DIR / cgal_dirname)}",
+                "--with-cgaldir=wacky",  # f"--with-cgaldir={str(DIR / cgal_dirname)}",
                 "--enable-swig",
                 "--enable-pyext",
             ]
             print("Running configure " + " ".join(args))  # noqa T001
-            subprocess.run(
-                ["./configure"] + args, cwd=FASTJET, check=True, env=env
-            )
+            subprocess.run(["./configure"] + args, cwd=FASTJET, check=True, env=env)
 
             subprocess.run(["make", "-j"], cwd=FASTJET, check=True)
             subprocess.run(["make", "install"], cwd=FASTJET, check=True)
