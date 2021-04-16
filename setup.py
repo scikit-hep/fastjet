@@ -148,6 +148,9 @@ ext_modules = [
         "fastjet._ext",
         ["src/_ext.cpp"],
         cxx_std=11,
+        include_dirs=[str(PYTHON / "_fastjet_core" / "include")],
+        library_dirs=[str(PYTHON / "_fastjet_core" / "lib")],
+        libraries=["fastjet"],
     ),
 ]
 
