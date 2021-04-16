@@ -72,7 +72,19 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
             subprocess.run(["unzip", str(zip_filename)], cwd=DIR, check=True)
 
             subprocess.run(
-                ["chmod", "-R", "+w", str(DIR / cgal_dirname)], cwd=DIR, check=True
+                [
+                    "chmod",
+                    "+w",
+                    str(
+                        DIR
+                        / cgal_dirname
+                        / "include"
+                        / "CGAL"
+                        / "Exact_predicates_inexact_constructions_kernel.h"
+                    ),
+                ],
+                cwd=DIR,
+                check=True,
             )
 
             subprocess.run(
