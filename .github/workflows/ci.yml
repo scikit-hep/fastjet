@@ -48,9 +48,6 @@ jobs:
       if: runner.os == 'macOS'
       run: brew install automake gcc swig
 
-    - name: Check automake, autoconf versions
-      run: automake --version ; autoconf --version
-
     - name: Install package
       run: python -m pip install .[test] -v
 

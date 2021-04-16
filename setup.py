@@ -20,13 +20,11 @@ import shutil
 import subprocess
 import sys
 import sysconfig
+import urllib.request
+import zipfile
 
 import setuptools.command.build_ext
 import setuptools.command.install
-
-# import urllib.request
-# import zipfile
-
 
 CGAL_ZIP = (
     "https://github.com/CGAL/cgal/releases/download/v5.2.1/CGAL-5.2.1-library.zip"
