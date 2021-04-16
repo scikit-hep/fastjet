@@ -74,7 +74,7 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
             subprocess.run(
                 [
                     "chmod",
-                    "+w",
+                    "664",
                     str(
                         DIR
                         / cgal_dirname
