@@ -72,6 +72,10 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
             subprocess.run(["unzip", str(zip_filename)], cwd=DIR, check=True)
 
             subprocess.run(
+                ["chmod", "-R", "+w", str(DIR / cgal_dirname)], cwd=DIR, check=True
+            )
+
+            subprocess.run(
                 [
                     "ls",
                     "-l",
@@ -82,7 +86,9 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
                         / "CGAL"
                         / "Exact_predicates_inexact_constructions_kernel.h"
                     ),
-                ]
+                ],
+                cwd=DIR,
+                check=True,
             )
 
             env = os.environ.copy()
@@ -101,7 +107,7 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
                 "--enable-allplugins",
                 "--enable-cgal",
                 "--enable-cgal-header-only",
-                "--with-cgaldir=wacky",  # f"--with-cgaldir={str(DIR / cgal_dirname)}",
+                f"--with-cgaldir={str(DIR / cgal_dirname)}",
                 "--enable-swig",
                 "--enable-pyext",
             ]
