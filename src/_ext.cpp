@@ -12,18 +12,52 @@
 #include <pybind11/stl.h>
 
 namespace fj = fastjet;
-
+using namespace std;
 namespace py = pybind11;
 
-void interface(){
+void interface(py::array_t<float> xs, double Rv ){
+  
+    py::buffer_info info = xs.request(); 	// requesting buffer information of the input
+    auto ptr = static_cast<float *>(info.ptr);	// pointer to the initial value
+    vector<int> dims;				// the dimensions of the input array
+    int n = 1;
+    vector<vector<float>> grid = {{1,2,3},{1,2,3}};
+    grid.clear();
+    vector <float> too;   
+
+    for (auto r: info.shape) {
+      dims.push_back(r);
+      n *= r;					// total number of elements
+    }
+      
+    for (int i = 0; i < dims[0]; i++) { 
+        // Vector to store column elements 
+        vector <float> too; 
+  
+        for (int j = 0; j < dims[1]; j++) { 
+            too.push_back(*ptr); 
+            ptr++; 
+        } 
+  
+        // Pushing back above 1D vector 
+        // to create the 2D vector 
+        grid.push_back(too); 
+    } 
+   //for(int i = 0; i <dims[0]; i++){  //for debugging
+    //for(int j = 0; j <dims[1]; j++){
+    //	std::cout<<grid[i][j];
+    //}
+   //} 
   std::vector<fj::PseudoJet> particles;
   // an event with three particles:    px    py  pz      E
-  particles.push_back(fj::PseudoJet( 99.0,  0.1,  0, 100.0));
-  particles.push_back(fj::PseudoJet(  4.0, -0.1,  0,   5.0));
-  particles.push_back(fj::PseudoJet(-99.0,    0,  0,  99.0));
-
+  for(int i = 0; i < dims[0]; i++){
+  particles.push_back(fj::PseudoJet( grid[i][0],  grid[i][1],  grid[i][2], grid[i][3]));
+  }
+  for(int i = 0; i < dims[0]; i++){
+  std::cout<<particles[i][0]<<" "<<particles[i][1]<<" "<<particles[i][2]<<" "<<particles[i][3]<<endl;
+  }
   // choose a jet definition
-  double R = 0.8;
+  double R = Rv;
   fj::JetDefinition jet_def(fj::antikt_algorithm, R);
 
   // run the clustering, extract the jets
