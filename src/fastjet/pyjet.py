@@ -19,4 +19,4 @@ class cluster:
             .view(np.float32)
             .reshape(-1, 4)
         )
-        fastjet._ext.interface(data, R)
+        self.out = fastjet._ext.interface(data, R)

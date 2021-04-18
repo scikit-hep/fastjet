@@ -15,7 +15,7 @@ namespace fj = fastjet;
 using namespace std;
 namespace py = pybind11;
 
-void interface(py::array_t<float> xs, double Rv ){
+std::map<string,vector<float>> interface(py::array_t<float> xs, double Rv ){
   
     py::buffer_info info = xs.request(); 	// requesting buffer information of the input
     auto ptr = static_cast<float *>(info.ptr);	// pointer to the initial value
@@ -66,18 +66,34 @@ void interface(py::array_t<float> xs, double Rv ){
 
   // print out some infos
   std::cout << "Clustering with " << jet_def.description() << std::endl;
-
+  std::vector<float> pt;
+  std::vector<float> rap;
+  std::vector<float> phi;
+  std::vector<float> constpt;
+  std::vector<float> constrap;
+  std::vector<float> constphi;
+  std::vector<float> idx;
   // print the jets
   std::cout <<   "        pt y phi" << std::endl;
   for (unsigned int i = 0;  i < jets.size();  i++) {
     std::cout << "jet " << i << ": " << jets[i].pt() << " "
               << jets[i].rap() << " " << jets[i].phi() << std::endl;
+    pt.push_back(jets[i].pt());rap.push_back(jets[i].rap());phi.push_back(jets[i].phi());
     std::vector<fj::PseudoJet> constituents = jets[i].constituents();
-    for (unsigned int j = 0;  j < constituents.size();  j++) {
+    unsigned int j;
+    for (j = 0;  j < constituents.size();  j++) {
       std::cout << "    constituents " << j << "'s pt: " << constituents[j].pt()
                 << std::endl;
+    constpt.push_back(constituents[j].pt());constrap.push_back(constituents[j].rap());constphi.push_back(constituents[j].phi());
+    }
+    if (idx.size() == 0){
+    idx.push_back(j);}
+    else{
+    idx.push_back(j+idx[idx.size()-1]);
     }
   }
+  std::map<string,vector<float>> out = {{"pt",pt},{"rap",rap},{"phi",phi},{"constpt",constpt},{"constrap",constrap},{"constphi",constphi},{"idx",idx}};
+  return out;
 }
 
 PYBIND11_MODULE(_ext, m) {
