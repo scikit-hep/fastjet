@@ -6,7 +6,7 @@ __all__ = ("__version__",)
 
 
 class cluster:
-    def __init__(self, data, R):
+    def __init__(self, data, R, algor):
         data = (
             data.astype(
                 [
@@ -19,4 +19,4 @@ class cluster:
             .view(np.float32)
             .reshape(-1, 4)
         )
-        self.out = fastjet._ext.interface(data, R)
+        self.out = fastjet._ext.interface(data, R, algor)

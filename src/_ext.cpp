@@ -15,7 +15,7 @@ namespace fj = fastjet;
 using namespace std;
 namespace py = pybind11;
 
-std::map<string,vector<float>> interface(py::array_t<float> xs, double Rv ){
+std::map<string,vector<float>> interface(py::array_t<float> xs, double Rv, string algor ){
   
     py::buffer_info info = xs.request(); 	// requesting buffer information of the input
     auto ptr = static_cast<float *>(info.ptr);	// pointer to the initial value
@@ -58,14 +58,9 @@ std::map<string,vector<float>> interface(py::array_t<float> xs, double Rv ){
   }
   // choose a jet definition
   double R = Rv;
-  fj::JetDefinition jet_def(fj::antikt_algorithm, R);
-
-  // run the clustering, extract the jets
-  fj::ClusterSequence cs(particles, jet_def);
-  std::vector<fj::PseudoJet> jets = fj::sorted_by_pt(cs.inclusive_jets());
-
-  // print out some infos
-  std::cout << "Clustering with " << jet_def.description() << std::endl;
+  string algo = algor;
+  std::vector<fj::PseudoJet> jets;
+  //fj::JetDefinition jet_def;
   std::vector<float> pt;
   std::vector<float> rap;
   std::vector<float> phi;
@@ -73,8 +68,19 @@ std::map<string,vector<float>> interface(py::array_t<float> xs, double Rv ){
   std::vector<float> constrap;
   std::vector<float> constphi;
   std::vector<float> idx;
-  // print the jets
-  std::cout <<   "        pt y phi" << std::endl;
+  
+  
+  
+  
+  if(algo.compare("antikt_algorithm")==0){
+  fj::JetDefinition jet_def(fj::antikt_algorithm, R);
+
+  // run the clustering, extract the jets
+  fj::ClusterSequence cs(particles, jet_def);
+  
+  jets = fj::sorted_by_pt(cs.inclusive_jets());
+  std::cout << "Clustering with " << jet_def.description() << std::endl;
+    std::cout <<   "        pt y phi" << std::endl;
   for (unsigned int i = 0;  i < jets.size();  i++) {
     std::cout << "jet " << i << ": " << jets[i].pt() << " "
               << jets[i].rap() << " " << jets[i].phi() << std::endl;
@@ -92,6 +98,85 @@ std::map<string,vector<float>> interface(py::array_t<float> xs, double Rv ){
     idx.push_back(j+idx[idx.size()-1]);
     }
   }
+  }
+  
+  
+  
+  
+  if(algo.compare("kt_algorithm")==0){
+  
+  fj::JetDefinition jet_def(fj::kt_algorithm, R);
+
+  // run the clustering, extract the jets
+  fj::ClusterSequence cs(particles, jet_def);
+  
+  jets = fj::sorted_by_pt(cs.inclusive_jets());
+  std::cout << "Clustering with " << jet_def.description() << std::endl;
+  }
+  if(algo.compare("cambridge_algorithm")==0){
+  
+  fj::JetDefinition jet_def(fj::cambridge_algorithm, R);
+
+  // run the clustering, extract the jets
+  fj::ClusterSequence cs(particles, jet_def);
+  
+  jets = fj::sorted_by_pt(cs.inclusive_jets());
+  std::cout << "Clustering with " << jet_def.description() << std::endl;
+    std::cout <<   "        pt y phi" << std::endl;
+  for (unsigned int i = 0;  i < jets.size();  i++) {
+    std::cout << "jet " << i << ": " << jets[i].pt() << " "
+              << jets[i].rap() << " " << jets[i].phi() << std::endl;
+    pt.push_back(jets[i].pt());rap.push_back(jets[i].rap());phi.push_back(jets[i].phi());
+    std::vector<fj::PseudoJet> constituents = jets[i].constituents();
+    unsigned int j;
+    for (j = 0;  j < constituents.size();  j++) {
+      std::cout << "    constituents " << j << "'s pt: " << constituents[j].pt()
+                << std::endl;
+    constpt.push_back(constituents[j].pt());constrap.push_back(constituents[j].rap());constphi.push_back(constituents[j].phi());
+    }
+    if (idx.size() == 0){
+    idx.push_back(j);}
+    else{
+    idx.push_back(j+idx[idx.size()-1]);
+    }
+  }
+  }
+  
+  
+  
+  if(algo.compare("ee_kt_algorithm")==0){
+  fj::JetDefinition jet_def(fj::ee_kt_algorithm);
+
+  // run the clustering, extract the jets
+  fj::ClusterSequence cs(particles, jet_def);
+  
+  jets = fj::sorted_by_pt(cs.inclusive_jets());
+  std::cout << "Clustering with " << jet_def.description() << std::endl;
+    std::cout <<   "        pt y phi" << std::endl;
+  for (unsigned int i = 0;  i < jets.size();  i++) {
+    std::cout << "jet " << i << ": " << jets[i].pt() << " "
+              << jets[i].rap() << " " << jets[i].phi() << std::endl;
+    pt.push_back(jets[i].pt());rap.push_back(jets[i].rap());phi.push_back(jets[i].phi());
+    std::vector<fj::PseudoJet> constituents = jets[i].constituents();
+    unsigned int j;
+    for (j = 0;  j < constituents.size();  j++) {
+      std::cout << "    constituents " << j << "'s pt: " << constituents[j].pt()
+                << std::endl;
+    constpt.push_back(constituents[j].pt());constrap.push_back(constituents[j].rap());constphi.push_back(constituents[j].phi());
+    }
+    if (idx.size() == 0){
+    idx.push_back(j);}
+    else{
+    idx.push_back(j+idx[idx.size()-1]);
+    }
+  }
+  }
+  
+  // print out some infos
+  
+
+  // print the jets
+
   std::map<string,vector<float>> out = {{"pt",pt},{"rap",rap},{"phi",phi},{"constpt",constpt},{"constrap",constrap},{"constphi",constphi},{"idx",idx}};
   return out;
 }
