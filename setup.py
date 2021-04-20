@@ -9,12 +9,7 @@ from setuptools import setup  # isort:skip
 # Available at setup time due to pyproject.toml
 from pybind11.setup_helpers import Pybind11Extension  # isort:skip
 
-# Note:
-#   Sort input source files if you glob sources to ensure bit-for-bit
-#   reproducible builds (https://github.com/pybind/python_example/pull/53)
-
-import glob
-import os.path
+import os
 import pathlib
 import shutil
 import subprocess
@@ -32,87 +27,56 @@ CGAL_ZIP = (
 
 DIR = pathlib.Path(__file__).parent.resolve()
 FASTJET = DIR / "fastjet-core"
-PYTHON = DIR / "src" / "fastjet"
+PYTHON = DIR / "src/fastjet"
+OUTPUT = PYTHON / "_fastjet_core"
 
 
-def get_version():
+def get_version() -> str:
     g = {}
-    with open(os.path.join("src", "fastjet", "version.py")) as f:
+    with open(PYTHON / "version.py") as f:
         exec(f.read(), g)
     return g["__version__"]
 
 
 class FastJetBuild(setuptools.command.build_ext.build_ext):
     def build_extensions(self):
-        if not os.path.exists(self.build_temp):
-            os.makedirs(self.build_temp)
-
-        if not (PYTHON / "_fastjet_core").exists():
+        if not OUTPUT.exists():
             zip_filename = DIR / pathlib.Path(CGAL_ZIP).parts[-1]
 
             with urllib.request.urlopen(CGAL_ZIP) as http_obj:
-                print(f"Downloading {CGAL_ZIP} to {zip_filename}")  # noqa T001
                 with open(zip_filename, "wb") as file_obj:
                     shutil.copyfileobj(http_obj, file_obj)
 
             with zipfile.ZipFile(zip_filename) as zip_obj:
-                cgal_dirname = zip_obj.namelist()[0]
-                print(  # noqa T001
-                    f"Unzipping {zip_filename} to {str(DIR / cgal_dirname)}"
-                )
+                # cgal_dir = DIR / zip_obj.namelist()[0]
                 zip_obj.extractall(DIR)
 
-            subprocess.run(
-                [
-                    "ls",
-                    "-l",
-                    str(
-                        DIR
-                        / cgal_dirname
-                        / "include"
-                        / "CGAL"
-                        / "Exact_predicates_inexact_constructions_kernel.h"
-                    ),
-                ],
-                cwd=DIR,
-                check=True,
-            )
-
             env = os.environ.copy()
-            env["NOCONFIGURE"] = "1"
             env["PYTHON"] = sys.executable
             env["PYTHON_INCLUDE"] = f'-I{sysconfig.get_path("include")}'
             env["CXXFLAGS"] = "-O3 -Bstatic -lgmp -lgfortran -Bdynamic"
             if sys.platform.startswith("darwin"):
                 env["FC"] = "gfortran"
 
-            print("Running autogen.sh")  # noqa T001
-            subprocess.run(["./autogen.sh"], cwd=FASTJET, env=env, check=True)
-
             args = [
-                f"--prefix={str(PYTHON / '_fastjet_core')}",
+                f"--prefix={OUTPUT}",
                 "--enable-allplugins",
                 # "--enable-cgal",
                 # "--enable-cgal-header-only",
-                # f"--with-cgaldir={str(DIR / cgal_dirname)}",
+                # f"--with-cgaldir={cgal_dir}",
                 "--enable-swig",
                 "--enable-pyext",
             ]
-            print("Running configure " + " ".join(args))  # noqa T001
-            subprocess.run(["./configure"] + args, cwd=FASTJET, check=True, env=env)
+
+            subprocess.run(["./autogen.sh"] + args, cwd=FASTJET, env=env, check=True)
 
             subprocess.run(["make", "-j"], cwd=FASTJET, check=True)
             subprocess.run(["make", "install"], cwd=FASTJET, check=True)
 
-            for pythondir in glob.glob(
-                str(PYTHON / "_fastjet_core" / "lib" / "python*")
-            ):
-                pythondir = pathlib.Path(pythondir)
-                shutil.copyfile(
-                    pythondir / "site-packages" / "fastjet.py", PYTHON / "_swig.py"
-                )
-                for sharedobj in glob.glob(str(pythondir / "site-packages" / "*.so*")):
-                    sharedobj = pathlib.Path(sharedobj)
+            for pythondir in (OUTPUT / "lib").glob("python*"):
+                sitepackages = pythondir / "site-packages"
+                shutil.copyfile(sitepackages / "fastjet.py", PYTHON / "_swig.py")
+                for sharedobj in sitepackages.glob("*.so*"):
                     shutil.copyfile(sharedobj, PYTHON / sharedobj.parts[-1])
 
         setuptools.command.build_ext.build_ext.build_extensions(self)
@@ -120,24 +84,18 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
 
 class FastJetInstall(setuptools.command.install.install):
     def run(self):
-        outerdir = pathlib.Path(
-            f"build/lib.{sysconfig.get_platform()}-{'.'.join(map(str, sys.version_info[0:2]))}"
-        )
+        version = ".".join(map(str, sys.version_info[:2]))
+        plat = sysconfig.get_platform()
+        fastjetdir = pathlib.Path(f"build/lib.{plat}-{version}/fastjet")
 
-        shutil.copytree(
-            PYTHON / "_fastjet_core", outerdir / "fastjet" / "_fastjet_core"
-        )
+        shutil.copytree(OUTPUT, fastjetdir / "_fastjet_core")
 
-        for pythondir in glob.glob(
-            str(outerdir / "fastjet" / "_fastjet_core" / "lib" / "python*")
-        ):
-            pythondir = pathlib.Path(pythondir)
-            (pythondir / "site-packages" / "fastjet.py").rename(
-                outerdir / "fastjet" / "_swig.py"
-            )
-            for sharedobj in glob.glob(str(pythondir / "site-packages" / "*.so*")):
-                sharedobj = pathlib.Path(sharedobj)
-                sharedobj.rename(outerdir / "fastjet" / sharedobj.parts[-1])
+        for pythondir in (fastjetdir / "_fastjet_core/lib").glob("python*"):
+            sitepackages = pythondir / "site-packages"
+            (sitepackages / "fastjet.py").rename(fastjetdir / "_swig.py")
+            for sharedobj in sitepackages.glob("*.so*"):
+                sharedobj.rename(fastjetdir / sharedobj.parts[-1])
+
             shutil.rmtree(pythondir)
 
         setuptools.command.install.install.run(self)
@@ -148,8 +106,8 @@ ext_modules = [
         "fastjet._ext",
         ["src/_ext.cpp"],
         cxx_std=11,
-        include_dirs=[str(PYTHON / "_fastjet_core" / "include")],
-        library_dirs=[str(PYTHON / "_fastjet_core" / "lib")],
+        include_dirs=[str(OUTPUT / "include")],
+        library_dirs=[str(OUTPUT / "lib")],
         libraries=["fastjet"],
     ),
 ]
