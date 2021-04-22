@@ -35,7 +35,7 @@ std::map<string,vector<float>> interface(py::array_t<float> xs, double Rv, strin
         vector <float> too; 
   
         for (int j = 0; j < dims[1]; j++) { 
-            too.push_back(*ptr); 
+            too.push_back(*ptr);
             ptr++; 
         } 
   
@@ -47,15 +47,18 @@ std::map<string,vector<float>> interface(py::array_t<float> xs, double Rv, strin
     //for(int j = 0; j <dims[1]; j++){
     //	std::cout<<grid[i][j];
     //}
-   //} 
+   //}
   std::vector<fj::PseudoJet> particles;
   // an event with three particles:    px    py  pz      E
   for(int i = 0; i < dims[0]; i++){
   particles.push_back(fj::PseudoJet( grid[i][0],  grid[i][1],  grid[i][2], grid[i][3]));
   }
+  std::cout<<"---------------------------------------------------------------"<<endl;
   for(int i = 0; i < dims[0]; i++){
-  std::cout<<particles[i][0]<<" "<<particles[i][1]<<" "<<particles[i][2]<<" "<<particles[i][3]<<endl;
+  std::cout<<particles[i].px()<<" "<<particles[i].py()<<" "<<particles[i].pz()<<" "<<particles[i].E()<<endl;
   }
+  std::cout<<endl;
+  cout<<"---------------------------------------------------------------------"<<endl;
   // choose a jet definition
   double R = Rv;
   string algo = algor;
@@ -68,7 +71,7 @@ std::map<string,vector<float>> interface(py::array_t<float> xs, double Rv, strin
   std::vector<float> constrap;
   std::vector<float> constphi;
   std::vector<float> idx;
-  
+  std::vector<float> idxo;
   
   
   
@@ -77,7 +80,13 @@ std::map<string,vector<float>> interface(py::array_t<float> xs, double Rv, strin
 
   // run the clustering, extract the jets
   fj::ClusterSequence cs(particles, jet_def);
-  
+  std::vector<int> input = cs.unique_history_order();
+  cout<<"----------------------------------------------------------"<<endl;
+   for (int i = 0; i < input.size(); i++) {
+        std::cout << input.at(i) << ' ';
+    }
+   cout<<endl;
+   cout<<"----------------------------------------------------------"<<endl; 
   jets = fj::sorted_by_pt(cs.inclusive_jets());
   std::cout << "Clustering with " << jet_def.description() << std::endl;
     std::cout <<   "        pt y phi" << std::endl;
@@ -87,11 +96,17 @@ std::map<string,vector<float>> interface(py::array_t<float> xs, double Rv, strin
     pt.push_back(jets[i].pt());rap.push_back(jets[i].rap());phi.push_back(jets[i].phi());
     std::vector<fj::PseudoJet> constituents = jets[i].constituents();
     unsigned int j;
+    
     for (j = 0;  j < constituents.size();  j++) {
-      std::cout << "    constituents " << j << "'s pt: " << constituents[j].pt()
+      std::cout << "    constituent " << j << " " << constituents[j].px() << constituents[j].py() << constituents[j].pz() << constituents[j].E()
                 << std::endl;
     constpt.push_back(constituents[j].pt());constrap.push_back(constituents[j].rap());constphi.push_back(constituents[j].phi());
-    }
+    for(auto k = 0; k <dims[0]; k++) {
+    	if(constituents[j].px() == particles[k].px() && constituents[j].py() == particles[k].py() && constituents[j].pz() == particles[k].pz() && constituents[j].E() == particles[k].E() ) {
+    		idxo.push_back(k);
+    		std::cout<<k;
+    	}
+    }    }
     if (idx.size() == 0){
     idx.push_back(j);}
     else{
@@ -120,7 +135,7 @@ std::map<string,vector<float>> interface(py::array_t<float> xs, double Rv, strin
   // run the clustering, extract the jets
   fj::ClusterSequence cs(particles, jet_def);
   
-  jets = fj::sorted_by_pt(cs.inclusive_jets());
+  jets = cs.inclusive_jets();
   std::cout << "Clustering with " << jet_def.description() << std::endl;
     std::cout <<   "        pt y phi" << std::endl;
   for (unsigned int i = 0;  i < jets.size();  i++) {
@@ -177,7 +192,7 @@ std::map<string,vector<float>> interface(py::array_t<float> xs, double Rv, strin
 
   // print the jets
 
-  std::map<string,vector<float>> out = {{"pt",pt},{"rap",rap},{"phi",phi},{"constpt",constpt},{"constrap",constrap},{"constphi",constphi},{"idx",idx}};
+  std::map<string,vector<float>> out = {{"pt",pt},{"rap",rap},{"phi",phi},{"constpt",constpt},{"constrap",constrap},{"constphi",constphi},{"idx",idx},{"idxo",idxo}};
   return out;
 }
 

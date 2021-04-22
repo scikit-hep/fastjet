@@ -10,7 +10,7 @@ class cluster:
         data = (
             data.astype(
                 [
-                    ("px", np.float64),
+                    ("px", np.float32),
                     ("py", np.float32),
                     ("pz", np.float32),
                     ("E", np.float32),
@@ -19,4 +19,5 @@ class cluster:
             .view(np.float32)
             .reshape(-1, 4)
         )
+        data = data.tolist()
         self.out = fastjet._ext.interface(data, R, algor)
