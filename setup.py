@@ -48,7 +48,7 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
                     shutil.copyfileobj(http_obj, file_obj)
 
             with zipfile.ZipFile(zip_filename) as zip_obj:
-                # cgal_dir = DIR / zip_obj.namelist()[0]
+                cgal_dir = DIR / zip_obj.namelist()[0]
                 zip_obj.extractall(DIR)
 
             env = os.environ.copy()
@@ -61,9 +61,9 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
             args = [
                 f"--prefix={OUTPUT}",
                 "--enable-allplugins",
-                # "--enable-cgal",
-                # "--enable-cgal-header-only",
-                # f"--with-cgaldir={cgal_dir}",
+                "--enable-cgal",
+                "--enable-cgal-header-only",
+                f"--with-cgaldir={cgal_dir}",
                 "--enable-swig",
                 "--enable-pyext",
             ]
