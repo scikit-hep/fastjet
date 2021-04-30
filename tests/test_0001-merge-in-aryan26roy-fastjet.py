@@ -1,10 +1,10 @@
 # BSD 3-Clause License; see https://github.com/scikit-hep/fastjet/blob/main/LICENSE
+import awkward as ak
+import numpy as np
 
 import fastjet
 import fastjet._ext
 import fastjet._swig
-import numpy as np
-import awkward as ak
 
 
 def test_swig_bindings():

@@ -1,6 +1,7 @@
-import fastjet._ext  # noqa: F401, E402
-import numpy as np
 import awkward as ak
+import numpy as np
+
+import fastjet._ext  # noqa: F401, E402
 from fastjet.version import __version__  # noqa: E402
 
 __all__ = ("__version__",)
