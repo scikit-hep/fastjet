@@ -2,6 +2,7 @@
 
 import ctypes
 import pathlib
+
 import numpy as np
 
 _fastjet_core = pathlib.Path(__file__).parent.resolve() / "_fastjet_core" / "lib"
