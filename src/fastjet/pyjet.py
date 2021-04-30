@@ -1,6 +1,5 @@
 import awkward as ak
 
-# import numpy as np
 
 import fastjet._ext  # noqa: F401, E402
 from fastjet.version import __version__  # noqa: E402
@@ -66,7 +65,7 @@ class AwkwardClusterSequence:
 
 """
         self.out = fastjet._ext.interface(px, py, pz, E, R, algor)
-        length = self.out["nevents"]
+        # length = self.out["nevents"]
         # self.out.pop("nevents")
         # for key in self.out:
         # self.out[key] = np.asarray(self.out[key], dtype = "float64")
