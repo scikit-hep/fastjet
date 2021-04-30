@@ -1,6 +1,7 @@
 # BSD 3-Clause License; see https://github.com/scikit-hep/fastjet/blob/main/LICENSE
 import awkward as ak
-import numpy as np
+
+# import numpy as np
 
 import fastjet
 import fastjet._ext

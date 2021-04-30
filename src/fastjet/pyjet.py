@@ -1,5 +1,6 @@
 import awkward as ak
-import numpy as np
+
+# import numpy as np
 
 import fastjet._ext  # noqa: F401, E402
 from fastjet.version import __version__  # noqa: E402
