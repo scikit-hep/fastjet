@@ -15,187 +15,221 @@ namespace fj = fastjet;
 using namespace std;
 namespace py = pybind11;
 
-std::map<string,vector<float>> interface(py::array_t<float> xs, double Rv, string algor ){
-  
-    py::buffer_info info = xs.request(); 	// requesting buffer information of the input
-    auto ptr = static_cast<float *>(info.ptr);	// pointer to the initial value
-    vector<int> dims;				// the dimensions of the input array
-    int n = 1;
-    vector<vector<float>> grid = {{1,2,3},{1,2,3}};
-    grid.clear();
-    vector <float> too;   
+std::map<string, vector<float>> interface(py::array_t<float, py::array::c_style | py::array::forcecast> pxi, py::array_t<float, py::array::c_style | py::array::forcecast> pyi, py::array_t<float, py::array::c_style | py::array::forcecast> pzi, py::array_t<float, py::array::c_style | py::array::forcecast> Ei, double Rv, string algor)
+{
+  // py::buffer_info infooff = offsets.request();
+  py::buffer_info infopx = pxi.request();
+  py::buffer_info infopy = pyi.request();  // requesting buffer information of the input
+  py::buffer_info infopz = pzi.request();
+  py::buffer_info infoE = Ei.request();
 
-    for (auto r: info.shape) {
-      dims.push_back(r);
-      n *= r;					// total number of elements
-    }
-      
-    for (int i = 0; i < dims[0]; i++) { 
-        // Vector to store column elements 
-        vector <float> too; 
-  
-        for (int j = 0; j < dims[1]; j++) { 
-            too.push_back(*ptr);
-            ptr++; 
-        } 
-  
-        // Pushing back above 1D vector 
-        // to create the 2D vector 
-        grid.push_back(too); 
-    } 
-   //for(int i = 0; i <dims[0]; i++){  //for debugging
-    //for(int j = 0; j <dims[1]; j++){
-    //	std::cout<<grid[i][j];
-    //}
-   //}
-  std::vector<fj::PseudoJet> particles;
-  // an event with three particles:    px    py  pz      E
-  for(int i = 0; i < dims[0]; i++){
-  particles.push_back(fj::PseudoJet( grid[i][0],  grid[i][1],  grid[i][2], grid[i][3]));
-  }
-  std::cout<<"---------------------------------------------------------------"<<endl;
-  for(int i = 0; i < dims[0]; i++){
-  std::cout<<particles[i].px()<<" "<<particles[i].py()<<" "<<particles[i].pz()<<" "<<particles[i].E()<<endl;
-  }
-  std::cout<<endl;
-  cout<<"---------------------------------------------------------------------"<<endl;
-  // choose a jet definition
-  double R = Rv;
-  string algo = algor;
-  std::vector<fj::PseudoJet> jets;
-  //fj::JetDefinition jet_def;
+  // auto offptr = static_cast<int *>(infooff.ptr);
+  auto pxptr = static_cast<float *>(infopx.ptr);
+  auto pyptr = static_cast<float *>(infopy.ptr);  // pointer to the initial value
+  auto pzptr = static_cast<float *>(infopz.ptr);
+  auto Eptr = static_cast<float *>(infoE.ptr);
+
+  // int dimoff = infooff.shape[0];
+  int dimpx = infopx.shape[0];
+  int dimpy = infopy.shape[0];
+  int dimpz = infopz.shape[0];
+  int dimE = infoE.shape[0];
+
+  // vector<int> dims;  // the dimensions of the input array
+  // int n = 1;
+  // vector<vector<float>> grid = {{1,2,3},{1,2,3}};
+  // grid.clear();
+  // vector <float> too;
+
+  // for (auto r: info.shape) {
+  // dims.push_back(r);
+  // n *= r;					// total number of elements
+  // }
+
+  // for (int i = 0; i < dims[0]; i++) {
+  // Vector to store column elements
+  // vector <float> too;
+  // for (int j = 0; j < dims[1]; j++) {
+  // too.push_back(*ptr);
+  // ptr++;
+
+  // }
+  // Pushing back above 1D vector
+  // to create the 2D vector
+  // grid.push_back(too);
+  // }
+  // for(int i = 0; i <dims[0]; i++){  //for debugging
+  // for(int j = 0; j <dims[1]; j++){
+  // std::cout<<grid[i][j];
+  // }
+  // }
+
   std::vector<float> pt;
   std::vector<float> rap;
   std::vector<float> phi;
-  std::vector<float> constpt;
-  std::vector<float> constrap;
+  std::vector<float> nevents;
+  std::vector<float> offidx;
   std::vector<float> constphi;
   std::vector<float> idx;
   std::vector<float> idxo;
-  
-  
-  
-  if(algo.compare("antikt_algorithm")==0){
-  fj::JetDefinition jet_def(fj::antikt_algorithm, R);
 
-  // run the clustering, extract the jets
-  fj::ClusterSequence cs(particles, jet_def);
-  std::vector<int> input = cs.unique_history_order();
-  cout<<"----------------------------------------------------------"<<endl;
-   for (int i = 0; i < input.size(); i++) {
-        std::cout << input.at(i) << ' ';
+ // nevents.push_back(dimoff - 1);
+  //offidx.push_back(0);
+  //idx.push_back(0);
+  //for (int k = 0; k < dimoff - 1; k++)
+  //{
+    std::vector<fj::PseudoJet> particles;
+    // an event with three particles:    px    py  pz      E
+    //if(*offptr == *(offptr+1)){
+      //idx.push_back(idx[idx.size() - 1]);
+      //offptr++;
+      //continue;
+    //}
+    for (int i = 0; i < dimpx; i++) {
+      particles.push_back(fj::PseudoJet(*pxptr, *pyptr, *pzptr, *Eptr));
+      pxptr++;
+      pyptr++;
+      pzptr++;
+      Eptr++;
     }
-   cout<<endl;
-   cout<<"----------------------------------------------------------"<<endl; 
-  jets = fj::sorted_by_pt(cs.inclusive_jets());
-  std::cout << "Clustering with " << jet_def.description() << std::endl;
-    std::cout <<   "        pt y phi" << std::endl;
-  for (unsigned int i = 0;  i < jets.size();  i++) {
-    std::cout << "jet " << i << ": " << jets[i].pt() << " "
-              << jets[i].rap() << " " << jets[i].phi() << std::endl;
-    pt.push_back(jets[i].pt());rap.push_back(jets[i].rap());phi.push_back(jets[i].phi());
-    std::vector<fj::PseudoJet> constituents = jets[i].constituents();
-    unsigned int j;
-    
-    for (j = 0;  j < constituents.size();  j++) {
-      std::cout << "    constituent " << j << " " << constituents[j].px() << constituents[j].py() << constituents[j].pz() << constituents[j].E()
-                << std::endl;
-    constpt.push_back(constituents[j].pt());constrap.push_back(constituents[j].rap());constphi.push_back(constituents[j].phi());
-    for(auto k = 0; k <dims[0]; k++) {
-    	if(constituents[j].px() == particles[k].px() && constituents[j].py() == particles[k].py() && constituents[j].pz() == particles[k].pz() && constituents[j].E() == particles[k].E() ) {
-    		idxo.push_back(k);
-    		std::cout<<k;
-    	}
-    }    }
-    if (idx.size() == 0){
-    idx.push_back(j);}
-    else{
-    idx.push_back(j+idx[idx.size()-1]);
-    }
-  }
-  }
-  
-  
-  
-  
-  if(algo.compare("kt_algorithm")==0){
-  
-  fj::JetDefinition jet_def(fj::kt_algorithm, R);
+    //offptr++;
 
-  // run the clustering, extract the jets
-  fj::ClusterSequence cs(particles, jet_def);
-  
-  jets = fj::sorted_by_pt(cs.inclusive_jets());
-  std::cout << "Clustering with " << jet_def.description() << std::endl;
-  }
-  if(algo.compare("cambridge_algorithm")==0){
-  
-  fj::JetDefinition jet_def(fj::cambridge_algorithm, R);
 
-  // run the clustering, extract the jets
-  fj::ClusterSequence cs(particles, jet_def);
-  
-  jets = cs.inclusive_jets();
-  std::cout << "Clustering with " << jet_def.description() << std::endl;
-    std::cout <<   "        pt y phi" << std::endl;
-  for (unsigned int i = 0;  i < jets.size();  i++) {
-    std::cout << "jet " << i << ": " << jets[i].pt() << " "
-              << jets[i].rap() << " " << jets[i].phi() << std::endl;
-    pt.push_back(jets[i].pt());rap.push_back(jets[i].rap());phi.push_back(jets[i].phi());
-    std::vector<fj::PseudoJet> constituents = jets[i].constituents();
-    unsigned int j;
-    for (j = 0;  j < constituents.size();  j++) {
-      std::cout << "    constituents " << j << "'s pt: " << constituents[j].pt()
-                << std::endl;
-    constpt.push_back(constituents[j].pt());constrap.push_back(constituents[j].rap());constphi.push_back(constituents[j].phi());
-    }
-    if (idx.size() == 0){
-    idx.push_back(j);}
-    else{
-    idx.push_back(j+idx[idx.size()-1]);
-    }
-  }
-  }
-  
-  
-  
-  if(algo.compare("ee_kt_algorithm")==0){
-  fj::JetDefinition jet_def(fj::ee_kt_algorithm);
+    // for(int i = *(offptr-1); i < *offptr; i++){
+    // std::cout<<particles[i].px()<<" "<<particles[i].py()<<" "<<particles[i].pz()<<" "<<particles[i].E()<<endl;
+    // }
 
-  // run the clustering, extract the jets
-  fj::ClusterSequence cs(particles, jet_def);
-  
-  jets = fj::sorted_by_pt(cs.inclusive_jets());
-  std::cout << "Clustering with " << jet_def.description() << std::endl;
-    std::cout <<   "        pt y phi" << std::endl;
-  for (unsigned int i = 0;  i < jets.size();  i++) {
-    std::cout << "jet " << i << ": " << jets[i].pt() << " "
-              << jets[i].rap() << " " << jets[i].phi() << std::endl;
-    pt.push_back(jets[i].pt());rap.push_back(jets[i].rap());phi.push_back(jets[i].phi());
-    std::vector<fj::PseudoJet> constituents = jets[i].constituents();
-    unsigned int j;
-    for (j = 0;  j < constituents.size();  j++) {
-      std::cout << "    constituents " << j << "'s pt: " << constituents[j].pt()
-                << std::endl;
-    constpt.push_back(constituents[j].pt());constrap.push_back(constituents[j].rap());constphi.push_back(constituents[j].phi());
+    // choose a jet definition
+    double R = Rv;
+    string algo = algor;
+    std::vector<fj::PseudoJet> jets;
+
+    if (algo.compare("antikt_algorithm") == 0) {
+      fj::JetDefinition jet_def(fj::antikt_algorithm, R);
+
+      // run the clustering, extract the jets
+      fj::ClusterSequence cs(particles, jet_def);
+      //std::vector<int> input = cs.unique_history_order();
+      //cout << "----------------------------------------------------------" << //endl;
+      // for (int i = 0; i < input.size(); i++) {
+      // std::cout << input.at(i) << ' ';
+      // }
+      //cout << endl;
+      //cout << "----------------------------------------------------------" << endl;
+      jets = fj::sorted_by_pt(cs.inclusive_jets());
+      std::cout << "Clustering with " << jet_def.description() << std::endl;
+      std::cout << "        pt y phi" << std::endl;
+      for (unsigned int i = 0; i < jets.size(); i++) {
+        std::cout << "jet " << i << ": " << jets[i].pt() << " "
+                  << jets[i].rap() << " " << jets[i].phi() << std::endl;
+        pt.push_back(jets[i].pt());
+        rap.push_back(jets[i].rap());
+        phi.push_back(jets[i].phi());
+        //std::vector<fj::PseudoJet> constituents = jets[i].constituents();
+        //unsigned int j;
+        //std::cout << constituents.size() << endl;
+        //for (j = 0; j < constituents.size(); j++) {
+          //std::cout << "    constituent " << j << " " << constituents[j].px() << constituents[j].py() << constituents[j].pz() << constituents[j].E() << std::endl;
+          //constpt.push_back(constituents[j].pt());
+          //constrap.push_back(constituents[j].rap());
+          //constphi.push_back(constituents[j].phi());
+          //for (auto k = 0; k < particles.size(); k++) {
+            //if (constituents[j].px() == particles[k].px() && constituents[j].py() == particles[k].py() && constituents[j].pz() == particles[k].pz() && constituents[j].E() == particles[k].E()) {
+              //idxo.push_back(k);
+              //std::cout << endl;
+              //std::cout << "---------------------------------------------------------------" << endl;
+              //std::cout << k;
+              //std::cout << endl;
+              //std::cout << "---------------------------------------------------------------" << endl;
+            //}
+          //}
+        //}
+        //offidx.push_back(idxo.size());
+        //if (idx.size() == 0)
+        //{
+          //idx.push_back(j);
+        //}
+        //else
+        //{
+          //idx.push_back(j + idx[idx.size() - 1]);
+        //}
+      }
     }
-    if (idx.size() == 0){
-    idx.push_back(j);}
-    else{
-    idx.push_back(j+idx[idx.size()-1]);
+
+
+  if (algo.compare("cambridge_algorithm") == 0) {
+      fj::JetDefinition jet_def(fj::cambridge_algorithm, R);
+
+      // run the clustering, extract the jets
+      fj::ClusterSequence cs(particles, jet_def);
+
+      jets = cs.inclusive_jets();
+      std::cout << "Clustering with " << jet_def.description() << std::endl;
+      std::cout << "        pt y phi" << std::endl;
+      for (unsigned int i = 0; i < jets.size(); i++) {
+        std::cout << "jet " << i << ": " << jets[i].pt() << " "
+                  << jets[i].rap() << " " << jets[i].phi() << std::endl;
+        pt.push_back(jets[i].pt());
+        rap.push_back(jets[i].rap());
+        phi.push_back(jets[i].phi());
+        std::vector<fj::PseudoJet> constituents = jets[i].constituents();
+        unsigned int j;
+        for (j = 0; j < constituents.size(); j++) {
+          std::cout << "    constituents " << j << "'s pt: " << constituents[j].pt()
+                    << std::endl;
+          //constpt.push_back(constituents[j].pt());
+          //constrap.push_back(constituents[j].rap());
+          //constphi.push_back(constituents[j].phi());
+        }
+        if (idx.size() == 0) {
+          idx.push_back(j);
+        } else {
+          idx.push_back(j + idx[idx.size() - 1]);
+        }
+      }
     }
-  }
-  }
-  
+
+    if (algo.compare("ee_kt_algorithm") == 0) {
+      fj::JetDefinition jet_def(fj::ee_kt_algorithm);
+
+      // run the clustering, extract the jets
+      fj::ClusterSequence cs(particles, jet_def);
+
+      jets = fj::sorted_by_pt(cs.inclusive_jets());
+      std::cout << "Clustering with " << jet_def.description() << std::endl;
+      std::cout << "        pt y phi" << std::endl;
+      for (unsigned int i = 0; i < jets.size(); i++) {
+        std::cout << "jet " << i << ": " << jets[i].pt() << " "
+                  << jets[i].rap() << " " << jets[i].phi() << std::endl;
+        pt.push_back(jets[i].pt());
+        rap.push_back(jets[i].rap());
+        phi.push_back(jets[i].phi());
+        std::vector<fj::PseudoJet> constituents = jets[i].constituents();
+        unsigned int j;
+        for (j = 0; j < constituents.size(); j++) {
+          std::cout << "    constituents " << j << "'s pt: " << constituents[j].pt()
+                    << std::endl;
+          //constpt.push_back(constituents[j].pt());
+          //constrap.push_back(constituents[j].rap());
+          //constphi.push_back(constituents[j].phi());
+        }
+        if (idx.size() == 0) {
+          idx.push_back(j);
+        } else {
+          idx.push_back(j + idx[idx.size() - 1]);
+        }
+      }
+    }
+  //}
+
   // print out some infos
-  
 
   // print the jets
 
-  std::map<string,vector<float>> out = {{"pt",pt},{"rap",rap},{"phi",phi},{"constpt",constpt},{"constrap",constrap},{"constphi",constphi},{"idx",idx},{"idxo",idxo}};
+  std::map<string, vector<float>> out = {{"part0-node3-data", pt}, {"part0-node4-data", rap}, {"part0-node2-data", phi}, {"nevents", nevents}, {"part0-node0-offsets", idx}, {"part0-node6-data", idxo}, {"part0-node5-offsets", offidx}};
   return out;
 }
 
 PYBIND11_MODULE(_ext, m) {
-    m.def("interface", &interface);
+  m.def("interface", &interface);
 }
