@@ -3,6 +3,8 @@
 import ctypes
 import pathlib
 
+# import numpy as np
+
 _fastjet_core = pathlib.Path(__file__).parent.resolve() / "_fastjet_core" / "lib"
 _libfastjet = ctypes.cdll.LoadLibrary(_fastjet_core / "libfastjet.so")
 _libfastjettools = ctypes.cdll.LoadLibrary(_fastjet_core / "libfastjettools.so")
