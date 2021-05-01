@@ -12,10 +12,9 @@
 #include <pybind11/stl.h>
 
 namespace fj = fastjet;
-using namespace std;
 namespace py = pybind11;
 
-std::map<string, vector<float>> interface(py::array_t<float, py::array::c_style | py::array::forcecast> pxi, py::array_t<float, py::array::c_style | py::array::forcecast> pyi, py::array_t<float, py::array::c_style | py::array::forcecast> pzi, py::array_t<float, py::array::c_style | py::array::forcecast> Ei, double Rv, string algor)
+std::map<std::string, std::vector<double>> interface(py::array_t<double, py::array::c_style | py::array::forcecast> pxi, py::array_t<double, py::array::c_style | py::array::forcecast> pyi, py::array_t<double, py::array::c_style | py::array::forcecast> pzi, py::array_t<double, py::array::c_style | py::array::forcecast> Ei, double Rv, std::string algor)
 {
   // py::buffer_info infooff = offsets.request();
   py::buffer_info infopx = pxi.request();
@@ -24,10 +23,10 @@ std::map<string, vector<float>> interface(py::array_t<float, py::array::c_style 
   py::buffer_info infoE = Ei.request();
 
   // auto offptr = static_cast<int *>(infooff.ptr);
-  auto pxptr = static_cast<float *>(infopx.ptr);
-  auto pyptr = static_cast<float *>(infopy.ptr);  // pointer to the initial value
-  auto pzptr = static_cast<float *>(infopz.ptr);
-  auto Eptr = static_cast<float *>(infoE.ptr);
+  auto pxptr = static_cast<double *>(infopx.ptr);
+  auto pyptr = static_cast<double *>(infopy.ptr);  // pointer to the initial value
+  auto pzptr = static_cast<double *>(infopz.ptr);
+  auto Eptr = static_cast<double *>(infoE.ptr);
 
   // int dimoff = infooff.shape[0];
   int dimpx = infopx.shape[0];
@@ -64,14 +63,14 @@ std::map<string, vector<float>> interface(py::array_t<float, py::array::c_style 
   // }
   // }
 
-  std::vector<float> pt;
-  std::vector<float> rap;
-  std::vector<float> phi;
-  std::vector<float> nevents;
-  std::vector<float> offidx;
-  std::vector<float> constphi;
-  std::vector<float> idx;
-  std::vector<float> idxo;
+  std::vector<double> pt;
+  std::vector<double> rap;
+  std::vector<double> phi;
+  std::vector<double> nevents;
+  std::vector<double> offidx;
+  std::vector<double> constphi;
+  std::vector<double> idx;
+  std::vector<double> idxo;
 
  // nevents.push_back(dimoff - 1);
   //offidx.push_back(0);
@@ -101,7 +100,7 @@ std::map<string, vector<float>> interface(py::array_t<float, py::array::c_style 
 
     // choose a jet definition
     double R = Rv;
-    string algo = algor;
+    std::string algo = algor;
     std::vector<fj::PseudoJet> jets;
 
     if (algo.compare("antikt_algorithm") == 0) {
@@ -226,7 +225,7 @@ std::map<string, vector<float>> interface(py::array_t<float, py::array::c_style 
 
   // print the jets
 
-  std::map<string, vector<float>> out = {{"part0-node3-data", pt}, {"part0-node4-data", rap}, {"part0-node2-data", phi}, {"nevents", nevents}, {"part0-node0-offsets", idx}, {"part0-node6-data", idxo}, {"part0-node5-offsets", offidx}};
+  std::map<std::string, std::vector<double>> out = {{"part0-node3-data", pt}, {"part0-node4-data", rap}, {"part0-node2-data", phi}, {"nevents", nevents}, {"part0-node0-offsets", idx}, {"part0-node6-data", idxo}, {"part0-node5-offsets", offidx}};
   return out;
 }
 
