@@ -14,7 +14,7 @@
 namespace fj = fastjet;
 namespace py = pybind11;
 
-std::map<std::string, std::vector<double>> interface(py::array_t<double, py::array::c_style | py::array::forcecast> pxi, py::array_t<double, py::array::c_style | py::array::forcecast> pyi, py::array_t<double, py::array::c_style | py::array::forcecast> pzi, py::array_t<double, py::array::c_style | py::array::forcecast> Ei, double Rv, std::string algor)
+py::dict interface(py::array_t<double, py::array::c_style | py::array::forcecast> pxi, py::array_t<double, py::array::c_style | py::array::forcecast> pyi, py::array_t<double, py::array::c_style | py::array::forcecast> pzi, py::array_t<double, py::array::c_style | py::array::forcecast> Ei, double Rv, std::string algor)
 {
   // py::buffer_info infooff = offsets.request();
   py::buffer_info infopx = pxi.request();
@@ -34,6 +34,7 @@ std::map<std::string, std::vector<double>> interface(py::array_t<double, py::arr
   int dimpz = infopz.shape[0];
   int dimE = infoE.shape[0];
 
+  ///auto roo;
   // vector<int> dims;  // the dimensions of the input array
   // int n = 1;
   // vector<vector<float>> grid = {{1,2,3},{1,2,3}};
@@ -63,9 +64,6 @@ std::map<std::string, std::vector<double>> interface(py::array_t<double, py::arr
   // }
   // }
 
-  std::vector<double> pt;
-  std::vector<double> rap;
-  std::vector<double> phi;
   std::vector<double> nevents;
   std::vector<double> offidx;
   std::vector<double> constphi;
@@ -97,8 +95,6 @@ std::map<std::string, std::vector<double>> interface(py::array_t<double, py::arr
     // for(int i = *(offptr-1); i < *offptr; i++){
     // std::cout<<particles[i].px()<<" "<<particles[i].py()<<" "<<particles[i].pz()<<" "<<particles[i].E()<<endl;
     // }
-
-    // choose a jet definition
     double R = Rv;
     std::string algo = algor;
     std::vector<fj::PseudoJet> jets;
@@ -117,42 +113,63 @@ std::map<std::string, std::vector<double>> interface(py::array_t<double, py::arr
       //cout << "----------------------------------------------------------" << endl;
       jets = fj::sorted_by_pt(cs.inclusive_jets());
       std::cout << "Clustering with " << jet_def.description() << std::endl;
+      auto jk = jets.size();
+      auto pt = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
+      auto bufpt = pt.request();
+      double *ptrpt = (double *)bufpt.ptr;
+
+      auto phi = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
+      auto bufphi = phi.request();
+      double *ptrphi = (double *)bufphi.ptr;
+
+      auto rap = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
+      auto bufrap = rap.request();
+      double *ptrrap = (double *)bufrap.ptr;
+      size_t idxe = 0;
       std::cout << "        pt y phi" << std::endl;
       for (unsigned int i = 0; i < jets.size(); i++) {
         std::cout << "jet " << i << ": " << jets[i].pt() << " "
                   << jets[i].rap() << " " << jets[i].phi() << std::endl;
-        pt.push_back(jets[i].pt());
-        rap.push_back(jets[i].rap());
-        phi.push_back(jets[i].phi());
+        ptrpt[idxe] = jets[i].pt();
+        ptrphi[idxe] = jets[i].phi();
+        ptrrap[idxe] = jets[i].rap();
+        idxe++;
         //std::vector<fj::PseudoJet> constituents = jets[i].constituents();
         //unsigned int j;
         //std::cout << constituents.size() << endl;
         //for (j = 0; j < constituents.size(); j++) {
-          //std::cout << "    constituent " << j << " " << constituents[j].px() << constituents[j].py() << constituents[j].pz() << constituents[j].E() << std::endl;
-          //constpt.push_back(constituents[j].pt());
-          //constrap.push_back(constituents[j].rap());
-          //constphi.push_back(constituents[j].phi());
-          //for (auto k = 0; k < particles.size(); k++) {
-            //if (constituents[j].px() == particles[k].px() && constituents[j].py() == particles[k].py() && constituents[j].pz() == particles[k].pz() && constituents[j].E() == particles[k].E()) {
-              //idxo.push_back(k);
-              //std::cout << endl;
-              //std::cout << "---------------------------------------------------------------" << endl;
-              //std::cout << k;
-              //std::cout << endl;
-              //std::cout << "---------------------------------------------------------------" << endl;
-            //}
-          //}
+        //std::cout << "    constituent " << j << " " << constituents[j].px() << constituents[j].py() << constituents[j].pz() << constituents[j].E() << std::endl;
+        //constpt.push_back(constituents[j].pt());
+        //constrap.push_back(constituents[j].rap());
+        //constphi.push_back(constituents[j].phi());
+        //for (auto k = 0; k < particles.size(); k++) {
+        //if (constituents[j].px() == particles[k].px() && constituents[j].py() == particles[k].py() && constituents[j].pz() == particles[k].pz() && constituents[j].E() == particles[k].E()) {
+        //idxo.push_back(k);
+        //std::cout << endl;
+        //std::cout << "---------------------------------------------------------------" << endl;
+        //std::cout << k;
+        //std::cout << endl;
+        //std::cout << "---------------------------------------------------------------" << endl;
+        //}
+        //}
         //}
         //offidx.push_back(idxo.size());
         //if (idx.size() == 0)
         //{
-          //idx.push_back(j);
+        //idx.push_back(j);
         //}
         //else
         //{
           //idx.push_back(j + idx[idx.size() - 1]);
         //}
       }
+      py::dict out;
+      out["part0-node1-data"] = pt; // throws exception error - ptyes.h Line 546
+      out["part0-node2-data"] = rap;
+      out["part0-node3-data"] = phi;
+
+      //std::map<std::string, py::array> out = {{"part0-node1-data", pt},{"part0-node2-data", rap},{"part0-node3-data", phi}};
+      return out;
     }
 
 
@@ -168,9 +185,6 @@ std::map<std::string, std::vector<double>> interface(py::array_t<double, py::arr
       for (unsigned int i = 0; i < jets.size(); i++) {
         std::cout << "jet " << i << ": " << jets[i].pt() << " "
                   << jets[i].rap() << " " << jets[i].phi() << std::endl;
-        pt.push_back(jets[i].pt());
-        rap.push_back(jets[i].rap());
-        phi.push_back(jets[i].phi());
         std::vector<fj::PseudoJet> constituents = jets[i].constituents();
         unsigned int j;
         for (j = 0; j < constituents.size(); j++) {
@@ -200,9 +214,6 @@ std::map<std::string, std::vector<double>> interface(py::array_t<double, py::arr
       for (unsigned int i = 0; i < jets.size(); i++) {
         std::cout << "jet " << i << ": " << jets[i].pt() << " "
                   << jets[i].rap() << " " << jets[i].phi() << std::endl;
-        pt.push_back(jets[i].pt());
-        rap.push_back(jets[i].rap());
-        phi.push_back(jets[i].phi());
         std::vector<fj::PseudoJet> constituents = jets[i].constituents();
         unsigned int j;
         for (j = 0; j < constituents.size(); j++) {
@@ -225,8 +236,6 @@ std::map<std::string, std::vector<double>> interface(py::array_t<double, py::arr
 
   // print the jets
 
-  std::map<std::string, std::vector<double>> out = {{"part0-node3-data", pt}, {"part0-node4-data", rap}, {"part0-node2-data", phi}, {"nevents", nevents}, {"part0-node0-offsets", idx}, {"part0-node6-data", idxo}, {"part0-node5-offsets", offidx}};
-  return out;
 }
 
 PYBIND11_MODULE(_ext, m) {
