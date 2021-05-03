@@ -15,4 +15,6 @@ def test_pybind11():
     py = np.array([2.11, 2.41, 24.1], dtype="float32")
     pz = np.array([3.71, 3.18, 35.11], dtype="float32")
     E = np.array([5.1, 52.1, 51.11], dtype="float32")
-    fastjet._ext.interface(px, py, pz, E, 0.8, "antikt_algorithm")
+    inps = {"algor": "anti-kt"}
+    inpf = {"R": 0.6}
+    fastjet._ext.interface(px, py, pz, E, inps, inpf)
