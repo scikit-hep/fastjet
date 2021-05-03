@@ -7,7 +7,12 @@ __all__ = ("__version__",)
 
 
 class AwkwardClusterSequence:
-    def __init__(self, data, R, algor):
+    def __init__(self, data, jetdef):
+        self.params = jetdef.description().split()
+        algor = self.params[2]
+        Rv = float(self.params[7])
+        inps = {"algor": algor}
+        inpf = {"R": Rv}
         container, length, data = ak.to_buffers(data)
         # offsets = data["part0-node0-offsets"]
         px = data["part0-node1-data"]
@@ -45,6 +50,6 @@ class AwkwardClusterSequence:
     "form_key": "node0"
 }
 """
-        results = fastjet._ext.interface(px, py, pz, E, R, algor)
+        results = fastjet._ext.interface(px, py, pz, E, inps, inpf)
         size = len(results["part0-node1-data"])
         self.inclusive_jets = ak.from_buffers(self.form, size, results)
