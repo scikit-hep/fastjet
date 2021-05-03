@@ -6,15 +6,23 @@
 #include <algorithm>
 
 #include <fastjet/ClusterSequence.hh>
+#include <fastjet/ClusterSequenceArea.hh>
+#include <fastjet/JetDefinition.hh>
+#include <fastjet/PseudoJet.hh>
+#include <fastjet/AreaDefinition.hh>
+#include <fastjet/GhostedAreaSpec.hh>
 
 #include <pybind11/pybind11.h>
+#include <pybind11/operators.h>
 #include <pybind11/numpy.h>
 #include <pybind11/stl.h>
 
 namespace fj = fastjet;
 namespace py = pybind11;
 
-py::dict interface(py::array_t<double, py::array::c_style | py::array::forcecast> pxi, py::array_t<double, py::array::c_style | py::array::forcecast> pyi, py::array_t<double, py::array::c_style | py::array::forcecast> pzi, py::array_t<double, py::array::c_style | py::array::forcecast> Ei, double Rv, std::string algor)
+using namespace pybind11::literals;
+
+py::dict interface(py::array_t<double, py::array::c_style | py::array::forcecast> pxi, py::array_t<double, py::array::c_style | py::array::forcecast> pyi, py::array_t<double, py::array::c_style | py::array::forcecast> pzi, py::array_t<double, py::array::c_style | py::array::forcecast> Ei, std::map<std::string,std::string> params, std::map<std::string,float> paramf)
 {
   // py::buffer_info infooff = offsets.request();
   py::buffer_info infopx = pxi.request();
@@ -63,7 +71,8 @@ py::dict interface(py::array_t<double, py::array::c_style | py::array::forcecast
   // std::cout<<grid[i][j];
   // }
   // }
-
+  auto algo =  (std::string)params["algor"];
+  auto R = paramf["R"];
   std::vector<double> nevents;
   std::vector<double> offidx;
   std::vector<double> constphi;
@@ -95,11 +104,9 @@ py::dict interface(py::array_t<double, py::array::c_style | py::array::forcecast
     // for(int i = *(offptr-1); i < *offptr; i++){
     // std::cout<<particles[i].px()<<" "<<particles[i].py()<<" "<<particles[i].pz()<<" "<<particles[i].E()<<endl;
     // }
-    double R = Rv;
-    std::string algo = algor;
     std::vector<fj::PseudoJet> jets;
 
-    if (algo.compare("antikt_algorithm") == 0) {
+    if (algo.compare("anti-kt") == 0) {
       fj::JetDefinition jet_def(fj::antikt_algorithm, R);
 
       // run the clustering, extract the jets
