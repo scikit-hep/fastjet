@@ -72,5 +72,3 @@ class AwkwardClusterSequence:
         size = len(results["part0-node1-data"])
         out = ak.from_buffers(self.form, size, results)
         return out
-
-
