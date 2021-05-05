@@ -22,7 +22,7 @@ namespace py = pybind11;
 
 using namespace pybind11::literals;
 
-py::dict interface(py::array_t<double, py::array::c_style | py::array::forcecast> pxi, py::array_t<double, py::array::c_style | py::array::forcecast> pyi, py::array_t<double, py::array::c_style | py::array::forcecast> pzi, py::array_t<double, py::array::c_style | py::array::forcecast> Ei, std::map<std::string,std::string> params, std::map<std::string,float> paramf)
+py::dict interface(py::array_t<double, py::array::c_style | py::array::forcecast> pxi, py::array_t<double, py::array::c_style | py::array::forcecast> pyi, py::array_t<double, py::array::c_style | py::array::forcecast> pzi, py::array_t<double, py::array::c_style | py::array::forcecast> Ei, std::map<std::string,std::string> params, std::map<std::string,float> paramf)//, py::object jetdef)
 {
   // py::buffer_info infooff = offsets.request();
   py::buffer_info infopx = pxi.request();
@@ -41,6 +41,9 @@ py::dict interface(py::array_t<double, py::array::c_style | py::array::forcecast
   int dimpy = infopy.shape[0];
   int dimpz = infopz.shape[0];
   int dimE = infoE.shape[0];
+
+  //auto aa = jetdef.attr("description").cast<std::string>();
+  //std::cout << aa << std::endl;
 
   ///auto roo;
   // vector<int> dims;  // the dimensions of the input array
@@ -121,25 +124,31 @@ py::dict interface(py::array_t<double, py::array::c_style | py::array::forcecast
       jets = fj::sorted_by_pt(cs.inclusive_jets());
       std::cout << "Clustering with " << jet_def.description() << std::endl;
       auto jk = jets.size();
-      auto pt = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
-      auto bufpt = pt.request();
-      double *ptrpt = (double *)bufpt.ptr;
+      auto px = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
+      auto bufpx = px.request();
+      double *ptrpx = (double *)bufpx.ptr;
 
-      auto phi = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
-      auto bufphi = phi.request();
-      double *ptrphi = (double *)bufphi.ptr;
+      auto py = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
+      auto bufpy = py.request();
+      double *ptrpy = (double *)bufpy.ptr;
 
-      auto rap = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
-      auto bufrap = rap.request();
-      double *ptrrap = (double *)bufrap.ptr;
+      auto pz = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
+      auto bufpz = pz.request();
+      double *ptrpz = (double *)bufpz.ptr;
+
+      auto E = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
+      auto bufE = E.request();
+      double *ptrE = (double *)bufE.ptr;
+
       size_t idxe = 0;
       std::cout << "        pt y phi" << std::endl;
       for (unsigned int i = 0; i < jets.size(); i++) {
         std::cout << "jet " << i << ": " << jets[i].pt() << " "
                   << jets[i].rap() << " " << jets[i].phi() << std::endl;
-        ptrpt[idxe] = jets[i].pt();
-        ptrphi[idxe] = jets[i].phi();
-        ptrrap[idxe] = jets[i].rap();
+        ptrpx[idxe] = jets[i].px();
+        ptrpy[idxe] = jets[i].py();
+        ptrpz[idxe] = jets[i].pz();
+        ptrE[idxe] = jets[i].E();
         idxe++;
         //std::vector<fj::PseudoJet> constituents = jets[i].constituents();
         //unsigned int j;
@@ -171,9 +180,10 @@ py::dict interface(py::array_t<double, py::array::c_style | py::array::forcecast
         //}
       }
       py::dict out;
-      out["part0-node1-data"] = pt; // throws exception error - ptyes.h Line 546
-      out["part0-node2-data"] = rap;
-      out["part0-node3-data"] = phi;
+      out["px"] = px; // throws exception error - ptyes.h Line 546
+      out["py"] = py;
+      out["pz"] = pz;
+      out["E"] = E;
 
       //std::map<std::string, py::array> out = {{"part0-node1-data", pt},{"part0-node2-data", rap},{"part0-node3-data", phi}};
       return out;
@@ -247,4 +257,68 @@ py::dict interface(py::array_t<double, py::array::c_style | py::array::forcecast
 
 PYBIND11_MODULE(_ext, m) {
   m.def("interface", &interface);
+  // py::class_<ClusterSequence>(m, "ClusterSequence")
+  //     .def(py::init<const std::vector<PseudoJet> &, const JetDefinition &, const bool &>(), "pseudojets"_a, "jet_definition"_a, "write_out_combinations"_a = false, "Create a ClusterSequence, starting from the supplied set of PseudoJets and clustering them with jet definition specified by jet_definition (which also specifies the clustering strategy)")
+  //     // numpy constructor.
+  //     .def(py::init([](const py::array_t<double> &pseudojets, const JetDefinition &jetDef, const bool &writeOutCombination) { auto convertedPseudojets = constructPseudojetsFromNumpy(pseudojets); return ClusterSequence(convertedPseudojets, jetDef, writeOutCombination); }), "pseudojets"_a, "jet_definition"_a, "write_out_combinations"_a = false, "Create a ClusterSequence, starting from the supplied set of PseudoJets and clustering them with jet definition specified by jet_definition (which also specifies the clustering strategy)")
+  //     .def("inclusive_jets", &ClusterSequence::inclusive_jets, "pt_min"_a = 0., "Return a vector of all jets (in the sense of the inclusive algorithm) with pt >= ptmin. Time taken should be of the order of the number of jets returned.")
+  //     .def(
+  //         "__getitem__", [](const ClusterSequence &cs, size_t i) {
+  //           auto inclusive_jets = cs.inclusive_jets();
+  //           if (i >= inclusive_jets.size())
+  //             throw py::index_error();
+  //           return inclusive_jets[i];
+  //         },
+  //         "i"_a, R"pbdoc(
+  //     Retrieve an individual jet at a given index.
+  //     Args:
+  //       i: Index of the jet to retrieve.
+  //     Returns:
+  //       Jet at that index.
+  //   )pbdoc")
+  //     .def(
+  //         "__iter__", [](const ClusterSequence &cs) {
+  //           auto jets = cs.inclusive_jets();
+  //           return py::make_iterator(IterableWrapper<std::vector<PseudoJet>>(jets), IterableWrapperSentinel());
+  //         },
+  //         py::keep_alive<0, 1>(), R"pbdoc(
+  //       Finds the include jets and iterates over them.
+  //     )pbdoc")
+  //     .def(
+  //         "__call__", [](const ClusterSequence &cs, double min_pt = 0) {
+  //           auto jets = cs.inclusive_jets(min_pt);
+  //           return py::make_iterator(IterableWrapper<std::vector<PseudoJet>>(jets), IterableWrapperSentinel());
+  //         },
+  //         py::keep_alive<0, 1>(), "min_pt"_a = 0, R"pbdoc(
+  //       Retrieves the inclusive jets.
+  //       Args:
+  //         min_pt: Minimum jet pt to include. Default: 0.
+  //       Returns:
+  //         List of inclusive jets.
+  //     )pbdoc")
+  //     .def(
+  //         "to_numpy", [](const fj::ClusterSequence &cs, double min_pt = 0) {
+  //           auto jets = cs.inclusive_jets(min_pt);
+  //           // Don't specify the size if using push_back.
+  //           std::vector<double> pt, eta, phi, m;
+  //           for (const auto &jet : jets)
+  //           {
+  //             pt.push_back(jet.pt());
+  //             eta.push_back(jet.eta());
+  //             phi.push_back(jet.phi());
+  //             m.push_back(jet.m());
+  //           }
+  //           return std::make_tuple(
+  //               py::array(py::cast(pt)),
+  //               py::array(py::cast(eta)),
+  //               py::array(py::cast(phi)),
+  //               py::array(py::cast(m)));
+  //         },
+  //         "min_pt"_a = 0, R"pbdoc(
+  //       Retrieves the inclusive jets and converts them to numpy arrays.
+  //       Args:
+  //         min_pt: Minimum jet pt to include. Default: 0.
+  //       Returns:
+  //         pt, eta, phi, m of inclusive jets.
+  //     )pbdoc");
 }

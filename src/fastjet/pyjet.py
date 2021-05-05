@@ -16,7 +16,7 @@ class AwkwardClusterSequence:
         py = data["part0-node2-data"]
         pz = data["part0-node3-data"]
         E = data["part0-node4-data"]
-        results = fastjet._ext.interface(px, py, pz, E, inps, inpf)
+        results = fastjet._ext.interface(px, py, pz, E, inps, inpf)  # , jetdef)
         self.inclusive_jets = self.construct_awkward_array(results)
 
     def swig_to_params(self, jetdef):
@@ -41,26 +41,33 @@ class AwkwardClusterSequence:
         self.form = """ {
     "class": "RecordArray",
     "contents": {
-        "phi": {
+        "px": {
             "class": "NumpyArray",
             "itemsize": 8,
             "format": "d",
             "primitive": "float64",
             "form_key": "node1"
         },
-        "rap": {
+        "py": {
             "class": "NumpyArray",
             "itemsize": 8,
             "format": "d",
             "primitive": "float64",
             "form_key": "node2"
         },
-        "pt": {
+        "pz": {
             "class": "NumpyArray",
             "itemsize": 8,
             "format": "d",
             "primitive": "float64",
             "form_key": "node3"
+        },
+        "E": {
+            "class": "NumpyArray",
+            "itemsize": 8,
+            "format": "d",
+            "primitive": "float64",
+            "form_key": "node4"
         }
     },
     "parameters": {
@@ -69,6 +76,14 @@ class AwkwardClusterSequence:
     "form_key": "node0"
 }
 """
-        size = len(results["part0-node1-data"])
-        out = ak.from_buffers(self.form, size, results)
+        results["px"] = ak.layout.NumpyArray(results["px"])
+        results["py"] = ak.layout.NumpyArray(results["py"])
+        results["pz"] = ak.layout.NumpyArray(results["pz"])
+        results["E"] = ak.layout.NumpyArray(results["E"])
+        out = ak.Array(
+            ak.layout.RecordArray(
+                [results["px"], results["py"], results["pz"], results["E"]],
+                ["px", "py", "pz", "E"],
+            )
+        )
         return out
