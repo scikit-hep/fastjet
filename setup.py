@@ -117,5 +117,5 @@ setup(
     version=get_version(),
     ext_modules=ext_modules,
     cmdclass={"build_ext": FastJetBuild, "install": FastJetInstall},
-    tests_require = ["awkward"],
+    tests_require=["awkward>=1"],
 )
