@@ -16,8 +16,8 @@ class AwkwardClusterSequence:
         py = data["part0-node2-data"]
         pz = data["part0-node3-data"]
         E = data["part0-node4-data"]
-        results = fastjet._ext.interface(px, py, pz, E, inps, inpf)  # , jetdef)
-        self.inclusive_jets = self.construct_awkward_array(results)
+        self.results = fastjet._ext.interface(px, py, pz, E, inps, inpf)  # , jetdef)
+        # self.inclusive_jets = self.construct_awkward_array(results)
 
     def swig_to_params(self, jetdef):
         params = jetdef.description().split()
