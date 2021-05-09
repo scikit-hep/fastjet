@@ -16,8 +16,8 @@ class AwkwardClusterSequence:
         py = data["part0-node2-data"]
         pz = data["part0-node3-data"]
         E = data["part0-node4-data"]
-        results = fastjet._ext.interface(px, py, pz, E, inps, inpf)  # , jetdef)
-        self.inclusive_jets = self.construct_awkward_array(results)
+        self._results = fastjet._ext.interface(px, py, pz, E, inps, inpf, jetdef)
+        # self.inclusive_jets
 
     def swig_to_params(self, jetdef):
         params = jetdef.description().split()
@@ -37,53 +37,23 @@ class AwkwardClusterSequence:
         inpf = {"R": Rv}
         return inps, inpf
 
-    def construct_awkward_array(self, results):
-        self.form = """ {
-    "class": "RecordArray",
-    "contents": {
-        "px": {
-            "class": "NumpyArray",
-            "itemsize": 8,
-            "format": "d",
-            "primitive": "float64",
-            "form_key": "node1"
-        },
-        "py": {
-            "class": "NumpyArray",
-            "itemsize": 8,
-            "format": "d",
-            "primitive": "float64",
-            "form_key": "node2"
-        },
-        "pz": {
-            "class": "NumpyArray",
-            "itemsize": 8,
-            "format": "d",
-            "primitive": "float64",
-            "form_key": "node3"
-        },
-        "E": {
-            "class": "NumpyArray",
-            "itemsize": 8,
-            "format": "d",
-            "primitive": "float64",
-            "form_key": "node4"
-        }
-    },
-    "parameters": {
-        "__record__": "Momentum4D"
-    },
-    "form_key": "node0"
-}
-"""
-        results["px"] = ak.layout.NumpyArray(results["px"])
-        results["py"] = ak.layout.NumpyArray(results["py"])
-        results["pz"] = ak.layout.NumpyArray(results["pz"])
-        results["E"] = ak.layout.NumpyArray(results["E"])
+    @property
+    def inclusive_jets(self):
+        np_results = self._results.to_numpy
+        # np_results()[0] = ak.layout.NumpyArray(np_results()[0])
+        # np_results()[1] = ak.layout.NumpyArray(np_results()[1])
+        # np_results()[2] = ak.layout.NumpyArray(np_results()[2])
+        # np_results()[3] = ak.layout.NumpyArray(np_results()[3])
         out = ak.Array(
             ak.layout.RecordArray(
-                [results["px"], results["py"], results["pz"], results["E"]],
+                [
+                    ak.layout.NumpyArray(np_results()[0]),
+                    ak.layout.NumpyArray(np_results()[1]),
+                    ak.layout.NumpyArray(np_results()[2]),
+                    ak.layout.NumpyArray(np_results()[3]),
+                ],
                 ["px", "py", "pz", "E"],
             )
         )
+
         return out

@@ -21,7 +21,7 @@ namespace fj = fastjet;
 namespace py = pybind11;
 using namespace pybind11::literals;
 
-fj::ClusterSequence interface(py::array_t<double, py::array::c_style | py::array::forcecast> pxi, py::array_t<double, py::array::c_style | py::array::forcecast> pyi, py::array_t<double, py::array::c_style | py::array::forcecast> pzi, py::array_t<double, py::array::c_style | py::array::forcecast> Ei, std::map<std::string,std::string> params, std::map<std::string,float> paramf)//, py::object jetdef)
+fj::ClusterSequence interface(py::array_t<double, py::array::c_style | py::array::forcecast> pxi, py::array_t<double, py::array::c_style | py::array::forcecast> pyi, py::array_t<double, py::array::c_style | py::array::forcecast> pzi, py::array_t<double, py::array::c_style | py::array::forcecast> Ei, std::map<std::string,std::string> params, std::map<std::string,float> paramf, py::object jetdef)
 {
   // py::buffer_info infooff = offsets.request();
   py::buffer_info infopx = pxi.request();
@@ -142,8 +142,8 @@ fj::ClusterSequence interface(py::array_t<double, py::array::c_style | py::array
       size_t idxe = 0;
       std::cout << "        pt y phi" << std::endl;
       for (unsigned int i = 0; i < jets.size(); i++) {
-        std::cout << "jet " << i << ": " << jets[i].pt() << " "
-                  << jets[i].rap() << " " << jets[i].phi() << std::endl;
+        std::cout << "jet " << i << ": " << jets[i].px() << " "
+                  << jets[i].py() << " " << jets[i].pz() << std::endl;
         ptrpx[idxe] = jets[i].px();
         ptrpy[idxe] = jets[i].py();
         ptrpz[idxe] = jets[i].pz();
@@ -588,18 +588,18 @@ PYBIND11_MODULE(_ext, m) {
       [](const ClusterSequence &cs, double min_pt = 0) {
         auto jets = cs.inclusive_jets(min_pt);
         // Don't specify the size if using push_back.
-        std::vector<double> pt, eta, phi, m;
+        std::vector<double> px, py, pz, E;
         for (const auto & jet : jets) {
-          pt.push_back(jet.pt());
-          eta.push_back(jet.eta());
-          phi.push_back(jet.phi());
-          m.push_back(jet.m());
+          px.push_back(jet.px());
+          py.push_back(jet.py());
+          pz.push_back(jet.pz());
+          E.push_back(jet.E());
         }
         return std::make_tuple(
-            py::array(py::cast(pt)),
-            py::array(py::cast(eta)),
-            py::array(py::cast(phi)),
-            py::array(py::cast(m))
+            py::array(py::cast(px)),
+            py::array(py::cast(py)),
+            py::array(py::cast(pz)),
+            py::array(py::cast(E))
           );
       }, "min_pt"_a = 0, R"pbdoc(
         Retrieves the inclusive jets and converts them to numpy arrays.

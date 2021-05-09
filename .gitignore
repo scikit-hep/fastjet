@@ -2,6 +2,7 @@ _swig.py
 _fastjet_core
 *.so.[0-9]
 *.so.[0-9].[0-9].[0-9]
+ex.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
