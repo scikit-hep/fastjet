@@ -17,7 +17,7 @@ class AwkwardClusterSequence:
         pz = data["part0-node3-data"]
         E = data["part0-node4-data"]
         self._results = fastjet._ext.interface(px, py, pz, E, inps, inpf, jetdef)
-        #self.inclusive_jets
+        # self.inclusive_jets
 
     def swig_to_params(self, jetdef):
         params = jetdef.description().split()
@@ -36,6 +36,7 @@ class AwkwardClusterSequence:
         inps = {"algor": algor}  # kt or antikt
         inpf = {"R": Rv}
         return inps, inpf
+
     @property
     def inclusive_jets(self):
         np_results = self._results.to_numpy
@@ -45,7 +46,12 @@ class AwkwardClusterSequence:
         # np_results()[3] = ak.layout.NumpyArray(np_results()[3])
         out = ak.Array(
             ak.layout.RecordArray(
-                [ak.layout.NumpyArray(np_results()[0]), ak.layout.NumpyArray(np_results()[1]), ak.layout.NumpyArray(np_results()[2]), ak.layout.NumpyArray(np_results()[3])],
+                [
+                    ak.layout.NumpyArray(np_results()[0]),
+                    ak.layout.NumpyArray(np_results()[1]),
+                    ak.layout.NumpyArray(np_results()[2]),
+                    ak.layout.NumpyArray(np_results()[3]),
+                ],
                 ["px", "py", "pz", "E"],
             )
         )
