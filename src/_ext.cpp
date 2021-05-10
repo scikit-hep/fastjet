@@ -21,6 +21,13 @@ namespace fj = fastjet;
 namespace py = pybind11;
 using namespace pybind11::literals;
 
+fj::JetDefinition make_jetdef(py::object jetdef){
+  auto aa = jetdef.attr("n_parameters_for_algorithm")(jetdef.attr("jet_algorithm")()).cast<int>();
+  std::cout << aa;
+  fj::JetDefinition jet_def(fj::antikt_algorithm, 0.6);
+  return jet_def;
+}
+
 fj::ClusterSequence interface(py::array_t<double, py::array::c_style | py::array::forcecast> pxi, py::array_t<double, py::array::c_style | py::array::forcecast> pyi, py::array_t<double, py::array::c_style | py::array::forcecast> pzi, py::array_t<double, py::array::c_style | py::array::forcecast> Ei, std::map<std::string,std::string> params, std::map<std::string,float> paramf, py::object jetdef)
 {
   // py::buffer_info infooff = offsets.request();
@@ -40,6 +47,8 @@ fj::ClusterSequence interface(py::array_t<double, py::array::c_style | py::array
   int dimpy = infopy.shape[0];
   int dimpz = infopz.shape[0];
   int dimE = infoE.shape[0];
+
+  auto bb = make_jetdef(jetdef);
 
   //auto aa = jetdef.attr("description").cast<std::string>();
   //std::cout << aa << std::endl;
@@ -73,7 +82,7 @@ fj::ClusterSequence interface(py::array_t<double, py::array::c_style | py::array
   // std::cout<<grid[i][j];
   // }
   // }
-  auto algo =  (std::string)params["algor"];
+  auto algo = (std::string)params["algor"];
   auto R = paramf["R"];
   std::vector<double> nevents;
   std::vector<double> offidx;
@@ -122,68 +131,6 @@ fj::ClusterSequence interface(py::array_t<double, py::array::c_style | py::array
       //cout << "----------------------------------------------------------" << endl;
       jets = fj::sorted_by_pt(cs.inclusive_jets());
       std::cout << "Clustering with " << jet_def.description() << std::endl;
-      auto jk = jets.size();
-      auto px = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
-      auto bufpx = px.request();
-      double *ptrpx = (double *)bufpx.ptr;
-
-      auto py = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
-      auto bufpy = py.request();
-      double *ptrpy = (double *)bufpy.ptr;
-
-      auto pz = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
-      auto bufpz = pz.request();
-      double *ptrpz = (double *)bufpz.ptr;
-
-      auto E = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
-      auto bufE = E.request();
-      double *ptrE = (double *)bufE.ptr;
-
-      size_t idxe = 0;
-      std::cout << "        pt y phi" << std::endl;
-      for (unsigned int i = 0; i < jets.size(); i++) {
-        std::cout << "jet " << i << ": " << jets[i].px() << " "
-                  << jets[i].py() << " " << jets[i].pz() << std::endl;
-        ptrpx[idxe] = jets[i].px();
-        ptrpy[idxe] = jets[i].py();
-        ptrpz[idxe] = jets[i].pz();
-        ptrE[idxe] = jets[i].E();
-        idxe++;
-        //std::vector<fj::PseudoJet> constituents = jets[i].constituents();
-        //unsigned int j;
-        //std::cout << constituents.size() << endl;
-        //for (j = 0; j < constituents.size(); j++) {
-        //std::cout << "    constituent " << j << " " << constituents[j].px() << constituents[j].py() << constituents[j].pz() << constituents[j].E() << std::endl;
-        //constpt.push_back(constituents[j].pt());
-        //constrap.push_back(constituents[j].rap());
-        //constphi.push_back(constituents[j].phi());
-        //for (auto k = 0; k < particles.size(); k++) {
-        //if (constituents[j].px() == particles[k].px() && constituents[j].py() == particles[k].py() && constituents[j].pz() == particles[k].pz() && constituents[j].E() == particles[k].E()) {
-        //idxo.push_back(k);
-        //std::cout << endl;
-        //std::cout << "---------------------------------------------------------------" << endl;
-        //std::cout << k;
-        //std::cout << endl;
-        //std::cout << "---------------------------------------------------------------" << endl;
-        //}
-        //}
-        //}
-        //offidx.push_back(idxo.size());
-        //if (idx.size() == 0)
-        //{
-        //idx.push_back(j);
-        //}
-        //else
-        //{
-          //idx.push_back(j + idx[idx.size() - 1]);
-        //}
-      }
-      py::dict out;
-      out["px"] = px; // throws exception error - ptyes.h Line 546
-      out["py"] = py;
-      out["pz"] = pz;
-      out["E"] = E;
-
       //std::map<std::string, py::array> out = {{"part0-node1-data", pt},{"part0-node2-data", rap},{"part0-node3-data", phi}};
       return cs;
     }
@@ -588,18 +535,40 @@ PYBIND11_MODULE(_ext, m) {
       [](const ClusterSequence &cs, double min_pt = 0) {
         auto jets = cs.inclusive_jets(min_pt);
         // Don't specify the size if using push_back.
-        std::vector<double> px, py, pz, E;
-        for (const auto & jet : jets) {
-          px.push_back(jet.px());
-          py.push_back(jet.py());
-          pz.push_back(jet.pz());
-          E.push_back(jet.E());
+        auto jk = jets.size();
+        auto px = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
+        auto bufpx = px.request();
+        double *ptrpx = (double *)bufpx.ptr;
+
+        auto py = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
+        auto bufpy = py.request();
+        double *ptrpy = (double *)bufpy.ptr;
+
+        auto pz = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
+        auto bufpz = pz.request();
+        double *ptrpz = (double *)bufpz.ptr;
+
+        auto E = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
+        auto bufE = E.request();
+        double *ptrE = (double *)bufE.ptr;
+        size_t idxe = 0;
+
+        std::cout << "        pt y phi" << std::endl;
+        for (unsigned int i = 0; i < jets.size(); i++)
+        {
+          std::cout << "jet " << i << ": " << jets[i].px() << " "
+                    << jets[i].py() << " " << jets[i].pz() << std::endl;
+          ptrpx[idxe] = jets[i].px();
+          ptrpy[idxe] = jets[i].py();
+          ptrpz[idxe] = jets[i].pz();
+          ptrE[idxe] = jets[i].E();
+          idxe++;
         }
         return std::make_tuple(
-            py::array(py::cast(px)),
-            py::array(py::cast(py)),
-            py::array(py::cast(pz)),
-            py::array(py::cast(E))
+            px,
+            py,
+            pz,
+            E
           );
       }, "min_pt"_a = 0, R"pbdoc(
         Retrieves the inclusive jets and converts them to numpy arrays.
