@@ -12,6 +12,7 @@ class AwkwardClusterSequence:
         inps, inpf = self.swig_to_params(self.jetdef)
         container, length, data = ak.to_buffers(data)
         # offsets = data["part0-node0-offsets"]
+        data = self.correct_byteorder(data)
         px = data["part0-node1-data"]
         py = data["part0-node2-data"]
         pz = data["part0-node3-data"]
@@ -36,6 +37,14 @@ class AwkwardClusterSequence:
         inps = {"algor": algor}  # kt or antikt
         inpf = {"R": Rv}
         return inps, inpf
+
+    def correct_byteorder(self, data):
+        for keys in data:
+            if data[keys].dtype.byteorder == "=":
+                pass
+            else:
+                data[keys] = data[keys].dtype.nebyteorder("=")
+        return data
 
     @property
     def inclusive_jets(self):
