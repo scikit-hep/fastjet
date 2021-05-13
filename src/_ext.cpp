@@ -100,7 +100,6 @@ fj::ClusterSequence interface(py::array_t<double, py::array::c_style | py::array
   return cs;
 }
 
-
 template <typename T>
 class IterableWrapper
 {
