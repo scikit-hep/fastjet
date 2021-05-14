@@ -282,9 +282,11 @@ PYBIND11_MODULE(_ext, m) {
     .value("BestFJ30", Strategy::BestFJ30, "the automatic strategy choice that was being made in FJ 3.0 (restricted to strategies that were present in FJ 3.0)")
     .value("plugin_strategy", Strategy::plugin_strategy, "the plugin has been used...")
     .export_values();
+
   py::class_<output_wrapper>(m, "output_wrapper")
     .def(py::init<fj::ClusterSequence, double*, double*, double*, double*>(), "ClusterSequence"_a, "px"_a, "py"_a, "pz"_a, "E"_a)
-    .def_property("cse", &output_wrapper::getCluster,&output_wrapper::setCluster); 
+    .def_property("cse", &output_wrapper::getCluster,&output_wrapper::setCluster);
+     
   py::class_<JetDefinition>(m, "JetDefinition", "Jet definition")
     .def(py::init<JetAlgorithm, RecombinationScheme, Strategy>(), "jet_algorithm"_a, "recombination_scheme"_a = E_scheme, "strategy"_a = Best)
     .def(py::init<JetAlgorithm, double, RecombinationScheme, Strategy>(), "jet_algorithm"_a, "R"_a, "recombination_scheme"_a = E_scheme, "strategy"_a = Best)
