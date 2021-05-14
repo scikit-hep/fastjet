@@ -64,7 +64,7 @@ class output_wrapper{
   double* pyptr;
   double* pzptr;
   double* Eptr;
-  
+
   output_wrapper(fj::ClusterSequence cs, double* px, double* py, double* pz, double* E){
     cse = cs;
     pxptr = px;
