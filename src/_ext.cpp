@@ -286,7 +286,7 @@ PYBIND11_MODULE(_ext, m) {
   py::class_<output_wrapper>(m, "output_wrapper")
     .def(py::init<fj::ClusterSequence, double*, double*, double*, double*>(), "ClusterSequence"_a, "px"_a, "py"_a, "pz"_a, "E"_a)
     .def_property("cse", &output_wrapper::getCluster,&output_wrapper::setCluster);
-     
+
   py::class_<JetDefinition>(m, "JetDefinition", "Jet definition")
     .def(py::init<JetAlgorithm, RecombinationScheme, Strategy>(), "jet_algorithm"_a, "recombination_scheme"_a = E_scheme, "strategy"_a = Best)
     .def(py::init<JetAlgorithm, double, RecombinationScheme, Strategy>(), "jet_algorithm"_a, "R"_a, "recombination_scheme"_a = E_scheme, "strategy"_a = Best)
