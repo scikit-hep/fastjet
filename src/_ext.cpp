@@ -57,8 +57,29 @@ fj::JetDefinition make_jetdef(py::object jetdef){
   }
   return jet_def;
 }
+class output_wrapper{
+  public:
+  fj::ClusterSequence cse;
+  double* pxptr;
+  double* pyptr;
+  double* pzptr;
+  double* Eptr;
+  
+  output_wrapper(fj::ClusterSequence cs, double* px, double* py, double* pz, double* E){
+    cse = cs;
+    pxptr = px;
+    pyptr = py;
+    pzptr = pz;
+    Eptr = E;
+  };
+  fj::ClusterSequence getCluster(){
+    return cse;
+  }
+  void setCluster(){}
 
-fj::ClusterSequence interface(py::array_t<double, py::array::c_style | py::array::forcecast> pxi, py::array_t<double, py::array::c_style | py::array::forcecast> pyi, py::array_t<double, py::array::c_style | py::array::forcecast> pzi, py::array_t<double, py::array::c_style | py::array::forcecast> Ei, py::object jetdef)
+};
+
+output_wrapper interface(py::array_t<double, py::array::c_style | py::array::forcecast> pxi, py::array_t<double, py::array::c_style | py::array::forcecast> pyi, py::array_t<double, py::array::c_style | py::array::forcecast> pzi, py::array_t<double, py::array::c_style | py::array::forcecast> Ei, py::object jetdef)
 {
   // py::buffer_info infooff = offsets.request();
   py::buffer_info infopx = pxi.request();
@@ -96,8 +117,9 @@ fj::ClusterSequence interface(py::array_t<double, py::array::c_style | py::array
   auto jet_def = make_jetdef(jetdef);
   fj::ClusterSequence cs(particles, jet_def);
   jets = fj::sorted_by_pt(cs.inclusive_jets());
+  auto out = output_wrapper(cs, pxptr, pyptr, pzptr, Eptr);
   std::cout << "Clustering with " << jet_def.description() << std::endl;
-  return cs;
+  return out;
 }
 
 
@@ -260,7 +282,9 @@ PYBIND11_MODULE(_ext, m) {
     .value("BestFJ30", Strategy::BestFJ30, "the automatic strategy choice that was being made in FJ 3.0 (restricted to strategies that were present in FJ 3.0)")
     .value("plugin_strategy", Strategy::plugin_strategy, "the plugin has been used...")
     .export_values();
-
+  py::class_<output_wrapper>(m, "output_wrapper")
+    .def(py::init<fj::ClusterSequence, double*, double*, double*, double*>(), "ClusterSequence"_a, "px"_a, "py"_a, "pz"_a, "E"_a)
+    .def_property("cse", &output_wrapper::getCluster,&output_wrapper::setCluster); 
   py::class_<JetDefinition>(m, "JetDefinition", "Jet definition")
     .def(py::init<JetAlgorithm, RecombinationScheme, Strategy>(), "jet_algorithm"_a, "recombination_scheme"_a = E_scheme, "strategy"_a = Best)
     .def(py::init<JetAlgorithm, double, RecombinationScheme, Strategy>(), "jet_algorithm"_a, "R"_a, "recombination_scheme"_a = E_scheme, "strategy"_a = Best)

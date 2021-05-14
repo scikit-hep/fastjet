@@ -9,7 +9,7 @@ __all__ = ("__version__",)
 class AwkwardClusterSequence:
     def __init__(self, data, jetdef):
         self.jetdef = jetdef
-        inps, inpf = self.swig_to_params(self.jetdef)
+        #inps, inpf = self.swig_to_params(self.jetdef)
         container, length, data = ak.to_buffers(data)
         # offsets = data["part0-node0-offsets"]
         data = self.correct_byteorder(data)
@@ -29,7 +29,7 @@ class AwkwardClusterSequence:
 
     @property
     def inclusive_jets(self):
-        np_results = self._results.to_numpy
+        np_results = self._results.cse.to_numpy
         out = ak.Array(
             ak.layout.RecordArray(
                 [
