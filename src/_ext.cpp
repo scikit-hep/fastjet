@@ -337,7 +337,10 @@ PYBIND11_MODULE(_ext, m) {
         for(auto x : ow.particles){
           std::cout<<x.px()<<x.py()<<x.pz()<<std::endl;
         }
-        auto idx = ow.cse.particle_jet_indices(ow.particles);
+        auto idx = ow.cse.particle_jet_indices(jets);
+        for(int i =0; i < idx.size(); i++){
+          std::cout<<idx[i]<<std::endl;
+        }
 
         size_t idxh = 0;
         for(int i = 0; i < size; i++){
