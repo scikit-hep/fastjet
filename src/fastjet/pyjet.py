@@ -24,7 +24,7 @@ class AwkwardClusterSequence:
             if data[keys].dtype.byteorder == "=":
                 pass
             else:
-                data[keys] = data[keys].dtype.nebyteorder("=")
+                data[keys] = data[keys].dtype.newbyteorder("=")
         return data
 
     @property
