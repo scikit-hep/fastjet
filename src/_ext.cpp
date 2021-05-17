@@ -66,7 +66,6 @@ class output_wrapper{
     return cse[0];
   }
   void setCluster(){}
-
 };
 
 fj::ClusterSequence interface(py::array_t<double, py::array::c_style | py::array::forcecast> pxi, py::array_t<double, py::array::c_style | py::array::forcecast> pyi, py::array_t<double, py::array::c_style | py::array::forcecast> pzi, py::array_t<double, py::array::c_style | py::array::forcecast> Ei, py::object jetdef)
