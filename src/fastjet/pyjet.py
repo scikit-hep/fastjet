@@ -20,6 +20,13 @@ class AwkwardClusterSequence:
             pz = data["part0-node3-data"]
             E = data["part0-node4-data"]
             self._results = fastjet._ext.interface(px, py, pz, E, jetdef)
+        if self.jagedness == 1:
+            px = data["part0-node2-data"]
+            py = data["part0-node3-data"]
+            pz = data["part0-node4-data"]
+            E = data["part0-node5-data"]
+            offsets = data["part0-node0-offsets"]
+            self._results = fastjet._ext.interfacemulti(px, py, pz, E, offsets, jetdef)
 
     def correct_byteorder(self, data):
         for keys in data:
@@ -37,20 +44,23 @@ class AwkwardClusterSequence:
 
     @property
     def inclusive_jets(self):
-        np_results = self._results.cse.to_numpy()
-        out = ak.Array(
-            ak.layout.RecordArray(
-                [
-                    ak.layout.NumpyArray(np_results[0]),
-                    ak.layout.NumpyArray(np_results[1]),
-                    ak.layout.NumpyArray(np_results[2]),
-                    ak.layout.NumpyArray(np_results[3]),
-                ],
-                ["px", "py", "pz", "E"],
+        if self.jagedness == 0:
+            np_results = self._results.cse.to_numpy()
+            out = ak.Array(
+                ak.layout.RecordArray(
+                    [
+                        ak.layout.NumpyArray(np_results[0]),
+                        ak.layout.NumpyArray(np_results[1]),
+                        ak.layout.NumpyArray(np_results[2]),
+                        ak.layout.NumpyArray(np_results[3]),
+                    ],
+                    ["px", "py", "pz", "E"],
+                )
             )
-        )
 
-        return out
+            return out
+        if self.jagedness == 1:
+            np_results = self._results.cse
 
     @property
     def unclustered_parts(self):

@@ -63,7 +63,8 @@ class output_wrapper{
   std::vector<int> particles;
 
   fj::ClusterSequence getCluster(){
-    return cse[0];
+    auto a = cse[0];
+    return a;
   }
   void setCluster(){}
 };
@@ -111,7 +112,7 @@ fj::ClusterSequence interface(py::array_t<double, py::array::c_style | py::array
   return cs;
 }
 
-output_wrapper interfacemulti(py::array_t<double, py::array::c_style | py::array::forcecast> pxi, py::array_t<double, py::array::c_style | py::array::forcecast> pyi, py::array_t<double, py::array::c_style | py::array::forcecast> pzi, py::array_t<double, py::array::c_style | py::array::forcecast> Ei,py::array_t<double, py::array::c_style | py::array::forcecast> offsets, py::object jetdef)
+output_wrapper interfacemulti(py::array_t<double, py::array::c_style | py::array::forcecast> pxi, py::array_t<double, py::array::c_style | py::array::forcecast> pyi, py::array_t<double, py::array::c_style | py::array::forcecast> pzi, py::array_t<double, py::array::c_style | py::array::forcecast> Ei,py::array_t<int, py::array::c_style | py::array::forcecast> offsets, py::object jetdef)
 {
   py::buffer_info infooff = offsets.request();
   py::buffer_info infopx = pxi.request();
@@ -136,10 +137,9 @@ output_wrapper interfacemulti(py::array_t<double, py::array::c_style | py::array
   std::vector<double> constphi;
   std::vector<double> idx;
   std::vector<double> idxo;
-  std::vector<fj::PseudoJet> particles;
-  for(int i = *offptr; i <= *(offptr+1); i++){
   for (int i = 0; i < dimoff-1; i++) {
-    for(int j = *offptr; j <= *(offptr+1); j++ ){
+    std::vector<fj::PseudoJet> particles;
+    for(int j = *offptr; j < *(offptr+1); j++ ){
     particles.push_back(fj::PseudoJet(*pxptr, *pyptr, *pzptr, *Eptr));
     pxptr++;
     pyptr++;
@@ -155,7 +155,6 @@ output_wrapper interfacemulti(py::array_t<double, py::array::c_style | py::array
   std::cout << "Clustering with " << jet_def.description() << std::endl;
   offptr++;
   ow.cse.push_back(cs);
-  }
   }
   return ow;
 }
@@ -271,6 +270,7 @@ struct JetFinderSettings
 PYBIND11_MODULE(_ext, m) {
   using namespace fastjet;
   m.def("interface", &interface);
+  m.def("interfacemulti", &interfacemulti);
   /// Jet algorithm definitions
   py::enum_<JetAlgorithm>(m, "JetAlgorithm", py::arithmetic(), "Jet algorithms")
     .value("kt_algorithm", JetAlgorithm::kt_algorithm, "the longitudinally invariant kt algorithm")
@@ -321,7 +321,67 @@ PYBIND11_MODULE(_ext, m) {
     .export_values();
 
   py::class_<output_wrapper>(m, "output_wrapper")
-    .def_property("cse", &output_wrapper::getCluster,&output_wrapper::setCluster);
+    .def_property("cse", &output_wrapper::getCluster,&output_wrapper::setCluster)
+    .def("to_numpy",
+      [](const output_wrapper ow, double min_pt = 0) {
+        auto css = ow.cse;
+        auto len = css.size();
+        // Don't specify the size if using push_back.
+        auto jk = 0;
+        for(int i = 0; i < len; i++){
+        jk += ow.cse.size();
+        }
+        auto px = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
+        auto bufpx = px.request();
+        double *ptrpx = (double *)bufpx.ptr;
+
+        auto py = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
+        auto bufpy = py.request();
+        double *ptrpy = (double *)bufpy.ptr;
+
+        auto pz = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
+        auto bufpz = pz.request();
+        double *ptrpz = (double *)bufpz.ptr;
+
+        auto E = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
+        auto bufE = E.request();
+        double *ptrE = (double *)bufE.ptr;
+
+        auto off = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len}, {sizeof(int)}));
+        auto bufoff = off.request();
+        int *ptroff = (int *)bufoff.ptr;
+        size_t idxe = 0;
+        *ptroff = 0;
+        ptroff++;
+        for(int i = 0; i < len; i++){
+        auto jets = ow.cse[i].inclusive_jets(min_pt);
+        std::cout << "jet " << i << ": " << jets[i].px() << " "
+                    << jets[i].py() << " " << jets[i].pz() << std::endl;
+        for (unsigned int i = 0; i < jets.size(); i++)
+        {
+          ptrpx[idxe] = jets[i].px();
+          ptrpy[idxe] = jets[i].py();
+          ptrpz[idxe] = jets[i].pz();
+          ptrE[idxe] = jets[i].E();
+          idxe++;
+        }
+        *ptroff = jets.size();
+        ptroff++;
+        }
+        return std::make_tuple(
+            px,
+            py,
+            pz,
+            E,
+            off
+          );
+      }, "min_pt"_a = 0, R"pbdoc(
+        Retrieves the inclusive jets from multievent clustering and converts them to numpy arrays.
+        Args:
+          min_pt: Minimum jet pt to include. Default: 0.
+        Returns:
+          pt, eta, phi, m of inclusive jets.
+      )pbdoc");
 
   py::class_<JetDefinition>(m, "JetDefinition", "Jet definition")
     .def(py::init<JetAlgorithm, RecombinationScheme, Strategy>(), "jet_algorithm"_a, "recombination_scheme"_a = E_scheme, "strategy"_a = Best)
