@@ -1,4 +1,5 @@
 import awkward as ak
+import numpy as np
 
 import fastjet._ext  # noqa: F401, E402
 from fastjet.version import __version__  # noqa: E402
@@ -45,7 +46,7 @@ class AwkwardClusterSequence:
     @property
     def inclusive_jets(self):
         if self.jagedness == 0:
-            np_results = self._results.cse.to_numpy()
+            np_results = self._results.to_numpy()
             out = ak.Array(
                 ak.layout.RecordArray(
                     [
@@ -64,7 +65,7 @@ class AwkwardClusterSequence:
 
     @property
     def unclustered_parts(self):
-        np_results = self._results.cse.to_numpy_unclustered()
+        np_results = self._results.to_numpy_unclustered()
         out = ak.Array(
             ak.layout.RecordArray(
                 [
@@ -77,4 +78,15 @@ class AwkwardClusterSequence:
             )
         )
 
+        return out
+
+    @property
+    def constituents(self):
+        np_results = self._results.to_numpy_with_constituents()
+        off = np.insert(np_results[-1], 0, 0)
+        out = ak.Array(
+            ak.layout.ListOffsetArray64(
+                ak.layout.Index64(off), ak.layout.NumpyArray(np_results[-2])
+            )
+        )
         return out
