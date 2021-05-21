@@ -14,14 +14,7 @@ class AwkwardClusterSequence:
         # inps, inpf = self.swig_to_params(self.jetdef)
         # offsets = data["part0-node0-offsets"]
         if self.jagedness == 0:
-            container, length, data = ak.to_buffers(data)
-            px = data["part0-node1-data"]
-            py = data["part0-node2-data"]
-            pz = data["part0-node3-data"]
-            E = data["part0-node4-data"]
-            self._results = fastjet._ext.interface(
-                self.px, self.py, self.pz, self.E, jetdef
-            )
+            data = self.single_to_jagged(data)
         px, py, pz, E, offsets = self.extract_cons(data)
         self.px = self.correct_byteorder(px)
         self.py = self.correct_byteorder(py)
@@ -54,41 +47,42 @@ class AwkwardClusterSequence:
         off = np.insert(off, 0, 0)
         return px, py, pz, E, off
 
-    @property
-    def inclusive_jets(self):
-        if self.jagedness == 0:
-            np_results = self._results.to_numpy()
-            out = ak.Array(
+    def single_to_jagged(self, array):
+        single = ak.Array(
+            ak.layout.ListOffsetArray64(
+                ak.layout.Index64(np.array([0, len(array)])),
                 ak.layout.RecordArray(
                     [
+                        ak.layout.NumpyArray(array.px),
+                        ak.layout.NumpyArray(array.py),
+                        ak.layout.NumpyArray(array.pz),
+                        ak.layout.NumpyArray(array.E),
+                    ],
+                    ["px", "py", "pz", "E"],
+                ),
+            )
+        )
+        return single
+
+    @property
+    def inclusive_jets(self):
+        np_results = self._results.to_numpy()
+        of = np.insert(np_results[-1], len(np_results[-1]), len(np_results[0]))
+        out = ak.Array(
+            ak.layout.ListOffsetArray64(
+                ak.layout.Index64(of),
+                ak.layout.RecordArray(
+                    (
                         ak.layout.NumpyArray(np_results[0]),
                         ak.layout.NumpyArray(np_results[1]),
                         ak.layout.NumpyArray(np_results[2]),
                         ak.layout.NumpyArray(np_results[3]),
-                    ],
-                    ["px", "py", "pz", "E"],
-                )
-            )
-
-            return out
-        if self.jagedness == 1:
-            np_results = self._results.to_numpy()
-            of = np.insert(np_results[-1], len(np_results[-1]), len(np_results[0]))
-            out = ak.Array(
-                ak.layout.ListOffsetArray64(
-                    ak.layout.Index64(of),
-                    ak.layout.RecordArray(
-                        (
-                            ak.layout.NumpyArray(np_results[0]),
-                            ak.layout.NumpyArray(np_results[1]),
-                            ak.layout.NumpyArray(np_results[2]),
-                            ak.layout.NumpyArray(np_results[3]),
-                        ),
-                        ("px", "py", "pz", "E"),
                     ),
-                )
+                    ("px", "py", "pz", "E"),
+                ),
             )
-            return out
+        )
+        return out
 
     @property
     def unclustered_parts(self):

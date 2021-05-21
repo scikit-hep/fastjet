@@ -150,8 +150,12 @@ output_wrapper interfacemulti(py::array_t<double, py::array::c_style | py::array
   std::vector<fj::PseudoJet> jets;
   auto jet_def = make_jetdef(jetdef);
   fj::ClusterSequence cs(particles, jet_def);
+  auto j = cs.inclusive_jets();
+  std::cout<<j.size()<<std::endl;
+  for (unsigned i = 0; i < j.size(); i++) 
+  {std::cout << "jet " << i << ": "<< j[i].px() << " "<< j[i].py() << " " << j[i].pz() << std::endl;}
   jets = fj::sorted_by_pt(cs.inclusive_jets());
-  //auto out = output_wrapper(cs, particles);
+
   std::cout << "Clustering with " << jet_def.description() << std::endl;
   offptr++;
   ow.cse.push_back(cs);
@@ -329,8 +333,12 @@ PYBIND11_MODULE(_ext, m) {
         // Don't specify the size if using push_back.
         auto jk = 0;
         for(int i = 0; i < len; i++){
-        jk += ow.cse.size();
+        jk += css[i].inclusive_jets().size();
         }
+        std::cout<<len<<std::endl;
+        auto j = css[0].inclusive_jets();
+        for (unsigned i = 0; i < j.size(); i++) 
+        {std::cout << "jet " << i << ": "<< j[i].px() << " "<< j[i].py() << " " << j[i].pz() << std::endl;}
         auto px = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
         auto bufpx = px.request();
         double *ptrpx = (double *)bufpx.ptr;
