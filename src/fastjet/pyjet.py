@@ -46,7 +46,7 @@ class AwkwardClusterSequence:
         off = np.asarray(array.layout.stops)
         off = np.insert(off, 0, 0)
         return px, py, pz, E, off
-
+      
     def single_to_jagged(self, array):
         single = ak.Array(
             ak.layout.ListOffsetArray64(
@@ -68,38 +68,36 @@ class AwkwardClusterSequence:
     def inclusive_jets(self):
         np_results = self._results.to_numpy()
         of = np.insert(np_results[-1], len(np_results[-1]), len(np_results[0]))
-        out = ak.Array(
-            ak.layout.ListOffsetArray64(
-                ak.layout.Index64(of),
-                ak.layout.RecordArray(
-                    (
-                        ak.layout.NumpyArray(np_results[0]),
-                        ak.layout.NumpyArray(np_results[1]),
-                        ak.layout.NumpyArray(np_results[2]),
-                        ak.layout.NumpyArray(np_results[3]),
+            out = ak.Array(
+                ak.layout.ListOffsetArray64(
+                    ak.layout.Index64(of),
+                    ak.layout.RecordArray(
+                        (
+                            ak.layout.NumpyArray(np_results[0]),
+                            ak.layout.NumpyArray(np_results[1]),
+                            ak.layout.NumpyArray(np_results[2]),
+                            ak.layout.NumpyArray(np_results[3]),
+                        ),
+                        ("px", "py", "pz", "E"),
                     ),
-                    ("px", "py", "pz", "E"),
-                ),
+                )
             )
-        )
-        return out
+            return out
 
     @property
     def unclustered_parts(self):
         np_results = self._results.to_numpy_unclustered()
         out = ak.Array(
-            ak.layout.RecordArray(
-                [
-                    ak.layout.NumpyArray(np_results[0]),
-                    ak.layout.NumpyArray(np_results[1]),
-                    ak.layout.NumpyArray(np_results[2]),
-                    ak.layout.NumpyArray(np_results[3]),
-                ],
-                ["px", "py", "pz", "E"],
-            )
-        )
-
-        return out
+              ak.layout.RecordArray(
+                  [
+                      ak.layout.NumpyArray(np_results[0]),
+                      ak.layout.NumpyArray(np_results[1]),
+                      ak.layout.NumpyArray(np_results[2]),
+                      ak.layout.NumpyArray(np_results[3]),
+                  ],
+                  ["px", "py", "pz", "E"],
+              )
+          )
 
     @property
     def constituents(self):

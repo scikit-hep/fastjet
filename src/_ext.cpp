@@ -339,6 +339,7 @@ PYBIND11_MODULE(_ext, m) {
         auto j = css[0].inclusive_jets();
         for (unsigned i = 0; i < j.size(); i++) 
         {std::cout << "jet " << i << ": "<< j[i].px() << " "<< j[i].py() << " " << j[i].pz() << std::endl;}
+
         auto px = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
         auto bufpx = px.request();
         double *ptrpx = (double *)bufpx.ptr;
