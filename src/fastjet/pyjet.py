@@ -104,9 +104,13 @@ class AwkwardClusterSequence:
     def constituents(self):
         np_results = self._results.to_numpy_with_constituents()
         off = np.insert(np_results[-1], 0, 0)
+        off = np.append(off, np_results[-2].size)
         out = ak.Array(
             ak.layout.ListOffsetArray64(
-                ak.layout.Index64(off), ak.layout.NumpyArray(np_results[-2])
+                ak.layout.Index64(np_results[0]), ak.layout.NumpyArray(np_results[1])
             )
         )
+        # out = ak.Array(
+        #   ak.layout.ListOffsetArray64(ak.layout.Index64(off), out.layout.content)
+        # )
         return out

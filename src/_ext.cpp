@@ -390,6 +390,86 @@ PYBIND11_MODULE(_ext, m) {
           min_pt: Minimum jet pt to include. Default: 0.
         Returns:
           pt, eta, phi, m of inclusive jets.
+      )pbdoc")
+      .def("to_numpy_with_constituents",
+      [](const output_wrapper ow, double min_pt = 0) {
+        auto css = ow.cse;
+        auto len = css.size();
+        auto jk = 0;
+        auto sizepar = 0;
+
+        for(int i = 0; i < len; i++){
+        jk += css[i].inclusive_jets().size();
+        sizepar += css[i].n_particles();
+        }
+        jk++;
+
+        auto parid = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {sizepar}, {sizeof(int)}));
+        auto bufparid = parid.request();
+        int *ptrid = (int *)bufparid.ptr;
+
+        auto eventoffsets = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len}, {sizeof(int)}));
+        auto bufeventoffsets = eventoffsets.request();
+        int *ptreventoffsets = (int *)bufeventoffsets.ptr;
+        size_t eventidx = 0;
+
+        auto jetoffsets = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {jk}, {sizeof(int)}));
+        auto bufjetoffsets = jetoffsets.request();
+        int *ptrjetoffsets = (int *)bufjetoffsets.ptr;
+        size_t jetidx = 0;
+
+        //for(auto x : ow.particles){
+          //std::cout<<x.px()<<x.py()<<x.pz()<<std::endl;
+        //}
+        size_t idxh = 0;
+        ptrjetoffsets[jetidx] = 0;
+        jetidx++;
+        auto eventprev = 0;
+
+
+        for (unsigned int i = 0; i < css.size(); i++){
+
+        auto jets = css[i].inclusive_jets(min_pt);
+        int size = css[i].inclusive_jets().size();
+        auto idx = css[i].particle_jet_indices(jets);
+        auto sizz = css[i].n_particles();
+        auto prev = ptrjetoffsets[jetidx-1];
+
+        for (unsigned int j = 0; j < jets.size(); j++){
+        ptrjetoffsets[jetidx] = jets[j].constituents().size() + prev;
+        std::cout<<ptrjetoffsets[jetidx]<<std::endl;
+        prev = ptrjetoffsets[jetidx];
+        jetidx++;
+        }
+        for(int k = 0; k < size; k++){
+          for(int j = 0; j <sizz; j++){
+            if(idx[j] == k){
+              ptrid[idxh] = j;
+              idxh++;
+            }
+          }
+        }
+        for(int j = 0; j <sizepar; j++){
+            if(idx[j] == -1){
+              ptrid[idxh] = j;
+              idxh++;
+            }
+          }
+        ptreventoffsets[eventidx] = jets.size()+eventprev+1;
+        eventprev = ptreventoffsets[eventidx];
+        eventidx++;
+          }
+        return std::make_tuple(
+            jetoffsets,
+            parid,
+            eventoffsets
+          );
+      }, "min_pt"_a = 0, R"pbdoc(
+        Retrieves the inclusive jets and converts them to numpy arrays.
+        Args:
+          min_pt: Minimum jet pt to include. Default: 0.
+        Returns:
+          pt, eta, phi, m of inclusive jets.
       )pbdoc");
 
   py::class_<JetDefinition>(m, "JetDefinition", "Jet definition")
