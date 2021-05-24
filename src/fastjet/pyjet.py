@@ -10,20 +10,19 @@ __all__ = ("__version__",)
 class AwkwardClusterSequence:
     def __init__(self, data, jetdef):
         self.jetdef = jetdef
-        self.jagedness = self.check_jaggedness(data)
+        self.data = data
+        self.jagedness = self.check_jaggedness(self.data)
         # inps, inpf = self.swig_to_params(self.jetdef)
         # offsets = data["part0-node0-offsets"]
         if self.jagedness == 0:
             data = self.single_to_jagged(data)
         px, py, pz, E, offsets = self.extract_cons(data)
-        self.px = self.correct_byteorder(px)
-        self.py = self.correct_byteorder(py)
-        self.pz = self.correct_byteorder(pz)
-        self.E = self.correct_byteorder(E)
-        self.offsets = self.correct_byteorder(offsets)
-        self._results = fastjet._ext.interfacemulti(
-            self.px, self.py, self.pz, self.E, self.offsets, self.jetdef
-        )
+        px = self.correct_byteorder(px)
+        py = self.correct_byteorder(py)
+        pz = self.correct_byteorder(pz)
+        E = self.correct_byteorder(E)
+        offsets = self.correct_byteorder(offsets)
+        self._results = fastjet._ext.interfacemulti(px, py, pz, E, offsets, jetdef)
 
     def correct_byteorder(self, data):
         if data.dtype.byteorder == "=":
@@ -101,16 +100,22 @@ class AwkwardClusterSequence:
         return out
 
     @property
-    def constituents(self):
+    def constituent_idx(self):
         np_results = self._results.to_numpy_with_constituents()
         off = np.insert(np_results[-1], 0, 0)
-        off = np.append(off, np_results[-2].size)
         out = ak.Array(
             ak.layout.ListOffsetArray64(
                 ak.layout.Index64(np_results[0]), ak.layout.NumpyArray(np_results[1])
             )
         )
-        # out = ak.Array(
-        #   ak.layout.ListOffsetArray64(ak.layout.Index64(off), out.layout.content)
-        # )
+        out = ak.Array(ak.layout.ListOffsetArray64(ak.layout.Index64(off), out.layout))
         return out
+
+    @property
+    def constituent_particles(self):
+        outputs_to_inputs = self.constituent_idx
+        shape = ak.num(outputs_to_inputs)
+        total = np.sum(shape)
+        duplicate = ak.unflatten(np.zeros(total, np.int64), shape)
+        prepared = self.data[:, np.newaxis][duplicate]
+        return prepared[outputs_to_inputs]

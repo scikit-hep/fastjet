@@ -449,13 +449,7 @@ PYBIND11_MODULE(_ext, m) {
             }
           }
         }
-        for(int j = 0; j <sizepar; j++){
-            if(idx[j] == -1){
-              ptrid[idxh] = j;
-              idxh++;
-            }
-          }
-        ptreventoffsets[eventidx] = jets.size()+eventprev+1;
+        ptreventoffsets[eventidx] = jets.size()+eventprev;
         eventprev = ptreventoffsets[eventidx];
         eventidx++;
           }
