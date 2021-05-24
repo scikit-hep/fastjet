@@ -21,41 +21,21 @@ namespace fj = fastjet;
 namespace py = pybind11;
 using namespace pybind11::literals;
 
-fj::JetDefinition make_jetdef(py::object jetdef){
-  auto n_params = jetdef.attr("n_parameters_for_algorithm")(jetdef.attr("jet_algorithm")()).cast<int>();
-  auto Rv = jetdef.attr("R")().cast<float>();
-  fj::JetDefinition jet_def(fj::antikt_algorithm, Rv);
-  auto description = jetdef.attr("algorithm_description")(jetdef.attr("jet_algorithm")()).cast<std::string>();
-  if (n_params == 0){
-    if(description.compare("e+e- kt (Durham) algorithm (NB: no R)") == 0){
-      jet_def.set_jet_algorithm(fj::ee_kt_algorithm);
-    }
-  }
-  if (n_params == 1)
-  {
-    if (description.compare("Longitudinally invariant kt algorithm") == 0)
-    {
-      jet_def.set_jet_algorithm(fj::kt_algorithm);
-    }
-    if (description.compare("Longitudinally invariant Cambridge/Aachen algorithm") == 0)
-    {
-      jet_def.set_jet_algorithm(fj::cambridge_algorithm);
-    }
-  }
-  if (n_params == 2)
-  {
-    if (description.compare("Longitudinally invariant generalised kt algorithm") == 0)
-    {
-      jet_def.set_jet_algorithm(fj::genkt_algorithm);
-      jet_def.set_extra_param(jetdef.attr("extra_param")().cast<double>());
-    }
-    if (description.compare("e+e- generalised kt algorithm") == 0)
-    {
-      jet_def.set_jet_algorithm(fj::ee_genkt_algorithm);
-      jet_def.set_extra_param(jetdef.attr("extra_param")().cast<double>());
-    }
-  }
-  return jet_def;
+typedef struct{
+  PyObject_HEAD
+  void *ptr;
+  void *ty;
+  int own;
+  PyObject *next;
+} SwigPyObject;
+
+template <typename T>
+T swigtocpp(py::object obj) {
+  auto upointer = obj.attr("this").ptr();
+  auto swigpointer = reinterpret_cast<SwigPyObject*>(upointer);
+  auto objpointervoid = swigpointer->ptr;
+  auto objpointer = reinterpret_cast<T>(objpointervoid);
+  return objpointer;
 }
 class output_wrapper{
   public:
@@ -104,11 +84,11 @@ fj::ClusterSequence interface(py::array_t<double, py::array::c_style | py::array
     Eptr++;
     }
   std::vector<fj::PseudoJet> jets;
-  auto jet_def = make_jetdef(jetdef);
-  fj::ClusterSequence cs(particles, jet_def);
+  auto jet_def = swigtocpp<fj::JetDefinition*>(jetdef);
+  fj::ClusterSequence cs(particles, *jet_def);
   jets = fj::sorted_by_pt(cs.inclusive_jets());
   //auto out = output_wrapper(cs, particles);
-  std::cout << "Clustering with " << jet_def.description() << std::endl;
+  std::cout << "Clustering with " << jet_def->description() << std::endl;
   return cs;
 }
 
@@ -148,15 +128,15 @@ output_wrapper interfacemulti(py::array_t<double, py::array::c_style | py::array
     }
 
   std::vector<fj::PseudoJet> jets;
-  auto jet_def = make_jetdef(jetdef);
-  fj::ClusterSequence cs(particles, jet_def);
+  auto jet_def = swigtocpp<fj::JetDefinition*>(jetdef);
+  fj::ClusterSequence cs(particles, *jet_def);
   auto j = cs.inclusive_jets();
   std::cout<<j.size()<<std::endl;
   for (unsigned i = 0; i < j.size(); i++)
   {std::cout << "jet " << i << ": "<< j[i].px() << " "<< j[i].py() << " " << j[i].pz() << std::endl;}
   jets = fj::sorted_by_pt(cs.inclusive_jets());
 
-  std::cout << "Clustering with " << jet_def.description() << std::endl;
+  std::cout << "Clustering with " << jet_def->description() << std::endl;
   offptr++;
   ow.cse.push_back(cs);
   }
@@ -386,6 +366,80 @@ PYBIND11_MODULE(_ext, m) {
           );
       }, "min_pt"_a = 0, R"pbdoc(
         Retrieves the inclusive jets from multievent clustering and converts them to numpy arrays.
+        Args:
+          min_pt: Minimum jet pt to include. Default: 0.
+        Returns:
+          pt, eta, phi, m of inclusive jets.
+      )pbdoc")
+      .def("to_numpy_with_constituents",
+      [](const output_wrapper ow, double min_pt = 0) {
+        auto css = ow.cse;
+        auto len = css.size();
+        auto jk = 0;
+        auto sizepar = 0;
+
+        for(int i = 0; i < len; i++){
+        jk += css[i].inclusive_jets().size();
+        sizepar += css[i].n_particles();
+        }
+        jk++;
+
+        auto parid = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {sizepar}, {sizeof(int)}));
+        auto bufparid = parid.request();
+        int *ptrid = (int *)bufparid.ptr;
+
+        auto eventoffsets = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len}, {sizeof(int)}));
+        auto bufeventoffsets = eventoffsets.request();
+        int *ptreventoffsets = (int *)bufeventoffsets.ptr;
+        size_t eventidx = 0;
+
+        auto jetoffsets = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {jk}, {sizeof(int)}));
+        auto bufjetoffsets = jetoffsets.request();
+        int *ptrjetoffsets = (int *)bufjetoffsets.ptr;
+        size_t jetidx = 0;
+
+        //for(auto x : ow.particles){
+          //std::cout<<x.px()<<x.py()<<x.pz()<<std::endl;
+        //}
+        size_t idxh = 0;
+        ptrjetoffsets[jetidx] = 0;
+        jetidx++;
+        auto eventprev = 0;
+
+
+        for (unsigned int i = 0; i < css.size(); i++){
+
+        auto jets = css[i].inclusive_jets(min_pt);
+        int size = css[i].inclusive_jets().size();
+        auto idx = css[i].particle_jet_indices(jets);
+        auto sizz = css[i].n_particles();
+        auto prev = ptrjetoffsets[jetidx-1];
+
+        for (unsigned int j = 0; j < jets.size(); j++){
+        ptrjetoffsets[jetidx] = jets[j].constituents().size() + prev;
+        std::cout<<ptrjetoffsets[jetidx]<<std::endl;
+        prev = ptrjetoffsets[jetidx];
+        jetidx++;
+        }
+        for(int k = 0; k < size; k++){
+          for(int j = 0; j <sizz; j++){
+            if(idx[j] == k){
+              ptrid[idxh] = j;
+              idxh++;
+            }
+          }
+        }
+        ptreventoffsets[eventidx] = jets.size()+eventprev;
+        eventprev = ptreventoffsets[eventidx];
+        eventidx++;
+          }
+        return std::make_tuple(
+            jetoffsets,
+            parid,
+            eventoffsets
+          );
+      }, "min_pt"_a = 0, R"pbdoc(
+        Retrieves the inclusive jets and converts them to numpy arrays.
         Args:
           min_pt: Minimum jet pt to include. Default: 0.
         Returns:
