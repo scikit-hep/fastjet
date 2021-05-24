@@ -21,41 +21,21 @@ namespace fj = fastjet;
 namespace py = pybind11;
 using namespace pybind11::literals;
 
-fj::JetDefinition make_jetdef(py::object jetdef){
-  auto n_params = jetdef.attr("n_parameters_for_algorithm")(jetdef.attr("jet_algorithm")()).cast<int>();
-  auto Rv = jetdef.attr("R")().cast<float>();
-  fj::JetDefinition jet_def(fj::antikt_algorithm, Rv);
-  auto description = jetdef.attr("algorithm_description")(jetdef.attr("jet_algorithm")()).cast<std::string>();
-  if (n_params == 0){
-    if(description.compare("e+e- kt (Durham) algorithm (NB: no R)") == 0){
-      jet_def.set_jet_algorithm(fj::ee_kt_algorithm);
-    }
-  }
-  if (n_params == 1)
-  {
-    if (description.compare("Longitudinally invariant kt algorithm") == 0)
-    {
-      jet_def.set_jet_algorithm(fj::kt_algorithm);
-    }
-    if (description.compare("Longitudinally invariant Cambridge/Aachen algorithm") == 0)
-    {
-      jet_def.set_jet_algorithm(fj::cambridge_algorithm);
-    }
-  }
-  if (n_params == 2)
-  {
-    if (description.compare("Longitudinally invariant generalised kt algorithm") == 0)
-    {
-      jet_def.set_jet_algorithm(fj::genkt_algorithm);
-      jet_def.set_extra_param(jetdef.attr("extra_param")().cast<double>());
-    }
-    if (description.compare("e+e- generalised kt algorithm") == 0)
-    {
-      jet_def.set_jet_algorithm(fj::ee_genkt_algorithm);
-      jet_def.set_extra_param(jetdef.attr("extra_param")().cast<double>());
-    }
-  }
-  return jet_def;
+typedef struct{
+  PyObject_HEAD
+  void *ptr;
+  void *ty;
+  int own;
+  PyObject *next;
+} SwigPyObject;
+
+template <typename T>
+T swigtocpp(py::object obj) {
+  auto upointer = obj.attr("this").ptr();
+  auto swigpointer = reinterpret_cast<SwigPyObject*>(upointer);
+  auto objpointervoid = swigpointer->ptr;
+  auto objpointer = reinterpret_cast<T>(objpointervoid);
+  return objpointer;
 }
 class output_wrapper{
   public:
@@ -104,11 +84,11 @@ fj::ClusterSequence interface(py::array_t<double, py::array::c_style | py::array
     Eptr++;
     }
   std::vector<fj::PseudoJet> jets;
-  auto jet_def = make_jetdef(jetdef);
-  fj::ClusterSequence cs(particles, jet_def);
+  auto jet_def = swigtocpp<fj::JetDefinition*>(jetdef);
+  fj::ClusterSequence cs(particles, *jet_def);
   jets = fj::sorted_by_pt(cs.inclusive_jets());
   //auto out = output_wrapper(cs, particles);
-  std::cout << "Clustering with " << jet_def.description() << std::endl;
+  std::cout << "Clustering with " << jet_def->description() << std::endl;
   return cs;
 }
 
@@ -148,15 +128,15 @@ output_wrapper interfacemulti(py::array_t<double, py::array::c_style | py::array
     }
 
   std::vector<fj::PseudoJet> jets;
-  auto jet_def = make_jetdef(jetdef);
-  fj::ClusterSequence cs(particles, jet_def);
+  auto jet_def = swigtocpp<fj::JetDefinition*>(jetdef);
+  fj::ClusterSequence cs(particles, *jet_def);
   auto j = cs.inclusive_jets();
   std::cout<<j.size()<<std::endl;
   for (unsigned i = 0; i < j.size(); i++)
   {std::cout << "jet " << i << ": "<< j[i].px() << " "<< j[i].py() << " " << j[i].pz() << std::endl;}
   jets = fj::sorted_by_pt(cs.inclusive_jets());
 
-  std::cout << "Clustering with " << jet_def.description() << std::endl;
+  std::cout << "Clustering with " << jet_def->description() << std::endl;
   offptr++;
   ow.cse.push_back(cs);
   }
