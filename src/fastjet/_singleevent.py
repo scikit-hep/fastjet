@@ -97,11 +97,20 @@ class _classsingleevent:
             )
         )
         out = ak.Array(ak.layout.ListOffsetArray64(ak.layout.Index64(off), out.layout))
-        return out
+        return out[0]
 
     @property
     def constituents(self):
-        outputs_to_inputs = self.constituent_index
+        np_results = self._results.to_numpy_with_constituents()
+        off = np.insert(np_results[-1], 0, 0)
+        out = ak.Array(
+            ak.layout.ListOffsetArray64(
+                ak.layout.Index64(np_results[0]), ak.layout.NumpyArray(np_results[1])
+            )
+        )
+        outputs_to_inputs = ak.Array(
+            ak.layout.ListOffsetArray64(ak.layout.Index64(off), out.layout)
+        )
         shape = ak.num(outputs_to_inputs)
         total = np.sum(shape)
         duplicate = ak.unflatten(np.zeros(total, np.int64), shape)
