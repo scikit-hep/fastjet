@@ -55,9 +55,8 @@ class _classsingleevent:
         )
         return single
 
-    @property
-    def inclusive_jets(self):
-        np_results = self._results.to_numpy()
+    def inclusive_jets(self, min_pt):
+        np_results = self._results.to_numpy(min_pt)
         out = ak.Array(
             ak.layout.RecordArray(
                 (
@@ -71,7 +70,6 @@ class _classsingleevent:
         )
         return out
 
-    @property
     def unclustered_parts(self):
         np_results = self._results.to_numpy_unclustered()
         out = ak.Array(
@@ -87,9 +85,8 @@ class _classsingleevent:
         )
         return out
 
-    @property
-    def constituent_index(self):
-        np_results = self._results.to_numpy_with_constituents()
+    def constituent_index(self, min_pt):
+        np_results = self._results.to_numpy_with_constituents(min_pt)
         off = np.insert(np_results[-1], 0, 0)
         out = ak.Array(
             ak.layout.ListOffsetArray64(
@@ -99,9 +96,8 @@ class _classsingleevent:
         out = ak.Array(ak.layout.ListOffsetArray64(ak.layout.Index64(off), out.layout))
         return out[0]
 
-    @property
-    def constituents(self):
-        np_results = self._results.to_numpy_with_constituents()
+    def constituents(self, min_pt):
+        np_results = self._results.to_numpy_with_constituents(min_pt)
         off = np.insert(np_results[-1], 0, 0)
         out = ak.Array(
             ak.layout.ListOffsetArray64(
