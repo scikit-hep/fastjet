@@ -11,12 +11,17 @@ __all__ = ("__version__",)
 class AwkwardClusterSequence:
     def __init__(self, data, jetdef):
         """The base class for all clustering"""
+        self._jetdef = jetdef
         self._jagedness = self._check_jaggedness(data)
         if self._check_listoffset(data):
             if self._jagedness >= 1:
-                self._internalrep = fastjet._multievent._classmultievent(data, jetdef)
+                self._internalrep = fastjet._multievent._classmultievent(
+                    data, self._jetdef
+                )
         if self._jagedness == 0:
-            self._internalrep = fastjet._singleevent._classsingleevent(data, jetdef)
+            self._internalrep = fastjet._singleevent._classsingleevent(
+                data, self._jetdef
+            )
 
     def _check_jaggedness(self, data):
         """Internal function for checking the jaggedness of awkward array"""
@@ -36,6 +41,10 @@ class AwkwardClusterSequence:
             ),
         )
         return out
+
+    def jet_def(self):
+        """Returns the Jet Definition Object associated with the instance"""
+        return self._jetdef
 
     def inclusive_jets(self, min_pt=0):
         """Returns the inclusive jets after clustering in the same format as the input awkward array"""
