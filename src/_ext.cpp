@@ -313,10 +313,10 @@ PYBIND11_MODULE(_ext, m) {
         // Don't specify the size if using push_back.
         auto jk = 0;
         for(int i = 0; i < len; i++){
-        jk += css[i].inclusive_jets().size();
+        jk += css[i].inclusive_jets(min_pt).size();
         }
         std::cout<<len<<std::endl;
-        auto j = css[0].inclusive_jets();
+        auto j = css[0].inclusive_jets(min_pt);
         for (unsigned i = 0; i < j.size(); i++)
         {std::cout << "jet " << i << ": "<< j[i].px() << " "<< j[i].py() << " " << j[i].pz() << std::endl;}
 

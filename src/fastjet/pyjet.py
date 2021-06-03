@@ -11,21 +11,26 @@ __all__ = ("__version__",)
 class AwkwardClusterSequence:
     def __init__(self, data, jetdef):
         """The base class for all clustering"""
-        self.jagedness = self.check_jaggedness(data)
-        if self.check_listoffset(data):
-            if self.jagedness >= 1:
-                self._internalrep = fastjet._multievent._classmultievent(data, jetdef)
-        if self.jagedness == 0:
-            self._internalrep = fastjet._singleevent._classsingleevent(data, jetdef)
+        self._jetdef = jetdef
+        self._jagedness = self._check_jaggedness(data)
+        if self._check_listoffset(data):
+            if self._jagedness >= 1:
+                self._internalrep = fastjet._multievent._classmultievent(
+                    data, self._jetdef
+                )
+        if self._jagedness == 0:
+            self._internalrep = fastjet._singleevent._classsingleevent(
+                data, self._jetdef
+            )
 
-    def check_jaggedness(self, data):
+    def _check_jaggedness(self, data):
         """Internal function for checking the jaggedness of awkward array"""
         if isinstance(data.layout, ak.layout.ListOffsetArray64):
-            return 1 + self.check_jaggedness(ak.Array(data.layout.content))
+            return 1 + self._check_jaggedness(ak.Array(data.layout.content))
         else:
             return 0
 
-    def check_listoffset(self, data):
+    def _check_listoffset(self, data):
         """Internal function for checking whether the given array is a listoffset array or not"""
         out = isinstance(
             data.layout,
@@ -35,25 +40,24 @@ class AwkwardClusterSequence:
                 ak.layout.ListOffsetArrayU32,
             ),
         )
-
         return out
 
-    @property
-    def inclusive_jets(self):
-        """Returns the inclusive jets after clustering in the same format as the input awkward array"""
-        return self._internalrep.inclusive_jets
+    def jet_def(self):
+        """Returns the Jet Definition Object associated with the instance"""
+        return self._jetdef
 
-    @property
+    def inclusive_jets(self, min_pt=0):
+        """Returns the inclusive jets after clustering in the same format as the input awkward array"""
+        return self._internalrep.inclusive_jets(min_pt)
+
     def unclustered_parts(self):
         """Returns the particles that were left unclustered"""
         return self._internalrep.unclustered_parts
 
-    @property
-    def constituent_index(self):
+    def constituent_index(self, min_pt=0):
         """Returns the index of the constituent of each Jet"""
-        return self._internalrep.constituent_index
+        return self._internalrep.constituent_index(min_pt)
 
-    @property
-    def constituents(self):
+    def constituents(self, min_pt=0):
         """Returns the particles that make up each Jet"""
-        return self._internalrep.constituents
+        return self._internalrep.constituents(min_pt)

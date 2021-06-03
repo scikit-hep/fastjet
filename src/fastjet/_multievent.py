@@ -49,9 +49,8 @@ class _classmultievent:
         )
         return single
 
-    @property
-    def inclusive_jets(self):
-        np_results = self._results.to_numpy()
+    def inclusive_jets(self, min_pt):
+        np_results = self._results.to_numpy(min_pt)
         of = np.insert(np_results[-1], len(np_results[-1]), len(np_results[0]))
         out = ak.Array(
             ak.layout.ListOffsetArray64(
@@ -85,9 +84,8 @@ class _classmultievent:
         )
         return out
 
-    @property
-    def constituent_index(self):
-        np_results = self._results.to_numpy_with_constituents()
+    def constituent_index(self, min_pt):
+        np_results = self._results.to_numpy_with_constituents(min_pt)
         off = np.insert(np_results[-1], 0, 0)
         out = ak.Array(
             ak.layout.ListOffsetArray64(
@@ -97,9 +95,8 @@ class _classmultievent:
         out = ak.Array(ak.layout.ListOffsetArray64(ak.layout.Index64(off), out.layout))
         return out
 
-    @property
-    def constituents(self):
-        outputs_to_inputs = self.constituent_index
+    def constituents(self, min_pt):
+        outputs_to_inputs = self.constituent_index(min_pt)
         shape = ak.num(outputs_to_inputs)
         total = np.sum(shape)
         duplicate = ak.unflatten(np.zeros(total, np.int64), shape)
