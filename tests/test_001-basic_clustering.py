@@ -1,6 +1,7 @@
 import awkward as ak  # noqa: F401
 import numpy as np  # noqa: F401
 import pytest  # noqa: F401
+
 import fastjet.pyjet  # noqa: F401
 
 vector = pytest.importorskip("vector")  # noqa: F401
