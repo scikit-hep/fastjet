@@ -70,6 +70,29 @@ class _classsingleevent:
         )
         return out
 
+    def exclusive_jets(self, n_jets, dcut):
+        np_results = 0
+        if n_jets == 0:
+            raise ValueError("Njets cannot be 0")
+        if dcut == -1 and n_jets != -1:
+            np_results = self._results.to_numpy_exclusive_njet(n_jets)
+        if n_jets == -1 and dcut != -1:
+            np_results = self._results.to_numpy_exclusive_dcut(dcut)
+        if np_results == 0:
+            raise ValueError("Either Dcut or Njets should be entered")
+        out = ak.Array(
+            ak.layout.RecordArray(
+                (
+                    ak.layout.NumpyArray(np_results[0]),
+                    ak.layout.NumpyArray(np_results[1]),
+                    ak.layout.NumpyArray(np_results[2]),
+                    ak.layout.NumpyArray(np_results[3]),
+                ),
+                ("px", "py", "pz", "E"),
+            )
+        )
+        return out
+
     def unclustered_parts(self):
         np_results = self._results.to_numpy_unclustered()
         out = ak.Array(

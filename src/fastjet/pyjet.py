@@ -50,6 +50,10 @@ class AwkwardClusterSequence:
         """Returns the inclusive jets after clustering in the same format as the input awkward array"""
         return self._internalrep.inclusive_jets(min_pt)
 
+    def exclusive_jets(self, n_jets=-1, dcut=-1):
+        """Returns the exclusive jets after clustering in the same format as the input awkward array"""
+        return self._internalrep.exclusive_jets(n_jets, dcut)
+
     def unclustered_parts(self):
         """Returns the particles that were left unclustered"""
         return self._internalrep.unclustered_parts

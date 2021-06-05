@@ -444,6 +444,136 @@ PYBIND11_MODULE(_ext, m) {
           min_pt: Minimum jet pt to include. Default: 0.
         Returns:
           pt, eta, phi, m of inclusive jets.
+      )pbdoc")
+      .def("to_numpy_exclusive_njet",
+      [](const output_wrapper ow, const int n_jets = 0) {
+        auto css = ow.cse;
+        auto len = css.size();
+        // Don't specify the size if using push_back.
+        auto jk = 0;
+        for(int i = 0; i < len; i++){
+        jk += css[i].exclusive_jets(n_jets).size();
+        }
+        std::cout<<len<<std::endl;
+        auto j = css[0].exclusive_jets(n_jets);
+        for (unsigned i = 0; i < j.size(); i++)
+        {std::cout << "jet " << i << ": "<< j[i].px() << " "<< j[i].py() << " " << j[i].pz() << std::endl;}
+
+        auto px = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
+        auto bufpx = px.request();
+        double *ptrpx = (double *)bufpx.ptr;
+
+        auto py = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
+        auto bufpy = py.request();
+        double *ptrpy = (double *)bufpy.ptr;
+
+        auto pz = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
+        auto bufpz = pz.request();
+        double *ptrpz = (double *)bufpz.ptr;
+
+        auto E = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
+        auto bufE = E.request();
+        double *ptrE = (double *)bufE.ptr;
+
+        auto off = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len}, {sizeof(int)}));
+        auto bufoff = off.request();
+        int *ptroff = (int *)bufoff.ptr;
+        size_t idxe = 0;
+        *ptroff = 0;
+        ptroff++;
+        for(int i = 0; i < len; i++){
+        auto jets = ow.cse[i].exclusive_jets(n_jets);
+        std::cout << "jet " << i << ": " << jets[i].px() << " "
+                    << jets[i].py() << " " << jets[i].pz() << std::endl;
+        for (unsigned int i = 0; i < jets.size(); i++)
+        {
+          ptrpx[idxe] = jets[i].px();
+          ptrpy[idxe] = jets[i].py();
+          ptrpz[idxe] = jets[i].pz();
+          ptrE[idxe] = jets[i].E();
+          idxe++;
+        }
+        *ptroff = jets.size();
+        ptroff++;
+        }
+        return std::make_tuple(
+            px,
+            py,
+            pz,
+            E,
+            off
+          );
+      }, "n_jets"_a = 0, R"pbdoc(
+        Retrieves the exclusive jets upto n jets from multievent clustering and converts them to numpy arrays.
+        Args:
+          min_pt: Minimum jet pt to include. Default: 0.
+        Returns:
+          pt, eta, phi, m of inclusive jets.
+      )pbdoc")
+      .def("to_numpy_exclusive_dcut",
+      [](const output_wrapper ow, const double dcut = 100) {
+        auto css = ow.cse;
+        auto len = css.size();
+        // Don't specify the size if using push_back.
+        auto jk = 0;
+        for(int i = 0; i < len; i++){
+        jk += css[i].exclusive_jets(dcut).size();
+        }
+        std::cout<<len<<std::endl;
+        auto j = css[0].exclusive_jets(dcut);
+        for (unsigned i = 0; i < j.size(); i++)
+        {std::cout << "jet " << i << ": "<< j[i].px() << " "<< j[i].py() << " " << j[i].pz() << std::endl;}
+
+        auto px = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
+        auto bufpx = px.request();
+        double *ptrpx = (double *)bufpx.ptr;
+
+        auto py = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
+        auto bufpy = py.request();
+        double *ptrpy = (double *)bufpy.ptr;
+
+        auto pz = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
+        auto bufpz = pz.request();
+        double *ptrpz = (double *)bufpz.ptr;
+
+        auto E = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
+        auto bufE = E.request();
+        double *ptrE = (double *)bufE.ptr;
+
+        auto off = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len}, {sizeof(int)}));
+        auto bufoff = off.request();
+        int *ptroff = (int *)bufoff.ptr;
+        size_t idxe = 0;
+        *ptroff = 0;
+        ptroff++;
+        for(int i = 0; i < len; i++){
+        auto jets = ow.cse[i].exclusive_jets(dcut);
+        std::cout << "jet " << i << ": " << jets[i].px() << " "
+                    << jets[i].py() << " " << jets[i].pz() << std::endl;
+        for (unsigned int i = 0; i < jets.size(); i++)
+        {
+          ptrpx[idxe] = jets[i].px();
+          ptrpy[idxe] = jets[i].py();
+          ptrpz[idxe] = jets[i].pz();
+          ptrE[idxe] = jets[i].E();
+          idxe++;
+        }
+        *ptroff = jets.size();
+        ptroff++;
+        }
+        return std::make_tuple(
+            px,
+            py,
+            pz,
+            E,
+            off
+          );
+      }, "dcut"_a = 100, R"pbdoc(
+        Retrieves the exclusive jets upto the given dcut from multievent clustering and converts them to numpy arrays.
+        Args:
+          min_pt: Minimum jet pt to include. Default: 0.
+        Returns:
+          pt, eta, phi, m of inclusive jets.
       )pbdoc");
 
   py::class_<JetDefinition>(m, "JetDefinition", "Jet definition")
