@@ -84,6 +84,35 @@ class _classmultievent:
         )
         return out
 
+    def exclusive_jets(self, n_jets, dcut):
+        of = 0
+        np_results = 0
+        if n_jets == 0:
+            raise ValueError("Njets cannot be 0")
+        if dcut == -1 and n_jets != -1:
+            np_results = self._results.to_numpy_exclusive_njet(n_jets)
+            of = np.insert(np_results[-1], len(np_results[-1]), len(np_results[0]))
+        if n_jets == -1 and dcut != -1:
+            np_results = self._results.to_numpy_exclusive_dcut(dcut)
+            of = np.insert(np_results[-1], len(np_results[-1]), len(np_results[0]))
+        if np_results == 0 and np_results == 0:
+            raise ValueError("Either NJets or Dcut sould be entered")
+        out = ak.Array(
+            ak.layout.ListOffsetArray64(
+                ak.layout.Index64(of),
+                ak.layout.RecordArray(
+                    (
+                        ak.layout.NumpyArray(np_results[0]),
+                        ak.layout.NumpyArray(np_results[1]),
+                        ak.layout.NumpyArray(np_results[2]),
+                        ak.layout.NumpyArray(np_results[3]),
+                    ),
+                    ("px", "py", "pz", "E"),
+                ),
+            )
+        )
+        return out
+
     def constituent_index(self, min_pt):
         np_results = self._results.to_numpy_with_constituents(min_pt)
         off = np.insert(np_results[-1], 0, 0)
