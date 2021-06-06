@@ -93,6 +93,21 @@ class _classsingleevent:
         )
         return out
 
+    def exclusive_jets_ycut(self, ycut):
+        np_results = self._results.to_numpy_exclusive_ycut(ycut)
+        out = ak.Array(
+            ak.layout.RecordArray(
+                (
+                    ak.layout.NumpyArray(np_results[0]),
+                    ak.layout.NumpyArray(np_results[1]),
+                    ak.layout.NumpyArray(np_results[2]),
+                    ak.layout.NumpyArray(np_results[3]),
+                ),
+                ("px", "py", "pz", "E"),
+            )
+        )
+        return out
+
     def unclustered_parts(self):
         np_results = self._results.to_numpy_unclustered()
         out = ak.Array(
