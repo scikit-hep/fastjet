@@ -62,3 +62,50 @@ def test_exclusive_multi():
         [{"px": 1.2, "py": 3.2, "pz": 5.4, "E": 2.5}],
     ]
     assert multi_exclusive_dcut == cluster.exclusive_jets(dcut=0.0001).to_list()
+
+
+def test_exclusive_ycut():
+    array = ak.Array(
+        [
+            [
+                {"px": 1.2, "py": 3.2, "pz": 5.4, "E": 2.5, "ex": 0.78},
+                {"px": 32.2, "py": 64.21, "pz": 543.34, "E": 24.12, "ex": 0.35},
+                {"px": 32.45, "py": 63.21, "pz": 543.14, "E": 24.56, "ex": 0.0},
+            ],
+            [
+                {"px": 1.2, "py": 3.2, "pz": 5.4, "E": 2.5, "ex": 0.78},
+                {"px": 32.2, "py": 64.21, "pz": 543.34, "E": 24.12, "ex": 0.35},
+                {"px": 32.45, "py": 63.21, "pz": 543.14, "E": 24.56, "ex": 0.0},
+            ],
+        ]
+    )
+    jetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.6)
+    cluster = fastjet.pyjet.AwkwardClusterSequence(array, jetdef)
+    multi_exclusive_ycut = [
+        [
+            {"px": 32.2, "py": 64.21, "pz": 543.34, "E": 24.12},
+            {"px": 32.45, "py": 63.21, "pz": 543.14, "E": 24.56},
+            {"px": 1.2, "py": 3.2, "pz": 5.4, "E": 2.5},
+        ],
+        [
+            {"px": 32.2, "py": 64.21, "pz": 543.34, "E": 24.12},
+            {"px": 32.45, "py": 63.21, "pz": 543.14, "E": 24.56},
+            {"px": 1.2, "py": 3.2, "pz": 5.4, "E": 2.5},
+        ],
+    ]
+    assert multi_exclusive_ycut == cluster.exclusive_jets_ycut(ycut=0.01).to_list()
+    array2 = ak.Array(
+        [
+            {"px": 1.2, "py": 3.2, "pz": 5.4, "E": 2.5, "ex": 0.78},
+            {"px": 32.2, "py": 64.21, "pz": 543.34, "E": 24.12, "ex": 0.35},
+            {"px": 32.45, "py": 63.21, "pz": 543.14, "E": 24.56, "ex": 0.0},
+        ],
+    )
+    jetdef2 = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.6)
+    cluster = fastjet.pyjet.AwkwardClusterSequence(array2, jetdef2)
+    single_exclusive_ycut = [
+        {"px": 32.2, "py": 64.21, "pz": 543.34, "E": 24.12},
+        {"px": 32.45, "py": 63.21, "pz": 543.14, "E": 24.56},
+        {"px": 1.2, "py": 3.2, "pz": 5.4, "E": 2.5},
+    ]
+    assert single_exclusive_ycut == cluster.exclusive_jets_ycut(ycut=0.01).to_list()
