@@ -253,8 +253,8 @@ struct JetFinderSettings
 
 PYBIND11_MODULE(_ext, m) {
   using namespace fastjet;
-  m.def("interface", &interface);
-  m.def("interfacemulti", &interfacemulti);
+  m.def("interface", &interface, py::return_value_policy::take_ownership);
+  m.def("interfacemulti", &interfacemulti, py::return_value_policy::take_ownership);
   /// Jet algorithm definitions
   py::enum_<JetAlgorithm>(m, "JetAlgorithm", py::arithmetic(), "Jet algorithms")
     .value("kt_algorithm", JetAlgorithm::kt_algorithm, "the longitudinally invariant kt algorithm")
