@@ -30,7 +30,7 @@ typedef struct{
 } SwigPyObject;
 
 template <typename T>
-T swigtocpp(py::object obj) {
+T swigtocpp(py::object obj) {  // unwraps python object to get the cpp pointer from the swig bindings
   auto upointer = obj.attr("this").ptr();
   auto swigpointer = reinterpret_cast<SwigPyObject*>(upointer);
   auto objpointervoid = swigpointer->ptr;
