@@ -30,7 +30,7 @@ typedef struct{
 } SwigPyObject;
 
 template <typename T>
-T swigtocpp(py::object obj) {
+T swigtocpp(py::object obj) {  // unwraps python object to get the cpp pointer from the swig bindings
   auto upointer = obj.attr("this").ptr();
   auto swigpointer = reinterpret_cast<SwigPyObject*>(upointer);
   auto objpointervoid = swigpointer->ptr;
@@ -253,8 +253,8 @@ struct JetFinderSettings
 
 PYBIND11_MODULE(_ext, m) {
   using namespace fastjet;
-  m.def("interface", &interface);
-  m.def("interfacemulti", &interfacemulti);
+  m.def("interface", &interface, py::return_value_policy::take_ownership);
+  m.def("interfacemulti", &interfacemulti, py::return_value_policy::take_ownership);
   /// Jet algorithm definitions
   py::enum_<JetAlgorithm>(m, "JetAlgorithm", py::arithmetic(), "Jet algorithms")
     .value("kt_algorithm", JetAlgorithm::kt_algorithm, "the longitudinally invariant kt algorithm")

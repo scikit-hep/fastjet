@@ -94,6 +94,9 @@ def test_exclusive_ycut():
         ],
     ]
     assert multi_exclusive_ycut == cluster.exclusive_jets_ycut(ycut=0.01).to_list()
+
+
+def test_exclusive_ycut_multi():
     array2 = ak.Array(
         [
             {"px": 1.2, "py": 3.2, "pz": 5.4, "E": 2.5, "ex": 0.78},
