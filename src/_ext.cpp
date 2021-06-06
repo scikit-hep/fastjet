@@ -39,10 +39,10 @@ T swigtocpp(py::object obj) {  // unwraps python object to get the cpp pointer f
 }
 class output_wrapper{
   public:
-  std::vector<fj::ClusterSequence> cse;
+  std::vector<std::shared_ptr<fj::ClusterSequence>> cse;
   std::vector<int> particles;
 
-  fj::ClusterSequence getCluster(){
+  std::shared_ptr<fj::ClusterSequence> getCluster(){
     auto a = cse[0];
     return a;
   }
@@ -129,12 +129,11 @@ output_wrapper interfacemulti(py::array_t<double, py::array::c_style | py::array
 
   std::vector<fj::PseudoJet> jets;
   auto jet_def = swigtocpp<fj::JetDefinition*>(jetdef);
-  fj::ClusterSequence cs(particles, *jet_def);
-  auto j = cs.inclusive_jets();
+  std::shared_ptr<fastjet::ClusterSequence> cs = std::make_shared<fastjet::ClusterSequence>(particles, *jet_def);
+  auto j = cs->inclusive_jets();
   std::cout<<j.size()<<std::endl;
   for (unsigned i = 0; i < j.size(); i++)
   {std::cout << "jet " << i << ": "<< j[i].px() << " "<< j[i].py() << " " << j[i].pz() << std::endl;}
-  jets = fj::sorted_by_pt(cs.inclusive_jets());
 
   std::cout << "Clustering with " << jet_def->description() << std::endl;
   offptr++;
@@ -313,13 +312,8 @@ PYBIND11_MODULE(_ext, m) {
         // Don't specify the size if using push_back.
         auto jk = 0;
         for(int i = 0; i < len; i++){
-        jk += css[i].inclusive_jets(min_pt).size();
+        jk += css[i]->inclusive_jets(min_pt).size();
         }
-        std::cout<<len<<std::endl;
-        auto j = css[0].inclusive_jets(min_pt);
-        for (unsigned i = 0; i < j.size(); i++)
-        {std::cout << "jet " << i << ": "<< j[i].px() << " "<< j[i].py() << " " << j[i].pz() << std::endl;}
-
         auto px = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
         auto bufpx = px.request();
         double *ptrpx = (double *)bufpx.ptr;
@@ -343,9 +337,7 @@ PYBIND11_MODULE(_ext, m) {
         *ptroff = 0;
         ptroff++;
         for(int i = 0; i < len; i++){
-        auto jets = ow.cse[i].inclusive_jets(min_pt);
-        std::cout << "jet " << i << ": " << jets[i].px() << " "
-                    << jets[i].py() << " " << jets[i].pz() << std::endl;
+        auto jets = ow.cse[i]->inclusive_jets(min_pt);
         for (unsigned int i = 0; i < jets.size(); i++)
         {
           ptrpx[idxe] = jets[i].px();
@@ -379,8 +371,8 @@ PYBIND11_MODULE(_ext, m) {
         auto sizepar = 0;
 
         for(int i = 0; i < len; i++){
-        jk += css[i].inclusive_jets().size();
-        sizepar += css[i].n_particles();
+        jk += css[i]->inclusive_jets().size();
+        sizepar += css[i]->n_particles();
         }
         jk++;
 
@@ -409,10 +401,10 @@ PYBIND11_MODULE(_ext, m) {
 
         for (unsigned int i = 0; i < css.size(); i++){
 
-        auto jets = css[i].inclusive_jets(min_pt);
-        int size = css[i].inclusive_jets().size();
-        auto idx = css[i].particle_jet_indices(jets);
-        auto sizz = css[i].n_particles();
+        auto jets = css[i]->inclusive_jets(min_pt);
+        int size = css[i]->inclusive_jets().size();
+        auto idx = css[i]->particle_jet_indices(jets);
+        auto sizz = css[i]->n_particles();
         auto prev = ptrjetoffsets[jetidx-1];
 
         for (unsigned int j = 0; j < jets.size(); j++){
@@ -452,12 +444,8 @@ PYBIND11_MODULE(_ext, m) {
         // Don't specify the size if using push_back.
         auto jk = 0;
         for(int i = 0; i < len; i++){
-        jk += css[i].exclusive_jets(n_jets).size();
+        jk += css[i]->exclusive_jets(n_jets).size();
         }
-        std::cout<<len<<std::endl;
-        auto j = css[0].exclusive_jets(n_jets);
-        for (unsigned i = 0; i < j.size(); i++)
-        {std::cout << "jet " << i << ": "<< j[i].px() << " "<< j[i].py() << " " << j[i].pz() << std::endl;}
 
         auto px = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
         auto bufpx = px.request();
@@ -482,9 +470,7 @@ PYBIND11_MODULE(_ext, m) {
         *ptroff = 0;
         ptroff++;
         for(int i = 0; i < len; i++){
-        auto jets = ow.cse[i].exclusive_jets(n_jets);
-        std::cout << "jet " << i << ": " << jets[i].px() << " "
-                    << jets[i].py() << " " << jets[i].pz() << std::endl;
+        auto jets = ow.cse[i]->exclusive_jets(n_jets);
         for (unsigned int i = 0; i < jets.size(); i++)
         {
           ptrpx[idxe] = jets[i].px();
@@ -517,12 +503,8 @@ PYBIND11_MODULE(_ext, m) {
         // Don't specify the size if using push_back.
         auto jk = 0;
         for(int i = 0; i < len; i++){
-        jk += css[i].exclusive_jets(dcut).size();
+        jk += css[i]->exclusive_jets(dcut).size();
         }
-        std::cout<<len<<std::endl;
-        auto j = css[0].exclusive_jets(dcut);
-        for (unsigned i = 0; i < j.size(); i++)
-        {std::cout << "jet " << i << ": "<< j[i].px() << " "<< j[i].py() << " " << j[i].pz() << std::endl;}
 
         auto px = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
         auto bufpx = px.request();
@@ -547,9 +529,7 @@ PYBIND11_MODULE(_ext, m) {
         *ptroff = 0;
         ptroff++;
         for(int i = 0; i < len; i++){
-        auto jets = ow.cse[i].exclusive_jets(dcut);
-        std::cout << "jet " << i << ": " << jets[i].px() << " "
-                    << jets[i].py() << " " << jets[i].pz() << std::endl;
+        auto jets = ow.cse[i]->exclusive_jets(dcut);
         for (unsigned int i = 0; i < jets.size(); i++)
         {
           ptrpx[idxe] = jets[i].px();
@@ -582,13 +562,8 @@ PYBIND11_MODULE(_ext, m) {
         // Don't specify the size if using push_back.
         auto jk = 0;
         for(int i = 0; i < len; i++){
-        jk += css[i].exclusive_jets_ycut(ycut).size();
+        jk += css[i]->exclusive_jets_ycut(ycut).size();
         }
-        std::cout<<len<<std::endl;
-        auto j = css[0].exclusive_jets_ycut(ycut);
-        for (unsigned i = 0; i < j.size(); i++)
-        {std::cout << "jet " << i << ": "<< j[i].px() << " "<< j[i].py() << " " << j[i].pz() << std::endl;}
-
         auto px = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
         auto bufpx = px.request();
         double *ptrpx = (double *)bufpx.ptr;
@@ -612,11 +587,9 @@ PYBIND11_MODULE(_ext, m) {
         *ptroff = 0;
         ptroff++;
         for(int i = 0; i < len; i++){
-        auto jets = ow.cse[i].exclusive_jets_ycut(ycut);
-        std::cout << "jet " << i << ": " << jets[i].px() << " "
-                    << jets[i].py() << " " << jets[i].pz() << std::endl;
-        for (unsigned int i = 0; i < jets.size(); i++)
-        {
+        auto jets = ow.cse[i]->exclusive_jets_ycut(ycut);
+        std::cout<<jets.size()<<std::endl;
+        for (unsigned int i = 0; i < jets.size(); i++){
           ptrpx[idxe] = jets[i].px();
           ptrpy[idxe] = jets[i].py();
           ptrpz[idxe] = jets[i].pz();
