@@ -138,7 +138,7 @@ def test_exclusive_ymerge_single():
     assert out == cluster.exclusive_ymerge(njets=1)
 
 
-def test_exclusive_ymerge_single():
+def test_exclusive_ymerge_max_single():
     array = ak.Array(
         [
             {"px": 1.2, "py": 3.2, "pz": 5.4, "E": 2.5, "ex": 0.78},
