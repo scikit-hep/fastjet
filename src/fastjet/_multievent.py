@@ -143,6 +143,66 @@ class _classmultievent:
         out = ak.Array(ak.layout.ListOffsetArray64(ak.layout.Index64(off), out.layout))
         return out
 
+    def exclusive_dmerge(self, njets):
+        np_results = self._results.to_numpy_exclusive_dmerge(njets)
+        off = np.insert(np_results[-1], 0, 0)
+        out = ak.Array(
+            ak.layout.ListOffsetArray64(
+                ak.layout.Index64(off), ak.layout.NumpyArray(np_results[0])
+            )
+        )
+        return out
+
+    def exclusive_dmerge_max(self, njets):
+        np_results = self._results.to_numpy_exclusive_dmerge_max(njets)
+        off = np.insert(np_results[-1], 0, 0)
+        out = ak.Array(
+            ak.layout.ListOffsetArray64(
+                ak.layout.Index64(off), ak.layout.NumpyArray(np_results[0])
+            )
+        )
+        return out
+
+    def exclusive_ymerge_max(self, njets):
+        np_results = self._results.to_numpy_exclusive_ymerge_max(njets)
+        off = np.insert(np_results[-1], 0, 0)
+        out = ak.Array(
+            ak.layout.ListOffsetArray64(
+                ak.layout.Index64(off), ak.layout.NumpyArray(np_results[0])
+            )
+        )
+        return out
+
+    def exclusive_ymerge(self, njets):
+        np_results = self._results.to_numpy_exclusive_ymerge(njets)
+        off = np.insert(np_results[-1], 0, 0)
+        out = ak.Array(
+            ak.layout.ListOffsetArray64(
+                ak.layout.Index64(off), ak.layout.NumpyArray(np_results[0])
+            )
+        )
+        return out
+
+    def Q(self):
+        np_results = self._results.to_numpy_q()
+        off = np.insert(np_results[-1], 0, 0)
+        out = ak.Array(
+            ak.layout.ListOffsetArray64(
+                ak.layout.Index64(off), ak.layout.NumpyArray(np_results[0])
+            )
+        )
+        return out
+
+    def Q2(self):
+        np_results = self._results.to_numpy_q2()
+        off = np.insert(np_results[-1], 0, 0)
+        out = ak.Array(
+            ak.layout.ListOffsetArray64(
+                ak.layout.Index64(off), ak.layout.NumpyArray(np_results[0])
+            )
+        )
+        return out
+
     def constituents(self, min_pt):
         outputs_to_inputs = self.constituent_index(min_pt)
         shape = ak.num(outputs_to_inputs)
