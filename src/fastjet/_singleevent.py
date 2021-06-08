@@ -175,3 +175,15 @@ class _classsingleevent:
         out = np_results[0]
         out = out[0]
         return out
+
+    def Q(self):
+        np_results = self._results.to_numpy_q()
+        out = np_results[0]
+        out = out[0]
+        return out
+
+    def Q2(self):
+        np_results = self._results.to_numpy_q2()
+        out = np_results[0]
+        out = out[0]
+        return out

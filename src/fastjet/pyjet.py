@@ -85,3 +85,11 @@ class AwkwardClusterSequence:
     def exclusive_ymerge(self, njets=10):
         """Returns the ymin corresponding to the recombination that went from n+1 to n jets"""
         return self._internalrep.exclusive_ymerge(njets)
+
+    def Q(self):
+        """Returns the sum of all energies in the event (relevant mainly for e+e-)"""
+        return self._internalrep.Q()
+
+    def Q2(self):
+        """Return Q()^2"""
+        return self._internalrep.Q2()
