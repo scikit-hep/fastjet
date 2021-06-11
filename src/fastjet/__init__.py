@@ -193,10 +193,10 @@ from fastjet._swig import pseudojet_invalid_rap  # noqa: F401, E402
 from fastjet._swig import pt2_scheme  # noqa: F401, E402
 from fastjet._swig import pt_scheme  # noqa: F401, E402
 from fastjet._swig import sort_indices  # noqa: F401, E402
-from fastjet._swig import sorted_by_E  # noqa: F401, E402
-from fastjet._swig import sorted_by_pt  # noqa: F401, E402
-from fastjet._swig import sorted_by_pz  # noqa: F401, E402
-from fastjet._swig import sorted_by_rapidity  # noqa: F401, E402
+from fastjet._utils import sorted_by_E  # noqa: F401, E402
+from fastjet._utils import sorted_by_pt  # noqa: F401, E402
+from fastjet._utils import sorted_by_pz  # noqa: F401, E402
+from fastjet._utils import sorted_by_rapidity  # noqa: F401, E402
 from fastjet._swig import theta  # noqa: F401, E402
 from fastjet._swig import twopi  # noqa: F401, E402
 from fastjet._swig import undefined_jet_algorithm  # noqa: F401, E402
