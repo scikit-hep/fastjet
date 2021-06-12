@@ -93,3 +93,7 @@ class AwkwardClusterSequence:
     def Q2(self):
         """Return Q()^2"""
         return self._internalrep.Q2()
+
+    def exclusive_subjets(self, data, dcut):
+        """Returns an Awkward Array of all subjets of the current jet (in the sense of the exclusive algorithm) that would be obtained when running the algorithm with the given dcut."""
+        return self._internalrep.exclusive_subjets(data, dcut)

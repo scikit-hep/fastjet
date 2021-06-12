@@ -210,3 +210,29 @@ class _classmultievent:
         duplicate = ak.unflatten(np.zeros(total, np.int64), shape)
         prepared = self.data[:, np.newaxis][duplicate]
         return prepared[outputs_to_inputs]
+
+    def exclusive_subjets(self, data, dcut=0):
+        try:
+            px = data.px
+            py = data.py
+            pz = data.pz
+            E = data.E
+        except AttributeError:
+            raise AttributeError("Lorentz vector not found")
+        np_results = self._results.to_numpy_exclusive_subjets_dcut(px, py, pz, E, dcut)
+        of = np.insert(np_results[-1], len(np_results[-1]), len(np_results[0]))
+        out = ak.Array(
+            ak.layout.ListOffsetArray64(
+                ak.layout.Index64(of),
+                ak.layout.RecordArray(
+                    (
+                        ak.layout.NumpyArray(np_results[0]),
+                        ak.layout.NumpyArray(np_results[1]),
+                        ak.layout.NumpyArray(np_results[2]),
+                        ak.layout.NumpyArray(np_results[3]),
+                    ),
+                    ("px", "py", "pz", "E"),
+                ),
+            )
+        )
+        return out
