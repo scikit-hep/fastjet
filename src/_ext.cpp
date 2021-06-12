@@ -338,12 +338,12 @@ PYBIND11_MODULE(_ext, m) {
         ptroff++;
         for(int i = 0; i < len; i++){
         auto jets = ow.cse[i]->inclusive_jets(min_pt);
-        for (unsigned int i = 0; i < jets.size(); i++)
+        for (unsigned int j = 0; j < jets.size(); j++)
         {
-          ptrpx[idxe] = jets[i].px();
-          ptrpy[idxe] = jets[i].py();
-          ptrpz[idxe] = jets[i].pz();
-          ptrE[idxe] = jets[i].E();
+          ptrpx[idxe] = jets[j].px();
+          ptrpy[idxe] = jets[j].py();
+          ptrpz[idxe] = jets[j].pz();
+          ptrE[idxe] = jets[j].E();
           idxe++;
         }
         *ptroff = jets.size();
@@ -471,12 +471,12 @@ PYBIND11_MODULE(_ext, m) {
         ptroff++;
         for(int i = 0; i < len; i++){
         auto jets = ow.cse[i]->exclusive_jets(n_jets);
-        for (unsigned int i = 0; i < jets.size(); i++)
+        for (unsigned int j = 0; j < jets.size(); j++)
         {
-          ptrpx[idxe] = jets[i].px();
-          ptrpy[idxe] = jets[i].py();
-          ptrpz[idxe] = jets[i].pz();
-          ptrE[idxe] = jets[i].E();
+          ptrpx[idxe] = jets[j].px();
+          ptrpy[idxe] = jets[j].py();
+          ptrpz[idxe] = jets[j].pz();
+          ptrE[idxe] = jets[j].E();
           idxe++;
         }
         *ptroff = jets.size();
@@ -530,12 +530,12 @@ PYBIND11_MODULE(_ext, m) {
         ptroff++;
         for(int i = 0; i < len; i++){
         auto jets = ow.cse[i]->exclusive_jets(dcut);
-        for (unsigned int i = 0; i < jets.size(); i++)
+        for (unsigned int j = 0; j < jets.size(); j++)
         {
-          ptrpx[idxe] = jets[i].px();
-          ptrpy[idxe] = jets[i].py();
-          ptrpz[idxe] = jets[i].pz();
-          ptrE[idxe] = jets[i].E();
+          ptrpx[idxe] = jets[j].px();
+          ptrpy[idxe] = jets[j].py();
+          ptrpz[idxe] = jets[j].pz();
+          ptrE[idxe] = jets[j].E();
           idxe++;
         }
         *ptroff = jets.size();
@@ -589,11 +589,11 @@ PYBIND11_MODULE(_ext, m) {
         for(int i = 0; i < len; i++){
         auto jets = ow.cse[i]->exclusive_jets_ycut(ycut);
         std::cout<<jets.size()<<std::endl;
-        for (unsigned int i = 0; i < jets.size(); i++){
-          ptrpx[idxe] = jets[i].px();
-          ptrpy[idxe] = jets[i].py();
-          ptrpz[idxe] = jets[i].pz();
-          ptrE[idxe] = jets[i].E();
+        for (unsigned int j = 0; j < jets.size(); j++){
+          ptrpx[idxe] = jets[j].px();
+          ptrpy[idxe] = jets[j].py();
+          ptrpz[idxe] = jets[j].pz();
+          ptrE[idxe] = jets[j].E();
           idxe++;
         }
         *ptroff = jets.size();
@@ -608,6 +608,301 @@ PYBIND11_MODULE(_ext, m) {
           );
       }, "dcut"_a = 100, R"pbdoc(
         Retrieves the exclusive jets upto the given dcut from multievent clustering and converts them to numpy arrays.
+        Args:
+          min_pt: Minimum jet pt to include. Default: 0.
+        Returns:
+          pt, eta, phi, m of inclusive jets.
+      )pbdoc")
+      .def("to_numpy_exclusive_dmerge",
+      [](const output_wrapper ow, int njets = 0) {
+        auto css = ow.cse;
+        auto len = css.size();
+        auto jk = len;
+
+        auto parid = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {len}, {sizeof(double)}));
+        auto bufparid = parid.request();
+        double *ptrid = (double *)bufparid.ptr;
+
+        auto eventoffsets = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len}, {sizeof(int)}));
+        auto bufeventoffsets = eventoffsets.request();
+        int *ptreventoffsets = (int *)bufeventoffsets.ptr;
+        size_t eventidx = 0;
+        size_t idxh = 0;
+        auto eventprev = 0;
+
+        for (unsigned int i = 0; i < css.size(); i++){
+        ptrid[idxh] = css[i]->exclusive_dmerge(njets);
+        idxh++;
+        ptreventoffsets[eventidx] = 1+eventprev;
+        eventprev = ptreventoffsets[eventidx];
+        eventidx++;
+          }
+        return std::make_tuple(
+            parid,
+            eventoffsets
+          );
+      }, "njets"_a = 0, R"pbdoc(
+        Retrieves the inclusive jets and converts them to numpy arrays.
+        Args:
+          min_pt: Minimum jet pt to include. Default: 0.
+        Returns:
+          pt, eta, phi, m of inclusive jets.
+      )pbdoc")
+      .def("to_numpy_exclusive_dmerge_max",
+      [](const output_wrapper ow, int njets = 0) {
+        auto css = ow.cse;
+        auto len = css.size();
+        auto jk = len;
+
+        auto parid = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {len}, {sizeof(double)}));
+        auto bufparid = parid.request();
+        double *ptrid = (double *)bufparid.ptr;
+
+        auto eventoffsets = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len}, {sizeof(int)}));
+        auto bufeventoffsets = eventoffsets.request();
+        int *ptreventoffsets = (int *)bufeventoffsets.ptr;
+        size_t eventidx = 0;
+        size_t idxh = 0;
+        auto eventprev = 0;
+
+        for (unsigned int i = 0; i < css.size(); i++){
+        ptrid[idxh] = css[i]->exclusive_dmerge_max(njets);
+        idxh++;
+        ptreventoffsets[eventidx] = 1+eventprev;
+        eventprev = ptreventoffsets[eventidx];
+        eventidx++;
+          }
+        return std::make_tuple(
+            parid,
+            eventoffsets
+          );
+      }, "njets"_a = 0, R"pbdoc(
+        Retrieves the inclusive jets and converts them to numpy arrays.
+        Args:
+          min_pt: Minimum jet pt to include. Default: 0.
+        Returns:
+          pt, eta, phi, m of inclusive jets.
+      )pbdoc")
+      .def("to_numpy_exclusive_ymerge_max",
+      [](const output_wrapper ow, int njets = 0) {
+        auto css = ow.cse;
+        auto len = css.size();
+        auto jk = len;
+
+        auto parid = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {len}, {sizeof(double)}));
+        auto bufparid = parid.request();
+        double *ptrid = (double *)bufparid.ptr;
+
+        auto eventoffsets = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len}, {sizeof(int)}));
+        auto bufeventoffsets = eventoffsets.request();
+        int *ptreventoffsets = (int *)bufeventoffsets.ptr;
+        size_t eventidx = 0;
+        size_t idxh = 0;
+        auto eventprev = 0;
+
+        for (unsigned int i = 0; i < css.size(); i++){
+        ptrid[idxh] = css[i]->exclusive_ymerge_max(njets);
+        idxh++;
+        ptreventoffsets[eventidx] = 1+eventprev;
+        eventprev = ptreventoffsets[eventidx];
+        eventidx++;
+          }
+        return std::make_tuple(
+            parid,
+            eventoffsets
+          );
+      }, "njets"_a = 0, R"pbdoc(
+        Retrieves the inclusive jets and converts them to numpy arrays.
+        Args:
+          min_pt: Minimum jet pt to include. Default: 0.
+        Returns:
+          pt, eta, phi, m of inclusive jets.
+      )pbdoc")
+      .def("to_numpy_exclusive_ymerge",
+      [](const output_wrapper ow, int njets = 0) {
+        auto css = ow.cse;
+        auto len = css.size();
+        auto jk = len;
+
+        auto parid = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {len}, {sizeof(double)}));
+        auto bufparid = parid.request();
+        double *ptrid = (double *)bufparid.ptr;
+
+        auto eventoffsets = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len}, {sizeof(int)}));
+        auto bufeventoffsets = eventoffsets.request();
+        int *ptreventoffsets = (int *)bufeventoffsets.ptr;
+        size_t eventidx = 0;
+        size_t idxh = 0;
+        auto eventprev = 0;
+
+        for (unsigned int i = 0; i < css.size(); i++){
+        ptrid[idxh] = css[i]->exclusive_ymerge(njets);
+        idxh++;
+        ptreventoffsets[eventidx] = 1+eventprev;
+        eventprev = ptreventoffsets[eventidx];
+        eventidx++;
+          }
+        return std::make_tuple(
+            parid,
+            eventoffsets
+          );
+      }, "njets"_a = 0, R"pbdoc(
+        Retrieves the inclusive jets and converts them to numpy arrays.
+        Args:
+          min_pt: Minimum jet pt to include. Default: 0.
+        Returns:
+          pt, eta, phi, m of inclusive jets.
+      )pbdoc")
+      .def("to_numpy_q",
+      [](const output_wrapper ow) {
+        auto css = ow.cse;
+        auto len = css.size();
+        auto jk = len;
+
+        auto parid = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {len}, {sizeof(double)}));
+        auto bufparid = parid.request();
+        double *ptrid = (double *)bufparid.ptr;
+
+        auto eventoffsets = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len}, {sizeof(int)}));
+        auto bufeventoffsets = eventoffsets.request();
+        int *ptreventoffsets = (int *)bufeventoffsets.ptr;
+        size_t eventidx = 0;
+        size_t idxh = 0;
+        auto eventprev = 0;
+
+        for (unsigned int i = 0; i < css.size(); i++){
+        ptrid[idxh] = css[i]->Q();
+        idxh++;
+        ptreventoffsets[eventidx] = 1+eventprev;
+        eventprev = ptreventoffsets[eventidx];
+        eventidx++;
+          }
+        return std::make_tuple(
+            parid,
+            eventoffsets
+          );
+      }, R"pbdoc(
+        Retrieves the inclusive jets and converts them to numpy arrays.
+        Args:
+          min_pt: Minimum jet pt to include. Default: 0.
+        Returns:
+          pt, eta, phi, m of inclusive jets.
+      )pbdoc")
+      .def("to_numpy_q2",
+      [](const output_wrapper ow) {
+        auto css = ow.cse;
+        auto len = css.size();
+        auto jk = len;
+
+        auto parid = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {len}, {sizeof(double)}));
+        auto bufparid = parid.request();
+        double *ptrid = (double *)bufparid.ptr;
+
+        auto eventoffsets = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len}, {sizeof(int)}));
+        auto bufeventoffsets = eventoffsets.request();
+        int *ptreventoffsets = (int *)bufeventoffsets.ptr;
+        size_t eventidx = 0;
+        size_t idxh = 0;
+        auto eventprev = 0;
+
+        for (unsigned int i = 0; i < css.size(); i++){
+        ptrid[idxh] = css[i]->Q2();
+        idxh++;
+        ptreventoffsets[eventidx] = 1+eventprev;
+        eventprev = ptreventoffsets[eventidx];
+        eventidx++;
+          }
+        return std::make_tuple(
+            parid,
+            eventoffsets
+          );
+      }, R"pbdoc(
+        Retrieves the inclusive jets and converts them to numpy arrays.
+        Args:
+          min_pt: Minimum jet pt to include. Default: 0.
+        Returns:
+          pt, eta, phi, m of inclusive jets.
+      )pbdoc")
+      .def("to_numpy_exclusive_subjets_dcut",
+      [](const output_wrapper ow, py::array_t<double, py::array::c_style | py::array::forcecast> pxi, py::array_t<double, py::array::c_style | py::array::forcecast> pyi, py::array_t<double, py::array::c_style | py::array::forcecast> pzi, py::array_t<double, py::array::c_style | py::array::forcecast> Ei, double dcut = 0) {
+
+        py::buffer_info infopx = pxi.request();
+        py::buffer_info infopy = pyi.request();  // requesting buffer information of the input
+        py::buffer_info infopz = pzi.request();
+        py::buffer_info infoE = Ei.request();
+
+        auto pxptr = static_cast<double *>(infopx.ptr);
+        auto pyptr = static_cast<double *>(infopy.ptr);  // pointer to the initial value
+        auto pzptr = static_cast<double *>(infopz.ptr);
+        auto Eptr = static_cast<double *>(infoE.ptr);
+
+        int dimpx = infopx.shape[0];
+        int dimpy = infopy.shape[0];
+        int dimpz = infopz.shape[0];
+        int dimE = infoE.shape[0];
+        auto css = ow.cse;
+        auto len = css.size();
+        // Don't specify the size if using push_back.
+
+        std::vector<fj::PseudoJet> particles;
+        for(int j = 0; j < dimpx; j++ ){
+          particles.push_back(fj::PseudoJet(*pxptr, *pyptr, *pzptr, *Eptr));
+          pxptr++;
+          pyptr++;
+          pzptr++;
+          Eptr++;
+          }
+        auto jk = 0;
+        for(int i = 0; i < len; i++){
+        std::cout<<ow.cse[i]->contains(particles[i])<<"Falseeeeeeeeeee"<<std::endl;
+        jk += css[i]->exclusive_subjets(particles[i],dcut).size();
+        }
+        auto px = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {dimpy}, {sizeof(double)}));
+        auto bufpx = px.request();
+        double *ptrpx = (double *)bufpx.ptr;
+
+        auto py = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {dimpy}, {sizeof(double)}));
+        auto bufpy = py.request();
+        double *ptrpy = (double *)bufpy.ptr;
+
+        auto pz = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {dimpy}, {sizeof(double)}));
+        auto bufpz = pz.request();
+        double *ptrpz = (double *)bufpz.ptr;
+
+        auto E = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {dimpy}, {sizeof(double)}));
+        auto bufE = E.request();
+        double *ptrE = (double *)bufE.ptr;
+
+        auto off = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len}, {sizeof(int)}));
+        auto bufoff = off.request();
+        int *ptroff = (int *)bufoff.ptr;
+
+        size_t idxe = 0;
+        *ptroff = 0;
+        ptroff++;
+        for(int i = 0; i < len; i++){
+        std::cout<<ow.cse[i]->contains(particles[i])<<"Falseeeeeeeeeee"<<std::endl;
+        auto jets = ow.cse[i]->exclusive_subjets(particles[i],dcut);
+        for (unsigned int j = 0; j < jets.size(); j++)
+        {
+          ptrpx[idxe] = jets[j].px();
+          ptrpy[idxe] = jets[j].py();
+          ptrpz[idxe] = jets[j].pz();
+          ptrE[idxe] = jets[j].E();
+          idxe++;
+        }
+        *ptroff = jets.size();
+        ptroff++;
+        }
+        return std::make_tuple(
+            px,
+            py,
+            pz,
+            E,
+            off
+          );
+      }, R"pbdoc(
+        Retrieves the inclusive jets from multievent clustering and converts them to numpy arrays.
         Args:
           min_pt: Minimum jet pt to include. Default: 0.
         Returns:

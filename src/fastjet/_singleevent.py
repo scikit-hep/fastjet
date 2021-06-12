@@ -151,3 +151,39 @@ class _classsingleevent:
         prepared = self.data[:, np.newaxis][duplicate]
         prepared = prepared[outputs_to_inputs]
         return prepared[0]
+
+    def exclusive_dmerge(self, njets):
+        np_results = self._results.to_numpy_exclusive_dmerge(njets)
+        out = np_results[0]
+        out = out[0]
+        return out
+
+    def exclusive_dmerge_max(self, njets):
+        np_results = self._results.to_numpy_exclusive_dmerge_max(njets)
+        out = np_results[0]
+        out = out[0]
+        return out
+
+    def exclusive_ymerge_max(self, njets):
+        np_results = self._results.to_numpy_exclusive_ymerge_max(njets)
+        out = np_results[0]
+        out = out[0]
+        return out
+
+    def exclusive_ymerge(self, njets):
+        np_results = self._results.to_numpy_exclusive_ymerge(njets)
+        out = np_results[0]
+        out = out[0]
+        return out
+
+    def Q(self):
+        np_results = self._results.to_numpy_q()
+        out = np_results[0]
+        out = out[0]
+        return out
+
+    def Q2(self):
+        np_results = self._results.to_numpy_q2()
+        out = np_results[0]
+        out = out[0]
+        return out

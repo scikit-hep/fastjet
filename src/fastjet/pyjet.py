@@ -69,3 +69,31 @@ class AwkwardClusterSequence:
     def constituents(self, min_pt=0):
         """Returns the particles that make up each Jet"""
         return self._internalrep.constituents(min_pt)
+
+    def exclusive_dmerge(self, njets=10):
+        """Returns the dmin corresponding to the recombination that went from n+1 to n jets"""
+        return self._internalrep.exclusive_dmerge(njets)
+
+    def exclusive_dmerge_max(self, njets=10):
+        """Returns the maximum of the dmin encountered during all recombinations up to the one that led to an n-jet final state"""
+        return self._internalrep.exclusive_dmerge_max(njets)
+
+    def exclusive_ymerge_max(self, njets=10):
+        """Same as exclusive_dmerge_max, but normalised to squared total energy"""
+        return self._internalrep.exclusive_ymerge_max(njets)
+
+    def exclusive_ymerge(self, njets=10):
+        """Returns the ymin corresponding to the recombination that went from n+1 to n jets"""
+        return self._internalrep.exclusive_ymerge(njets)
+
+    def Q(self):
+        """Returns the sum of all energies in the event (relevant mainly for e+e-)"""
+        return self._internalrep.Q()
+
+    def Q2(self):
+        """Return Q()^2"""
+        return self._internalrep.Q2()
+
+    def exclusive_subjets(self, data, dcut):
+        """Returns an Awkward Array of all subjets of the current jet (in the sense of the exclusive algorithm) that would be obtained when running the algorithm with the given dcut."""
+        return self._internalrep.exclusive_subjets(data, dcut)
