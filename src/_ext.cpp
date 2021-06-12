@@ -40,7 +40,7 @@ T swigtocpp(py::object obj) {  // unwraps python object to get the cpp pointer f
 class output_wrapper{
   public:
   std::vector<std::shared_ptr<fj::ClusterSequence>> cse;
-  std::vector<int> particles;
+  std::vector<std::shared_ptr<std::vector<fj::PseudoJet>>> parts;
 
   std::shared_ptr<fj::ClusterSequence> getCluster(){
     auto a = cse[0];
@@ -129,7 +129,8 @@ output_wrapper interfacemulti(py::array_t<double, py::array::c_style | py::array
 
   std::vector<fj::PseudoJet> jets;
   auto jet_def = swigtocpp<fj::JetDefinition*>(jetdef);
-  std::shared_ptr<fastjet::ClusterSequence> cs = std::make_shared<fastjet::ClusterSequence>(particles, *jet_def);
+  std::shared_ptr<std::vector<fj::PseudoJet>> pj = std::make_shared<std::vector<fj::PseudoJet>>(particles);
+  std::shared_ptr<fastjet::ClusterSequence> cs = std::make_shared<fastjet::ClusterSequence>(*pj, *jet_def);
   auto j = cs->inclusive_jets();
   std::cout<<j.size()<<std::endl;
   for (unsigned i = 0; i < j.size(); i++)
@@ -138,6 +139,7 @@ output_wrapper interfacemulti(py::array_t<double, py::array::c_style | py::array
   std::cout << "Clustering with " << jet_def->description() << std::endl;
   offptr++;
   ow.cse.push_back(cs);
+  ow.parts.push_back(pj);
   }
   return ow;
 }
