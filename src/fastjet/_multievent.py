@@ -95,7 +95,7 @@ class _classmultievent:
         if n_jets == -1 and dcut != -1:
             np_results = self._results.to_numpy_exclusive_dcut(dcut)
             of = np.insert(np_results[-1], len(np_results[-1]), len(np_results[0]))
-        if np_results == 0 and np_results == 0:
+        if np_results == 0 and of == 0:
             raise ValueError("Either NJets or Dcut sould be entered")
         out = ak.Array(
             ak.layout.ListOffsetArray64(
@@ -211,7 +211,7 @@ class _classmultievent:
         prepared = self.data[:, np.newaxis][duplicate]
         return prepared[outputs_to_inputs]
 
-    def exclusive_subjets(self, data, dcut=0):
+    def exclusive_subjets(self, data, dcut, nsub):
         try:
             px = data.px
             py = data.py
@@ -219,8 +219,23 @@ class _classmultievent:
             E = data.E
         except AttributeError:
             raise AttributeError("Lorentz vector not found")
-        np_results = self._results.to_numpy_exclusive_subjets_dcut(px, py, pz, E, dcut)
-        of = np.insert(np_results[-1], len(np_results[-1]), len(np_results[0]))
+        of = 0
+        np_results = 0
+        if nsub == 0:
+            raise ValueError("Njets cannot be 0")
+        if dcut == -1 and nsub != -1:
+            np_results = self._results.to_numpy_exclusive_subjets_nsub(
+                px, py, pz, E, nsub
+            )
+            of = np.insert(np_results[-1], len(np_results[-1]), len(np_results[0]))
+        if nsub == -1 and dcut != -1:
+            np_results = self._results.to_numpy_exclusive_subjets_dcut(
+                px, py, pz, E, dcut
+            )
+            of = np.insert(np_results[-1], len(np_results[-1]), len(np_results[0]))
+        if np_results == 0 and of == 0:
+            raise ValueError("Either NJets or Dcut sould be entered")
+
         out = ak.Array(
             ak.layout.ListOffsetArray64(
                 ak.layout.Index64(of),

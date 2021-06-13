@@ -187,3 +187,37 @@ class _classsingleevent:
         out = np_results[0]
         out = out[0]
         return out
+
+    def exclusive_subjets(self, data, dcut, nsub):
+        try:
+            px = data.px
+            py = data.py
+            pz = data.pz
+            E = data.E
+        except AttributeError:
+            raise AttributeError("Lorentz vector not found")
+        np_results = 0
+        if nsub == 0:
+            raise ValueError("Nsub cannot be 0")
+        if dcut == -1 and nsub != -1:
+            np_results = self._results.to_numpy_exclusive_subjets_nsub(
+                px, py, pz, E, nsub
+            )
+        if nsub == -1 and dcut != -1:
+            np_results = self._results.to_numpy_exclusive_subjets_dcut(
+                px, py, pz, E, dcut
+            )
+        if np_results == 0:
+            raise ValueError("Either Dcut or Njets should be entered")
+        out = ak.Array(
+            ak.layout.RecordArray(
+                [
+                    ak.layout.NumpyArray(np_results[0]),
+                    ak.layout.NumpyArray(np_results[1]),
+                    ak.layout.NumpyArray(np_results[2]),
+                    ak.layout.NumpyArray(np_results[3]),
+                ],
+                ["px", "py", "pz", "E"],
+            )
+        )
+        return out
