@@ -97,3 +97,11 @@ class AwkwardClusterSequence:
     def exclusive_subjets(self, data, dcut=-1, nsub=-1):
         """Returns an Awkward Array of all subjets of the current jet (in the sense of the exclusive algorithm) that would be obtained when running the algorithm with the given dcut."""
         return self._internalrep.exclusive_subjets(data, dcut, nsub)
+
+    def exclusive_subjets_up_to(self, data, nsub=0):
+        """Returns the list of subjets obtained by unclustering the supplied jet down to nsub subjets (or all constituents if there are fewer than nsub)."""
+        return self._internalrep.exclusive_subjets_up_to(data, nsub)
+
+    def exclusive_subdmerge(self, data, nsub=0):
+        """Returns the dij that was present in the merging nsub+1 -> nsub subjets inside this jet."""
+        return self._internalrep.exclusive_subdmerge(data, nsub)

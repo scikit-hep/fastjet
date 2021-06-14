@@ -251,3 +251,46 @@ class _classmultievent:
             )
         )
         return out
+
+    def exclusive_subjets_up_to(self, data, nsub):
+        try:
+            px = data.px
+            py = data.py
+            pz = data.pz
+            E = data.E
+        except AttributeError:
+            raise AttributeError("Lorentz vector not found")
+        np_results = self._results.to_numpy_exclusive_subjets_up_to(px, py, pz, E, nsub)
+        of = np.insert(np_results[-1], len(np_results[-1]), len(np_results[0]))
+        out = ak.Array(
+            ak.layout.ListOffsetArray64(
+                ak.layout.Index64(of),
+                ak.layout.RecordArray(
+                    (
+                        ak.layout.NumpyArray(np_results[0]),
+                        ak.layout.NumpyArray(np_results[1]),
+                        ak.layout.NumpyArray(np_results[2]),
+                        ak.layout.NumpyArray(np_results[3]),
+                    ),
+                    ("px", "py", "pz", "E"),
+                ),
+            )
+        )
+        return out
+
+    def exclusive_subdmerge(self, data, nsub):
+        try:
+            px = data.px
+            py = data.py
+            pz = data.pz
+            E = data.E
+        except AttributeError:
+            raise AttributeError("Lorentz vector not found")
+        np_results = self._results.to_numpy_exclusive_subdmerge(px, py, pz, E, nsub)
+        off = np.insert(np_results[-1], len(np_results[-1]), len(np_results[0]))
+        out = ak.Array(
+            ak.layout.ListOffsetArray64(
+                ak.layout.Index64(off), ak.layout.NumpyArray(np_results[0])
+            )
+        )
+        return out
