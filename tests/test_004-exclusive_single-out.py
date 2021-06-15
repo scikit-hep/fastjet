@@ -23,7 +23,7 @@ def test_exclusive_dmerge_multi():
     )
     jetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.6)
     cluster = fastjet.pyjet.AwkwardClusterSequence(array, jetdef)
-    out = [[4.898244145524306e-05], [4.898244145524306e-05]]
+    out = [4.898244145524306e-05, 4.898244145524306e-05]
     assert out == cluster.exclusive_dmerge(njets=1).to_list()
 
 
@@ -75,7 +75,7 @@ def test_exclusive_dmerge_max_multi():
     )
     jetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.6)
     cluster = fastjet.pyjet.AwkwardClusterSequence(array, jetdef)
-    out = [[4.898244145524306e-05], [4.898244145524306e-05]]
+    out = [4.898244145524306e-05, 4.898244145524306e-05]
     assert out == cluster.exclusive_dmerge_max(njets=1).to_list()
 
 
@@ -97,7 +97,7 @@ def test_exclusive_ymerge_max_multi():
     )
     jetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.6)
     cluster = fastjet.pyjet.AwkwardClusterSequence(array, jetdef)
-    out = [[1.8699925011328223e-08], [1.8699925011328223e-08]]
+    out = [1.8699925011328223e-08, 1.8699925011328223e-08]
     assert out == cluster.exclusive_ymerge_max(njets=1).to_list()
 
 
@@ -119,7 +119,7 @@ def test_exclusive_ymerge_multi():
     )
     jetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.6)
     cluster = fastjet.pyjet.AwkwardClusterSequence(array, jetdef)
-    out = [[1.8699925011328223e-08], [1.8699925011328223e-08]]
+    out = [1.8699925011328223e-08, 1.8699925011328223e-08]
     assert out == cluster.exclusive_ymerge(njets=1).to_list()
 
 
@@ -186,7 +186,7 @@ def test_Q_multi():
     )
     jetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.6)
     cluster = fastjet.pyjet.AwkwardClusterSequence(array, jetdef)
-    out = [[51.18], [51.18]]
+    out = [51.18, 51.18]
     assert out == cluster.Q().to_list()
 
 
@@ -208,7 +208,7 @@ def test_Q2_multi():
     )
     jetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.6)
     cluster = fastjet.pyjet.AwkwardClusterSequence(array, jetdef)
-    out = [[2619.3924], [2619.3924]]
+    out = [2619.3924, 2619.3924]
     assert out == cluster.Q2().to_list()
 
 

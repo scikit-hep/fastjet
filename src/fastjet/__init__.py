@@ -179,7 +179,6 @@ from fastjet._swig import genkt_algorithm  # noqa: F401, E402
 from fastjet._swig import genkt_for_passive_algorithm  # noqa: F401, E402
 from fastjet._swig import have_same_momentum  # noqa: F401, E402
 from fastjet._swig import invalid_area  # noqa: F401, E402
-from fastjet._swig import join  # noqa: F401, E402
 from fastjet._swig import kt_algorithm  # noqa: F401, E402
 from fastjet._swig import ln2  # noqa: F401, E402
 from fastjet._swig import one_ghost_passive_area  # noqa: F401, E402
@@ -200,6 +199,7 @@ from fastjet._swig import vectorPJ  # noqa: F401, E402
 from fastjet._swig import voronoi_area  # noqa: F401, E402
 from fastjet._swig import zeta2  # noqa: F401, E402
 from fastjet._swig import zeta3  # noqa: F401, E402
+from fastjet._utils import join  # noqa: F401, E402
 from fastjet._utils import sorted_by_E  # noqa: F401, E402
 from fastjet._utils import sorted_by_pt  # noqa: F401, E402
 from fastjet._utils import sorted_by_pz  # noqa: F401, E402

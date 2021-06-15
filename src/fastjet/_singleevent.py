@@ -256,3 +256,29 @@ class _classsingleevent:
         out = np_results[0]
         out = out[0]
         return out
+
+    def exclusive_subdmerge_max(self, data, nsub):
+        try:
+            px = data.px
+            py = data.py
+            pz = data.pz
+            E = data.E
+        except AttributeError:
+            raise AttributeError("Lorentz vector not found")
+        np_results = self._results.to_numpy_exclusive_subdmerge_max(px, py, pz, E, nsub)
+        out = np_results[0]
+        out = out[0]
+        return out
+
+    def n_exclusive_subjets(self, data, dcut):
+        try:
+            px = data.px
+            py = data.py
+            pz = data.pz
+            E = data.E
+        except AttributeError:
+            raise AttributeError("Lorentz vector not found")
+        np_results = self._results.to_numpy_n_exclusive_subjets(px, py, pz, E, dcut)
+        out = np_results[0]
+        out = out[0]
+        return out

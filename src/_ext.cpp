@@ -1199,7 +1199,156 @@ PYBIND11_MODULE(_ext, m) {
           min_pt: Minimum jet pt to include. Default: 0.
         Returns:
           pt, eta, phi, m of inclusive jets.
+      )pbdoc")
+      .def("to_numpy_exclusive_subdmerge_max",
+      [](const output_wrapper ow, py::array_t<double, py::array::c_style | py::array::forcecast> pxi, py::array_t<double, py::array::c_style | py::array::forcecast> pyi, py::array_t<double, py::array::c_style | py::array::forcecast> pzi, py::array_t<double, py::array::c_style | py::array::forcecast> Ei, int nsub = 0) {
+
+        py::buffer_info infopx = pxi.request();
+        py::buffer_info infopy = pyi.request();  // requesting buffer information of the input
+        py::buffer_info infopz = pzi.request();
+        py::buffer_info infoE = Ei.request();
+
+        auto pxptr = static_cast<double *>(infopx.ptr);
+        auto pyptr = static_cast<double *>(infopy.ptr);  // pointer to the initial value
+        auto pzptr = static_cast<double *>(infopz.ptr);
+        auto Eptr = static_cast<double *>(infoE.ptr);
+
+        int dimpx = infopx.shape[0];
+        int dimpy = infopy.shape[0];
+        int dimpz = infopz.shape[0];
+        int dimE = infoE.shape[0];
+        auto css = ow.cse;
+        auto len = css.size();
+        // Don't specify the size if using push_back.
+
+        std::vector<fj::PseudoJet> particles;
+        for(int j = 0; j < dimpx; j++ ){
+          particles.push_back(fj::PseudoJet(*pxptr, *pyptr, *pzptr, *Eptr));
+          pxptr++;
+          pyptr++;
+          pzptr++;
+          Eptr++;
+          }
+        std::vector<int> indices;
+        for(unsigned int i = 0 ; i < len; i++){
+          std::unordered_map<double, int> umap;
+          auto jets = ow.cse[i]->inclusive_jets();
+          for(unsigned int j = 0 ; j < jets.size(); j++){
+            umap.insert({jets[j].rap(),j});
+          }
+          auto got = umap.find(particles[i].rap());
+          if (got == umap.end()){
+              throw "Jet Not in this ClusterSequence";
+          }
+          if(got == umap.end()){
+          }
+          indices.push_back(got->second);
+        }
+        auto out_value = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {dimpy}, {sizeof(double)}));
+        auto bufpx = out_value.request();
+        double *ptrpx = (double *)bufpx.ptr;
+
+        auto off = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len}, {sizeof(int)}));
+        auto bufoff = off.request();
+        int *ptroff = (int *)bufoff.ptr;
+
+        size_t idxe = 0;
+        *ptroff = 0;
+        ptroff++;
+        for(int i = 0; i < len; i++){
+        auto incjets = ow.cse[i]->inclusive_jets();
+        auto value = css[i]->exclusive_subdmerge_max(incjets[indices[i]],nsub);
+        ptrpx[idxe] = value;
+        idxe++;
+        *ptroff = 1+ *(ptroff-1);
+        ptroff++;
+        }
+        return std::make_tuple(
+            out_value,
+            off
+          );
+      }, R"pbdoc(
+        Retrieves the exclusive subjets.
+        Args:
+          min_pt: Minimum jet pt to include. Default: 0.
+        Returns:
+          pt, eta, phi, m of inclusive jets.
+      )pbdoc")
+      .def("to_numpy_n_exclusive_subjets",
+      [](const output_wrapper ow, py::array_t<double, py::array::c_style | py::array::forcecast> pxi, py::array_t<double, py::array::c_style | py::array::forcecast> pyi, py::array_t<double, py::array::c_style | py::array::forcecast> pzi, py::array_t<double, py::array::c_style | py::array::forcecast> Ei, double dcut = 0) {
+
+        py::buffer_info infopx = pxi.request();
+        py::buffer_info infopy = pyi.request();  // requesting buffer information of the input
+        py::buffer_info infopz = pzi.request();
+        py::buffer_info infoE = Ei.request();
+
+        auto pxptr = static_cast<double *>(infopx.ptr);
+        auto pyptr = static_cast<double *>(infopy.ptr);  // pointer to the initial value
+        auto pzptr = static_cast<double *>(infopz.ptr);
+        auto Eptr = static_cast<double *>(infoE.ptr);
+
+        int dimpx = infopx.shape[0];
+        int dimpy = infopy.shape[0];
+        int dimpz = infopz.shape[0];
+        int dimE = infoE.shape[0];
+        auto css = ow.cse;
+        auto len = css.size();
+        // Don't specify the size if using push_back.
+
+        std::vector<fj::PseudoJet> particles;
+        for(int j = 0; j < dimpx; j++ ){
+          particles.push_back(fj::PseudoJet(*pxptr, *pyptr, *pzptr, *Eptr));
+          pxptr++;
+          pyptr++;
+          pzptr++;
+          Eptr++;
+          }
+        std::vector<int> indices;
+        for(unsigned int i = 0 ; i < len; i++){
+          std::unordered_map<double, int> umap;
+          auto jets = ow.cse[i]->inclusive_jets();
+          for(unsigned int j = 0 ; j < jets.size(); j++){
+            umap.insert({jets[j].rap(),j});
+          }
+          auto got = umap.find(particles[i].rap());
+          if (got == umap.end()){
+              throw "Jet Not in this ClusterSequence";
+          }
+          if(got == umap.end()){
+          }
+          indices.push_back(got->second);
+        }
+        auto out_value = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {dimpy}, {sizeof(int)}));
+        auto bufpx = out_value.request();
+        int *ptrpx = (int *)bufpx.ptr;
+
+        auto off = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len}, {sizeof(int)}));
+        auto bufoff = off.request();
+        int *ptroff = (int *)bufoff.ptr;
+
+        size_t idxe = 0;
+        *ptroff = 0;
+        ptroff++;
+        for(int i = 0; i < len; i++){
+        auto incjets = ow.cse[i]->inclusive_jets();
+        auto value = css[i]->n_exclusive_subjets(incjets[indices[i]],dcut);
+        ptrpx[idxe] = value;
+        idxe++;
+        *ptroff = 1+ *(ptroff-1);
+        ptroff++;
+        }
+        return std::make_tuple(
+            out_value,
+            off
+          );
+      }, R"pbdoc(
+        Retrieves the exclusive subjets.
+        Args:
+          min_pt: Minimum jet pt to include. Default: 0.
+        Returns:
+          pt, eta, phi, m of inclusive jets.
       )pbdoc");
+
 
   py::class_<JetDefinition>(m, "JetDefinition", "Jet definition")
     .def(py::init<JetAlgorithm, RecombinationScheme, Strategy>(), "jet_algorithm"_a, "recombination_scheme"_a = E_scheme, "strategy"_a = Best)

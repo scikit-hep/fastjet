@@ -145,62 +145,32 @@ class _classmultievent:
 
     def exclusive_dmerge(self, njets):
         np_results = self._results.to_numpy_exclusive_dmerge(njets)
-        off = np.insert(np_results[-1], 0, 0)
-        out = ak.Array(
-            ak.layout.ListOffsetArray64(
-                ak.layout.Index64(off), ak.layout.NumpyArray(np_results[0])
-            )
-        )
+        out = ak.Array(ak.layout.NumpyArray(np_results[0]))
         return out
 
     def exclusive_dmerge_max(self, njets):
         np_results = self._results.to_numpy_exclusive_dmerge_max(njets)
-        off = np.insert(np_results[-1], 0, 0)
-        out = ak.Array(
-            ak.layout.ListOffsetArray64(
-                ak.layout.Index64(off), ak.layout.NumpyArray(np_results[0])
-            )
-        )
+        out = ak.Array(ak.layout.NumpyArray(np_results[0]))
         return out
 
     def exclusive_ymerge_max(self, njets):
         np_results = self._results.to_numpy_exclusive_ymerge_max(njets)
-        off = np.insert(np_results[-1], 0, 0)
-        out = ak.Array(
-            ak.layout.ListOffsetArray64(
-                ak.layout.Index64(off), ak.layout.NumpyArray(np_results[0])
-            )
-        )
+        out = ak.Array(ak.layout.NumpyArray(np_results[0]))
         return out
 
     def exclusive_ymerge(self, njets):
         np_results = self._results.to_numpy_exclusive_ymerge(njets)
-        off = np.insert(np_results[-1], 0, 0)
-        out = ak.Array(
-            ak.layout.ListOffsetArray64(
-                ak.layout.Index64(off), ak.layout.NumpyArray(np_results[0])
-            )
-        )
+        out = ak.Array(ak.layout.NumpyArray(np_results[0]))
         return out
 
     def Q(self):
         np_results = self._results.to_numpy_q()
-        off = np.insert(np_results[-1], 0, 0)
-        out = ak.Array(
-            ak.layout.ListOffsetArray64(
-                ak.layout.Index64(off), ak.layout.NumpyArray(np_results[0])
-            )
-        )
+        out = ak.Array(ak.layout.NumpyArray(np_results[0]))
         return out
 
     def Q2(self):
         np_results = self._results.to_numpy_q2()
-        off = np.insert(np_results[-1], 0, 0)
-        out = ak.Array(
-            ak.layout.ListOffsetArray64(
-                ak.layout.Index64(off), ak.layout.NumpyArray(np_results[0])
-            )
-        )
+        out = ak.Array(ak.layout.NumpyArray(np_results[0]))
         return out
 
     def constituents(self, min_pt):
@@ -287,10 +257,29 @@ class _classmultievent:
         except AttributeError:
             raise AttributeError("Lorentz vector not found")
         np_results = self._results.to_numpy_exclusive_subdmerge(px, py, pz, E, nsub)
-        off = np.insert(np_results[-1], len(np_results[-1]), len(np_results[0]))
-        out = ak.Array(
-            ak.layout.ListOffsetArray64(
-                ak.layout.Index64(off), ak.layout.NumpyArray(np_results[0])
-            )
-        )
+        out = ak.Array(ak.layout.NumpyArray(np_results[0]))
+        return out
+
+    def exclusive_subdmerge_max(self, data, nsub):
+        try:
+            px = data.px
+            py = data.py
+            pz = data.pz
+            E = data.E
+        except AttributeError:
+            raise AttributeError("Lorentz vector not found")
+        np_results = self._results.to_numpy_exclusive_subdmerge_max(px, py, pz, E, nsub)
+        out = ak.Array(ak.layout.NumpyArray(np_results[0]))
+        return out
+
+    def n_exclusive_subjets(self, data, dcut):
+        try:
+            px = data.px
+            py = data.py
+            pz = data.pz
+            E = data.E
+        except AttributeError:
+            raise AttributeError("Lorentz vector not found")
+        np_results = self._results.to_numpy_n_exclusive_subjets(px, py, pz, E, dcut)
+        out = ak.Array(ak.layout.NumpyArray(np_results[0]))
         return out

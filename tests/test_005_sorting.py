@@ -136,3 +136,9 @@ def test_rapsorting():
     ]
 
     assert ans == fastjet.sorted_by_rapidity(array).to_list()
+
+
+def test_join():
+    bb = fastjet.PseudoJet(1, 1, 6, 1)
+    cc = fastjet.PseudoJet(3, 2, 3, 31)
+    assert fastjet.join(bb, cc).px() == 4.0

@@ -105,3 +105,11 @@ class AwkwardClusterSequence:
     def exclusive_subdmerge(self, data, nsub=0):
         """Returns the dij that was present in the merging nsub+1 -> nsub subjets inside this jet."""
         return self._internalrep.exclusive_subdmerge(data, nsub)
+
+    def exclusive_subdmerge_max(self, data, nsub=0):
+        """Returns the maximum dij that occurred in the whole event at the stage that the nsub+1 -> nsub merge of subjets occurred inside this jet."""
+        return self._internalrep.exclusive_subdmerge_max(data, nsub)
+
+    def n_exclusive_subjets(self, data, dcut=0):
+        """Returns the size of exclusive_subjets(...); still n ln n with same coefficient, but marginally more efficient than manually taking len(exclusive_subjets)"""
+        return self._internalrep.n_exclusive_subjets(data, dcut)
