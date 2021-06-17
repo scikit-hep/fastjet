@@ -70,6 +70,21 @@ class _classsingleevent:
         )
         return out
 
+    def unclustered_particles(self, min_pt):
+        np_results = self._results.to_numpy_unclustered_particles(min_pt)
+        out = ak.Array(
+            ak.layout.RecordArray(
+                (
+                    ak.layout.NumpyArray(np_results[0]),
+                    ak.layout.NumpyArray(np_results[1]),
+                    ak.layout.NumpyArray(np_results[2]),
+                    ak.layout.NumpyArray(np_results[3]),
+                ),
+                ("px", "py", "pz", "E"),
+            )
+        )
+        return out
+
     def exclusive_jets(self, n_jets, dcut):
         np_results = 0
         if n_jets == 0:
@@ -184,6 +199,140 @@ class _classsingleevent:
 
     def Q2(self):
         np_results = self._results.to_numpy_q2()
+        out = np_results[0]
+        out = out[0]
+        return out
+
+    def exclusive_subjets(self, data, dcut, nsub):
+        try:
+            px = data.px
+            py = data.py
+            pz = data.pz
+            E = data.E
+        except AttributeError:
+            raise AttributeError("Lorentz vector not found")
+        np_results = 0
+        if nsub == 0:
+            raise ValueError("Nsub cannot be 0")
+        if dcut == -1 and nsub != -1:
+            np_results = self._results.to_numpy_exclusive_subjets_nsub(
+                px, py, pz, E, nsub
+            )
+        if nsub == -1 and dcut != -1:
+            np_results = self._results.to_numpy_exclusive_subjets_dcut(
+                px, py, pz, E, dcut
+            )
+        if np_results == 0:
+            raise ValueError("Either Dcut or Njets should be entered")
+        out = ak.Array(
+            ak.layout.RecordArray(
+                [
+                    ak.layout.NumpyArray(np_results[0]),
+                    ak.layout.NumpyArray(np_results[1]),
+                    ak.layout.NumpyArray(np_results[2]),
+                    ak.layout.NumpyArray(np_results[3]),
+                ],
+                ["px", "py", "pz", "E"],
+            )
+        )
+        return out
+
+    def exclusive_subjets_up_to(self, data, nsub):
+        try:
+            px = data.px
+            py = data.py
+            pz = data.pz
+            E = data.E
+        except AttributeError:
+            raise AttributeError("Lorentz vector not found")
+        np_results = self._results.to_numpy_exclusive_subjets_up_to(px, py, pz, E, nsub)
+        out = ak.Array(
+            ak.layout.RecordArray(
+                [
+                    ak.layout.NumpyArray(np_results[0]),
+                    ak.layout.NumpyArray(np_results[1]),
+                    ak.layout.NumpyArray(np_results[2]),
+                    ak.layout.NumpyArray(np_results[3]),
+                ],
+                ["px", "py", "pz", "E"],
+            )
+        )
+        return out
+
+    def exclusive_subdmerge(self, data, nsub):
+        try:
+            px = data.px
+            py = data.py
+            pz = data.pz
+            E = data.E
+        except AttributeError:
+            raise AttributeError("Lorentz vector not found")
+        np_results = self._results.to_numpy_exclusive_subdmerge(px, py, pz, E, nsub)
+        out = np_results[0]
+        out = out[0]
+        return out
+
+    def exclusive_subdmerge_max(self, data, nsub):
+        try:
+            px = data.px
+            py = data.py
+            pz = data.pz
+            E = data.E
+        except AttributeError:
+            raise AttributeError("Lorentz vector not found")
+        np_results = self._results.to_numpy_exclusive_subdmerge_max(px, py, pz, E, nsub)
+        out = np_results[0]
+        out = out[0]
+        return out
+
+    def n_exclusive_subjets(self, data, dcut):
+        try:
+            px = data.px
+            py = data.py
+            pz = data.pz
+            E = data.E
+        except AttributeError:
+            raise AttributeError("Lorentz vector not found")
+        np_results = self._results.to_numpy_n_exclusive_subjets(px, py, pz, E, dcut)
+        out = np_results[0]
+        out = out[0]
+        return out
+
+    def has_parents(self, data):
+        try:
+            px = data.px
+            py = data.py
+            pz = data.pz
+            E = data.E
+        except AttributeError:
+            raise AttributeError("Lorentz vector not found")
+        np_results = self._results.to_numpy_has_parents(px, py, pz, E)
+        out = np_results[0]
+        out = out[0]
+        return out
+
+    def has_child(self, data):
+        try:
+            px = data.px
+            py = data.py
+            pz = data.pz
+            E = data.E
+        except AttributeError:
+            raise AttributeError("Lorentz vector not found")
+        np_results = self._results.to_numpy_has_child(px, py, pz, E)
+        out = np_results[0]
+        out = out[0]
+        return out
+
+    def jet_scale_for_algorithm(self, data):
+        try:
+            px = data.px
+            py = data.py
+            pz = data.pz
+            E = data.E
+        except AttributeError:
+            raise AttributeError("Lorentz vector not found")
+        np_results = self._results.to_numpy_jet_scale_for_algorithm(px, py, pz, E)
         out = np_results[0]
         out = out[0]
         return out

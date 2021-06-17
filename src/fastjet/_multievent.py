@@ -68,18 +68,21 @@ class _classmultievent:
         )
         return out
 
-    @property
-    def unclustered_parts(self):
-        np_results = self._results.to_numpy_unclustered()
+    def unclustered_particles(self):
+        np_results = self._results.to_numpy_unclustered_particles()
+        of = np.insert(np_results[-1], len(np_results[-1]), len(np_results[0]))
         out = ak.Array(
-            ak.layout.RecordArray(
-                [
-                    ak.layout.NumpyArray(np_results[0]),
-                    ak.layout.NumpyArray(np_results[1]),
-                    ak.layout.NumpyArray(np_results[2]),
-                    ak.layout.NumpyArray(np_results[3]),
-                ],
-                ["px", "py", "pz", "E"],
+            ak.layout.ListOffsetArray64(
+                ak.layout.Index64(of),
+                ak.layout.RecordArray(
+                    (
+                        ak.layout.NumpyArray(np_results[0]),
+                        ak.layout.NumpyArray(np_results[1]),
+                        ak.layout.NumpyArray(np_results[2]),
+                        ak.layout.NumpyArray(np_results[3]),
+                    ),
+                    ("px", "py", "pz", "E"),
+                ),
             )
         )
         return out
@@ -95,7 +98,7 @@ class _classmultievent:
         if n_jets == -1 and dcut != -1:
             np_results = self._results.to_numpy_exclusive_dcut(dcut)
             of = np.insert(np_results[-1], len(np_results[-1]), len(np_results[0]))
-        if np_results == 0 and np_results == 0:
+        if np_results == 0 and of == 0:
             raise ValueError("Either NJets or Dcut sould be entered")
         out = ak.Array(
             ak.layout.ListOffsetArray64(
@@ -145,62 +148,32 @@ class _classmultievent:
 
     def exclusive_dmerge(self, njets):
         np_results = self._results.to_numpy_exclusive_dmerge(njets)
-        off = np.insert(np_results[-1], 0, 0)
-        out = ak.Array(
-            ak.layout.ListOffsetArray64(
-                ak.layout.Index64(off), ak.layout.NumpyArray(np_results[0])
-            )
-        )
+        out = ak.Array(ak.layout.NumpyArray(np_results[0]))
         return out
 
     def exclusive_dmerge_max(self, njets):
         np_results = self._results.to_numpy_exclusive_dmerge_max(njets)
-        off = np.insert(np_results[-1], 0, 0)
-        out = ak.Array(
-            ak.layout.ListOffsetArray64(
-                ak.layout.Index64(off), ak.layout.NumpyArray(np_results[0])
-            )
-        )
+        out = ak.Array(ak.layout.NumpyArray(np_results[0]))
         return out
 
     def exclusive_ymerge_max(self, njets):
         np_results = self._results.to_numpy_exclusive_ymerge_max(njets)
-        off = np.insert(np_results[-1], 0, 0)
-        out = ak.Array(
-            ak.layout.ListOffsetArray64(
-                ak.layout.Index64(off), ak.layout.NumpyArray(np_results[0])
-            )
-        )
+        out = ak.Array(ak.layout.NumpyArray(np_results[0]))
         return out
 
     def exclusive_ymerge(self, njets):
         np_results = self._results.to_numpy_exclusive_ymerge(njets)
-        off = np.insert(np_results[-1], 0, 0)
-        out = ak.Array(
-            ak.layout.ListOffsetArray64(
-                ak.layout.Index64(off), ak.layout.NumpyArray(np_results[0])
-            )
-        )
+        out = ak.Array(ak.layout.NumpyArray(np_results[0]))
         return out
 
     def Q(self):
         np_results = self._results.to_numpy_q()
-        off = np.insert(np_results[-1], 0, 0)
-        out = ak.Array(
-            ak.layout.ListOffsetArray64(
-                ak.layout.Index64(off), ak.layout.NumpyArray(np_results[0])
-            )
-        )
+        out = ak.Array(ak.layout.NumpyArray(np_results[0]))
         return out
 
     def Q2(self):
         np_results = self._results.to_numpy_q2()
-        off = np.insert(np_results[-1], 0, 0)
-        out = ak.Array(
-            ak.layout.ListOffsetArray64(
-                ak.layout.Index64(off), ak.layout.NumpyArray(np_results[0])
-            )
-        )
+        out = ak.Array(ak.layout.NumpyArray(np_results[0]))
         return out
 
     def constituents(self, min_pt):
@@ -211,7 +184,7 @@ class _classmultievent:
         prepared = self.data[:, np.newaxis][duplicate]
         return prepared[outputs_to_inputs]
 
-    def exclusive_subjets(self, data, dcut=0):
+    def exclusive_subjets(self, data, dcut, nsub):
         try:
             px = data.px
             py = data.py
@@ -219,7 +192,48 @@ class _classmultievent:
             E = data.E
         except AttributeError:
             raise AttributeError("Lorentz vector not found")
-        np_results = self._results.to_numpy_exclusive_subjets_dcut(px, py, pz, E, dcut)
+        of = 0
+        np_results = 0
+        if nsub == 0:
+            raise ValueError("Njets cannot be 0")
+        if dcut == -1 and nsub != -1:
+            np_results = self._results.to_numpy_exclusive_subjets_nsub(
+                px, py, pz, E, nsub
+            )
+            of = np.insert(np_results[-1], len(np_results[-1]), len(np_results[0]))
+        if nsub == -1 and dcut != -1:
+            np_results = self._results.to_numpy_exclusive_subjets_dcut(
+                px, py, pz, E, dcut
+            )
+            of = np.insert(np_results[-1], len(np_results[-1]), len(np_results[0]))
+        if np_results == 0 and of == 0:
+            raise ValueError("Either NJets or Dcut sould be entered")
+
+        out = ak.Array(
+            ak.layout.ListOffsetArray64(
+                ak.layout.Index64(of),
+                ak.layout.RecordArray(
+                    (
+                        ak.layout.NumpyArray(np_results[0]),
+                        ak.layout.NumpyArray(np_results[1]),
+                        ak.layout.NumpyArray(np_results[2]),
+                        ak.layout.NumpyArray(np_results[3]),
+                    ),
+                    ("px", "py", "pz", "E"),
+                ),
+            )
+        )
+        return out
+
+    def exclusive_subjets_up_to(self, data, nsub):
+        try:
+            px = data.px
+            py = data.py
+            pz = data.pz
+            E = data.E
+        except AttributeError:
+            raise AttributeError("Lorentz vector not found")
+        np_results = self._results.to_numpy_exclusive_subjets_up_to(px, py, pz, E, nsub)
         of = np.insert(np_results[-1], len(np_results[-1]), len(np_results[0]))
         out = ak.Array(
             ak.layout.ListOffsetArray64(
@@ -235,4 +249,76 @@ class _classmultievent:
                 ),
             )
         )
+        return out
+
+    def exclusive_subdmerge(self, data, nsub):
+        try:
+            px = data.px
+            py = data.py
+            pz = data.pz
+            E = data.E
+        except AttributeError:
+            raise AttributeError("Lorentz vector not found")
+        np_results = self._results.to_numpy_exclusive_subdmerge(px, py, pz, E, nsub)
+        out = ak.Array(ak.layout.NumpyArray(np_results[0]))
+        return out
+
+    def exclusive_subdmerge_max(self, data, nsub):
+        try:
+            px = data.px
+            py = data.py
+            pz = data.pz
+            E = data.E
+        except AttributeError:
+            raise AttributeError("Lorentz vector not found")
+        np_results = self._results.to_numpy_exclusive_subdmerge_max(px, py, pz, E, nsub)
+        out = ak.Array(ak.layout.NumpyArray(np_results[0]))
+        return out
+
+    def n_exclusive_subjets(self, data, dcut):
+        try:
+            px = data.px
+            py = data.py
+            pz = data.pz
+            E = data.E
+        except AttributeError:
+            raise AttributeError("Lorentz vector not found")
+        np_results = self._results.to_numpy_n_exclusive_subjets(px, py, pz, E, dcut)
+        out = ak.Array(ak.layout.NumpyArray(np_results[0]))
+        return out
+
+    def has_parents(self, data):
+        try:
+            px = data.px
+            py = data.py
+            pz = data.pz
+            E = data.E
+        except AttributeError:
+            raise AttributeError("Lorentz vector not found")
+        np_results = self._results.to_numpy_has_parents(px, py, pz, E)
+        out = ak.Array(ak.layout.NumpyArray(np_results[0]))
+        return out
+
+    def has_child(self, data):
+        try:
+            px = data.px
+            py = data.py
+            pz = data.pz
+            E = data.E
+        except AttributeError:
+            raise AttributeError("Lorentz vector not found")
+        np_results = self._results.to_numpy_has_child(px, py, pz, E)
+        out = ak.Array(ak.layout.NumpyArray(np_results[0]))
+        return out
+
+    def jet_scale_for_algorithm(self, data):
+        try:
+            px = data.px
+            py = data.py
+            pz = data.pz
+            E = data.E
+        except AttributeError:
+            raise AttributeError("Lorentz vector not found")
+        np_results = self._results.to_numpy_jet_scale_for_algorithm(px, py, pz, E)
+        out = ak.Array(ak.layout.NumpyArray(np_results[0]))
         return out

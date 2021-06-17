@@ -50,6 +50,10 @@ class AwkwardClusterSequence:
         """Returns the inclusive jets after clustering in the same format as the input awkward array"""
         return self._internalrep.inclusive_jets(min_pt)
 
+    def unclustered_particles(self):
+        """Returns the unclustered particles after clustering in the same format as the input awkward array"""
+        return self._internalrep.unclustered_particles()
+
     def exclusive_jets(self, n_jets=-1, dcut=-1):
         """Returns the exclusive jets after clustering in the same format as the input awkward array"""
         return self._internalrep.exclusive_jets(n_jets, dcut)
@@ -94,6 +98,34 @@ class AwkwardClusterSequence:
         """Return Q()^2"""
         return self._internalrep.Q2()
 
-    def exclusive_subjets(self, data, dcut):
+    def exclusive_subjets(self, data, dcut=-1, nsub=-1):
         """Returns an Awkward Array of all subjets of the current jet (in the sense of the exclusive algorithm) that would be obtained when running the algorithm with the given dcut."""
-        return self._internalrep.exclusive_subjets(data, dcut)
+        return self._internalrep.exclusive_subjets(data, dcut, nsub)
+
+    def exclusive_subjets_up_to(self, data, nsub=0):
+        """Returns the list of subjets obtained by unclustering the supplied jet down to nsub subjets (or all constituents if there are fewer than nsub)."""
+        return self._internalrep.exclusive_subjets_up_to(data, nsub)
+
+    def exclusive_subdmerge(self, data, nsub=0):
+        """Returns the dij that was present in the merging nsub+1 -> nsub subjets inside this jet."""
+        return self._internalrep.exclusive_subdmerge(data, nsub)
+
+    def exclusive_subdmerge_max(self, data, nsub=0):
+        """Returns the maximum dij that occurred in the whole event at the stage that the nsub+1 -> nsub merge of subjets occurred inside this jet."""
+        return self._internalrep.exclusive_subdmerge_max(data, nsub)
+
+    def n_exclusive_subjets(self, data, dcut=0):
+        """Returns the size of exclusive_subjets(...); still n ln n with same coefficient, but marginally more efficient than manually taking len(exclusive_subjets)"""
+        return self._internalrep.n_exclusive_subjets(data, dcut)
+
+    def has_parents(self, data):
+        """if the jet has parents in the clustering, it returns true"""
+        return self._internalrep.has_parents(data)
+
+    def has_child(self, data):
+        """if the jet has children in the clustering, it returns true"""
+        return self._internalrep.has_child(data)
+
+    def jet_scale_for_algorithm(self, data):
+        """Returns the scale associated with a jet as required for this clustering algorithm (kt^2 for the kt-algorithm, 1 for the Cambridge algorithm)."""
+        return self._internalrep.jet_scale_for_algorithm(data)
