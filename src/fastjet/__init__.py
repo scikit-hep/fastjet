@@ -158,7 +158,6 @@ from fastjet._swig import antikt_algorithm  # noqa: F401, E402
 from fastjet._swig import cambridge_aachen_algorithm  # noqa: F401, E402
 from fastjet._swig import cambridge_algorithm  # noqa: F401, E402
 from fastjet._swig import cambridge_for_passive_algorithm  # noqa: F401, E402
-from fastjet._utils import cos_theta  # noqa: F401, E402
 from fastjet._swig import cpp_string_from_name_py_obj  # noqa: F401, E402
 from fastjet._swig import cpp_string_from_py_str  # noqa: F401, E402
 from fastjet._swig import cpp_string_from_str_py_obj  # noqa: F401, E402
@@ -169,7 +168,6 @@ from fastjet._swig import def_grid_scatter  # noqa: F401, E402
 from fastjet._swig import def_mean_ghost_pt  # noqa: F401, E402
 from fastjet._swig import def_pt_scatter  # noqa: F401, E402
 from fastjet._swig import def_repeat  # noqa: F401, E402
-from fastjet._utils import dot_product  # noqa: F401, E402
 from fastjet._swig import ee_genkt_algorithm  # noqa: F401, E402
 from fastjet._swig import ee_kt_algorithm  # noqa: F401, E402
 from fastjet._swig import eulergamma  # noqa: F401, E402
@@ -177,7 +175,6 @@ from fastjet._swig import external_scheme  # noqa: F401, E402
 from fastjet._swig import fastjet_version_string  # noqa: F401, E402
 from fastjet._swig import genkt_algorithm  # noqa: F401, E402
 from fastjet._swig import genkt_for_passive_algorithm  # noqa: F401, E402
-from fastjet._utils import have_same_momentum  # noqa: F401, E402
 from fastjet._swig import invalid_area  # noqa: F401, E402
 from fastjet._swig import kt_algorithm  # noqa: F401, E402
 from fastjet._swig import ln2  # noqa: F401, E402
@@ -191,19 +188,22 @@ from fastjet._swig import pseudojet_invalid_phi  # noqa: F401, E402
 from fastjet._swig import pseudojet_invalid_rap  # noqa: F401, E402
 from fastjet._swig import pt2_scheme  # noqa: F401, E402
 from fastjet._swig import pt_scheme  # noqa: F401, E402
-from fastjet._utils import sort_indices  # noqa: F401, E402
-from fastjet._utils import theta  # noqa: F401, E402
 from fastjet._swig import twopi  # noqa: F401, E402
 from fastjet._swig import undefined_jet_algorithm  # noqa: F401, E402
 from fastjet._swig import vectorPJ  # noqa: F401, E402
 from fastjet._swig import voronoi_area  # noqa: F401, E402
 from fastjet._swig import zeta2  # noqa: F401, E402
 from fastjet._swig import zeta3  # noqa: F401, E402
+from fastjet._utils import cos_theta  # noqa: F401, E402
+from fastjet._utils import dot_product  # noqa: F401, E402
+from fastjet._utils import have_same_momentum  # noqa: F401, E402
 from fastjet._utils import join  # noqa: F401, E402
+from fastjet._utils import sort_indices  # noqa: F401, E402
 from fastjet._utils import sorted_by_E  # noqa: F401, E402
 from fastjet._utils import sorted_by_pt  # noqa: F401, E402
 from fastjet._utils import sorted_by_pz  # noqa: F401, E402
 from fastjet._utils import sorted_by_rapidity  # noqa: F401, E402
+from fastjet._utils import theta  # noqa: F401, E402
 from fastjet.version import __version__  # noqa: E402
 
 __all__ = ("__version__",)

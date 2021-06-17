@@ -116,7 +116,12 @@ def cos_theta(a, b):
 
 
 def PtYPhiM(pt, y, phi, m):
-    if isinstance(a, ak.Array) or isinstance(b, ak.Array):
+    if (
+        isinstance(pt, ak.Array)
+        or isinstance(y, ak.Array)
+        or isinstance(phi, ak.Array)
+        or isinstance(m, ak.Array)
+    ):
         raise TypeError("Use inbuilt methods for Awkward Array")
     else:
         return fastjet._swig.PtYPhiM(pt, y, phi, m)
