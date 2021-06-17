@@ -68,18 +68,21 @@ class _classmultievent:
         )
         return out
 
-    @property
-    def unclustered_parts(self):
-        np_results = self._results.to_numpy_unclustered()
+    def unclustered_particles(self):
+        np_results = self._results.to_numpy_unclustered_particles()
+        of = np.insert(np_results[-1], len(np_results[-1]), len(np_results[0]))
         out = ak.Array(
-            ak.layout.RecordArray(
-                [
-                    ak.layout.NumpyArray(np_results[0]),
-                    ak.layout.NumpyArray(np_results[1]),
-                    ak.layout.NumpyArray(np_results[2]),
-                    ak.layout.NumpyArray(np_results[3]),
-                ],
-                ["px", "py", "pz", "E"],
+            ak.layout.ListOffsetArray64(
+                ak.layout.Index64(of),
+                ak.layout.RecordArray(
+                    (
+                        ak.layout.NumpyArray(np_results[0]),
+                        ak.layout.NumpyArray(np_results[1]),
+                        ak.layout.NumpyArray(np_results[2]),
+                        ak.layout.NumpyArray(np_results[3]),
+                    ),
+                    ("px", "py", "pz", "E"),
+                ),
             )
         )
         return out
