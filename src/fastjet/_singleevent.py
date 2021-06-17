@@ -282,3 +282,42 @@ class _classsingleevent:
         out = np_results[0]
         out = out[0]
         return out
+
+    def has_parents(self, data):
+        try:
+            px = data.px
+            py = data.py
+            pz = data.pz
+            E = data.E
+        except AttributeError:
+            raise AttributeError("Lorentz vector not found")
+        np_results = self._results.to_numpy_has_parents(px, py, pz, E)
+        out = np_results[0]
+        out = out[0]
+        return out
+
+    def has_child(self, data):
+        try:
+            px = data.px
+            py = data.py
+            pz = data.pz
+            E = data.E
+        except AttributeError:
+            raise AttributeError("Lorentz vector not found")
+        np_results = self._results.to_numpy_has_child(px, py, pz, E)
+        out = np_results[0]
+        out = out[0]
+        return out
+
+    def jet_scale_for_algorithm(self, data):
+        try:
+            px = data.px
+            py = data.py
+            pz = data.pz
+            E = data.E
+        except AttributeError:
+            raise AttributeError("Lorentz vector not found")
+        np_results = self._results.to_numpy_jet_scale_for_algorithm(px, py, pz, E)
+        out = np_results[0]
+        out = out[0]
+        return out

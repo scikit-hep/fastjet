@@ -269,3 +269,153 @@ def test_n_exclusive_subjets_single():
     )
     nsub_out = 1
     assert nsub_out == cluster.n_exclusive_subjets(test_input, dcut=0.0001)
+
+
+def test_has_parents_multi():
+
+    array = ak.Array(
+        [
+            [
+                {"px": 1.2, "py": 3.2, "pz": 5.4, "E": 2.5, "ex": 0.78},
+                {"px": 32.2, "py": 64.21, "pz": 543.34, "E": 24.12, "ex": 0.35},
+                {"px": 32.45, "py": 63.21, "pz": 543.14, "E": 24.56, "ex": 0.0},
+            ],
+            [
+                {"px": 1.2, "py": 3.2, "pz": 5.4, "E": 2.5, "ex": 0.78},
+                {"px": 32.2, "py": 64.21, "pz": 543.34, "E": 24.12, "ex": 0.35},
+                {"px": 32.45, "py": 63.21, "pz": 543.14, "E": 24.56, "ex": 0.0},
+            ],
+        ],
+        with_name="Momentum4D",
+    )
+    jetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.6)
+    cluster = fastjet.pyjet.AwkwardClusterSequence(array, jetdef)
+    test_input = ak.Array(
+        [
+            {"px": 1.2, "py": 3.2, "pz": 5.4, "E": 2.5, "ex": 0.78},
+            {"px": 64.65, "py": 127.41999999999999, "pz": 1086.48, "E": 48.68},
+        ]
+    )
+    nsub_out = [False, True]
+    assert nsub_out == cluster.has_parents(test_input).to_list()
+
+
+def test_has_parents_single():
+
+    array = ak.Array(
+        [
+            {"px": 1.2, "py": 3.2, "pz": 5.4, "E": 2.5, "ex": 0.78},
+            {"px": 32.2, "py": 64.21, "pz": 543.34, "E": 24.12, "ex": 0.35},
+            {"px": 32.45, "py": 63.21, "pz": 543.14, "E": 24.56, "ex": 0.0},
+        ],
+        with_name="Momentum4D",
+    )
+    jetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.6)
+    cluster = fastjet.pyjet.AwkwardClusterSequence(array, jetdef)
+    test_input = ak.Array(
+        [
+            {"px": 64.65, "py": 127.41999999999999, "pz": 1086.48, "E": 48.68},
+        ]
+    )
+    nsub_out = True
+    assert nsub_out == cluster.has_parents(test_input)
+
+
+def test_has_child_single():
+
+    array = ak.Array(
+        [
+            {"px": 1.2, "py": 3.2, "pz": 5.4, "E": 2.5, "ex": 0.78},
+            {"px": 32.2, "py": 64.21, "pz": 543.34, "E": 24.12, "ex": 0.35},
+            {"px": 32.45, "py": 63.21, "pz": 543.14, "E": 24.56, "ex": 0.0},
+        ],
+        with_name="Momentum4D",
+    )
+    jetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.6)
+    cluster = fastjet.pyjet.AwkwardClusterSequence(array, jetdef)
+    test_input = ak.Array(
+        [
+            {"px": 64.65, "py": 127.41999999999999, "pz": 1086.48, "E": 48.68},
+        ]
+    )
+    nsub_out = False
+    assert nsub_out == cluster.has_child(test_input)
+
+
+def test_has_child_multi():
+
+    array = ak.Array(
+        [
+            [
+                {"px": 1.2, "py": 3.2, "pz": 5.4, "E": 2.5, "ex": 0.78},
+                {"px": 32.2, "py": 64.21, "pz": 543.34, "E": 24.12, "ex": 0.35},
+                {"px": 32.45, "py": 63.21, "pz": 543.14, "E": 24.56, "ex": 0.0},
+            ],
+            [
+                {"px": 1.2, "py": 3.2, "pz": 5.4, "E": 2.5, "ex": 0.78},
+                {"px": 32.2, "py": 64.21, "pz": 543.34, "E": 24.12, "ex": 0.35},
+                {"px": 32.45, "py": 63.21, "pz": 543.14, "E": 24.56, "ex": 0.0},
+            ],
+        ],
+        with_name="Momentum4D",
+    )
+    jetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.6)
+    cluster = fastjet.pyjet.AwkwardClusterSequence(array, jetdef)
+    test_input = ak.Array(
+        [
+            {"px": 1.2, "py": 3.2, "pz": 5.4, "E": 2.5, "ex": 0.78},
+            {"px": 64.65, "py": 127.41999999999999, "pz": 1086.48, "E": 48.68},
+        ]
+    )
+    nsub_out = [False, False]
+    assert nsub_out == cluster.has_child(test_input).to_list()
+
+
+def test_jet_scale_for_algorithm_multi():
+
+    array = ak.Array(
+        [
+            [
+                {"px": 1.2, "py": 3.2, "pz": 5.4, "E": 2.5, "ex": 0.78},
+                {"px": 32.2, "py": 64.21, "pz": 543.34, "E": 24.12, "ex": 0.35},
+                {"px": 32.45, "py": 63.21, "pz": 543.14, "E": 24.56, "ex": 0.0},
+            ],
+            [
+                {"px": 1.2, "py": 3.2, "pz": 5.4, "E": 2.5, "ex": 0.78},
+                {"px": 32.2, "py": 64.21, "pz": 543.34, "E": 24.12, "ex": 0.35},
+                {"px": 32.45, "py": 63.21, "pz": 543.14, "E": 24.56, "ex": 0.0},
+            ],
+        ],
+        with_name="Momentum4D",
+    )
+    jetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.6)
+    cluster = fastjet.pyjet.AwkwardClusterSequence(array, jetdef)
+    test_input = ak.Array(
+        [
+            {"px": 64.65, "py": 127.41999999999999, "pz": 1086.48, "E": 48.68},
+            {"px": 1.2, "py": 3.2, "pz": 5.4, "E": 2.5, "ex": 0.78},
+        ]
+    )
+    nsub_out = [4.898244145524307e-05, 0.08561643835616438]
+    assert nsub_out == cluster.jet_scale_for_algorithm(test_input).to_list()
+
+
+def test_jet_scale_for_algorithm_single():
+
+    array = ak.Array(
+        [
+            {"px": 1.2, "py": 3.2, "pz": 5.4, "E": 2.5, "ex": 0.78},
+            {"px": 32.2, "py": 64.21, "pz": 543.34, "E": 24.12, "ex": 0.35},
+            {"px": 32.45, "py": 63.21, "pz": 543.14, "E": 24.56, "ex": 0.0},
+        ],
+        with_name="Momentum4D",
+    )
+    jetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.6)
+    cluster = fastjet.pyjet.AwkwardClusterSequence(array, jetdef)
+    test_input = ak.Array(
+        [
+            {"px": 1.2, "py": 3.2, "pz": 5.4, "E": 2.5, "ex": 0.78},
+        ]
+    )
+    nsub_out = 0.08561643835616438
+    assert nsub_out == cluster.jet_scale_for_algorithm(test_input)

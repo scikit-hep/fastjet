@@ -113,3 +113,15 @@ class AwkwardClusterSequence:
     def n_exclusive_subjets(self, data, dcut=0):
         """Returns the size of exclusive_subjets(...); still n ln n with same coefficient, but marginally more efficient than manually taking len(exclusive_subjets)"""
         return self._internalrep.n_exclusive_subjets(data, dcut)
+
+    def has_parents(self, data):
+        """if the jet has parents in the clustering, it returns true"""
+        return self._internalrep.has_parents(data)
+
+    def has_child(self, data):
+        """if the jet has children in the clustering, it returns true"""
+        return self._internalrep.has_child(data)
+
+    def jet_scale_for_algorithm(self, data):
+        """Returns the scale associated with a jet as required for this clustering algorithm (kt^2 for the kt-algorithm, 1 for the Cambridge algorithm)."""
+        return self._internalrep.jet_scale_for_algorithm(data)
