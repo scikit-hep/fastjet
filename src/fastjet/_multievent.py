@@ -146,6 +146,16 @@ class _classmultievent:
         out = ak.Array(ak.layout.ListOffsetArray64(ak.layout.Index64(off), out.layout))
         return out
 
+    def unique_history_order(self):
+        np_results = self._results.to_numpy_unique_history_order()
+        off = np.insert(np_results[-1], 0, 0)
+        out = ak.Array(
+            ak.layout.ListOffsetArray64(
+                ak.layout.Index64(off), ak.layout.NumpyArray(np_results[0])
+            )
+        )
+        return out
+
     def exclusive_dmerge(self, njets):
         np_results = self._results.to_numpy_exclusive_dmerge(njets)
         out = ak.Array(ak.layout.NumpyArray(np_results[0]))

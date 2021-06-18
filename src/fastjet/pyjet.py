@@ -129,3 +129,7 @@ class AwkwardClusterSequence:
     def jet_scale_for_algorithm(self, data):
         """Returns the scale associated with a jet as required for this clustering algorithm (kt^2 for the kt-algorithm, 1 for the Cambridge algorithm)."""
         return self._internalrep.jet_scale_for_algorithm(data)
+
+    def unique_history_order(self):
+        """Routine that returns an order in which to read the history such that clusterings that lead to identical jet compositions but different histories (because of degeneracies in the clustering order) will have matching constituents for each matching entry in the unique_history_order."""
+        return self._internalrep.unique_history_order()

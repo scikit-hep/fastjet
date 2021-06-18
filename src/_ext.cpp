@@ -1572,6 +1572,44 @@ PYBIND11_MODULE(_ext, m) {
           min_pt: Minimum jet pt to include. Default: 0.
         Returns:
           pt, eta, phi, m of inclusive jets.
+      )pbdoc")
+      .def("to_numpy_unique_history_order",
+      [](const output_wrapper ow) {
+        auto css = ow.cse;
+        auto len = css.size();
+        int jk = 0;
+        for(unsigned int i = 0; i<len; i++){
+
+          jk += css[i]->unique_history_order().size();
+        }
+        auto parid = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {jk}, {sizeof(int)}));
+        auto bufparid = parid.request();
+        int *ptrid = (int *)bufparid.ptr;
+        auto eventoffsets = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len}, {sizeof(int)}));
+        auto bufeventoffsets = eventoffsets.request();
+        int *ptreventoffsets = (int *)bufeventoffsets.ptr;
+        size_t eventidx = 0;
+        size_t idxh = 0;
+        auto eventprev = 0;
+        for (unsigned int i = 0; i < css.size(); i++){
+        auto info= css[i]->unique_history_order();
+        for(unsigned int j =0; j < info.size(); j++){
+        ptrid[idxh] = info[j];
+        idxh++;}
+        ptreventoffsets[eventidx] = info.size()+eventprev;
+        eventprev = ptreventoffsets[eventidx];
+        eventidx++;
+          }
+        return std::make_tuple(
+            parid,
+            eventoffsets
+          );
+      }, R"pbdoc(
+        Retrieves the inclusive jets and converts them to numpy arrays.
+        Args:
+          min_pt: Minimum jet pt to include. Default: 0.
+        Returns:
+          pt, eta, phi, m of inclusive jets.
       )pbdoc");
 
 
