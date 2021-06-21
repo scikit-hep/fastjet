@@ -175,3 +175,9 @@ class AwkwardClusterSequence:
         if not isinstance(data, ak.Array):
             raise TypeError("The input data is not an Awkward Array")
         return self._internalrep.get_parents(data)
+
+    def get_child(self, data):
+        """If the jet has parents in the clustering, it returns them."""
+        if not isinstance(data, ak.Array):
+            raise TypeError("The input data is not an Awkward Array")
+        return self._internalrep.get_child(data)
