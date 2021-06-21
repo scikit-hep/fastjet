@@ -169,3 +169,9 @@ class AwkwardClusterSequence:
     def jets(self):
         """Allows the user to access the internally stored _jets() array, which contains both the initial particles and the various intermediate and final stages of recombination."""
         return self._internalrep.jets()
+
+    def get_parents(self, data):
+        """If the jet has parents in the clustering, it returns them."""
+        if not isinstance(data, ak.Array):
+            raise TypeError("The input data is not an Awkward Array")
+        return self._internalrep.get_parents(data)

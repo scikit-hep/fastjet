@@ -383,3 +383,25 @@ class _classsingleevent:
             )
         )
         return out
+
+    def get_parents(self, data):
+        try:
+            px = data.px
+            py = data.py
+            pz = data.pz
+            E = data.E
+        except AttributeError:
+            raise AttributeError("Lorentz vector not found")
+        np_results = self._results.to_numpy_get_parents(px, py, pz, E)
+        out = ak.Array(
+            ak.layout.RecordArray(
+                (
+                    ak.layout.NumpyArray(np_results[0]),
+                    ak.layout.NumpyArray(np_results[1]),
+                    ak.layout.NumpyArray(np_results[2]),
+                    ak.layout.NumpyArray(np_results[3]),
+                ),
+                ("px", "py", "pz", "E"),
+            )
+        )
+        return out
