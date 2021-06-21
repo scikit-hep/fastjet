@@ -161,3 +161,7 @@ class AwkwardClusterSequence:
     def n_exclusive_jets(self, dcut=0):
         """Returns the number of particles that were provided to the clustering algorithm."""
         return self._internalrep.n_exclusive_jets(dcut)
+
+    def childless_pseudojets(self):
+        """Return the list of pseudojets in the ClusterSequence that do not have children (and are not among the inclusive jets)."""
+        return self._internalrep.childless_pseudojets()
