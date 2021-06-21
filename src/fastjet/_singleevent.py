@@ -70,8 +70,8 @@ class _classsingleevent:
         )
         return out
 
-    def unclustered_particles(self, min_pt):
-        np_results = self._results.to_numpy_unclustered_particles(min_pt)
+    def unclustered_particles(self):
+        np_results = self._results.to_numpy_unclustered_particles()
         out = ak.Array(
             ak.layout.RecordArray(
                 (
@@ -148,6 +148,11 @@ class _classsingleevent:
         )
         out = ak.Array(ak.layout.ListOffsetArray64(ak.layout.Index64(off), out.layout))
         return out[0]
+
+    def unique_history_order(self):
+        np_results = self._results.to_numpy_unique_history_order()
+        out = ak.Array(ak.layout.NumpyArray(np_results[0]))
+        return out
 
     def constituents(self, min_pt):
         np_results = self._results.to_numpy_with_constituents(min_pt)
@@ -335,4 +340,46 @@ class _classsingleevent:
         np_results = self._results.to_numpy_jet_scale_for_algorithm(px, py, pz, E)
         out = np_results[0]
         out = out[0]
+        return out
+
+    def n_particles(self):
+        np_results = self._results.to_numpy_n_particles()
+        out = np_results[0]
+        out = out[0]
+        return out
+
+    def n_exclusive_jets(self, dcut):
+        np_results = self._results.to_numpy_n_exclusive_jets(dcut)
+        out = np_results[0]
+        out = out[0]
+        return out
+
+    def childless_pseudojets(self):
+        np_results = self._results.to_numpy_childless_pseudojets()
+        out = ak.Array(
+            ak.layout.RecordArray(
+                (
+                    ak.layout.NumpyArray(np_results[0]),
+                    ak.layout.NumpyArray(np_results[1]),
+                    ak.layout.NumpyArray(np_results[2]),
+                    ak.layout.NumpyArray(np_results[3]),
+                ),
+                ("px", "py", "pz", "E"),
+            )
+        )
+        return out
+
+    def jets(self):
+        np_results = self._results.to_numpy_jets()
+        out = ak.Array(
+            ak.layout.RecordArray(
+                (
+                    ak.layout.NumpyArray(np_results[0]),
+                    ak.layout.NumpyArray(np_results[1]),
+                    ak.layout.NumpyArray(np_results[2]),
+                    ak.layout.NumpyArray(np_results[3]),
+                ),
+                ("px", "py", "pz", "E"),
+            )
+        )
         return out

@@ -146,6 +146,16 @@ class _classmultievent:
         out = ak.Array(ak.layout.ListOffsetArray64(ak.layout.Index64(off), out.layout))
         return out
 
+    def unique_history_order(self):
+        np_results = self._results.to_numpy_unique_history_order()
+        off = np.insert(np_results[-1], 0, 0)
+        out = ak.Array(
+            ak.layout.ListOffsetArray64(
+                ak.layout.Index64(off), ak.layout.NumpyArray(np_results[0])
+            )
+        )
+        return out
+
     def exclusive_dmerge(self, njets):
         np_results = self._results.to_numpy_exclusive_dmerge(njets)
         out = ak.Array(ak.layout.NumpyArray(np_results[0]))
@@ -321,4 +331,52 @@ class _classmultievent:
             raise AttributeError("Lorentz vector not found")
         np_results = self._results.to_numpy_jet_scale_for_algorithm(px, py, pz, E)
         out = ak.Array(ak.layout.NumpyArray(np_results[0]))
+        return out
+
+    def n_particles(self):
+        np_results = self._results.to_numpy_n_particles()
+        out = ak.Array(ak.layout.NumpyArray(np_results[0]))
+        return out
+
+    def n_exclusive_jets(self, dcut):
+        np_results = self._results.to_numpy_n_exclusive_jets(dcut)
+        out = ak.Array(ak.layout.NumpyArray(np_results[0]))
+        return out
+
+    def childless_pseudojets(self):
+        np_results = self._results.to_numpy_childless_pseudojets()
+        of = np.insert(np_results[-1], len(np_results[-1]), len(np_results[0]))
+        out = ak.Array(
+            ak.layout.ListOffsetArray64(
+                ak.layout.Index64(of),
+                ak.layout.RecordArray(
+                    (
+                        ak.layout.NumpyArray(np_results[0]),
+                        ak.layout.NumpyArray(np_results[1]),
+                        ak.layout.NumpyArray(np_results[2]),
+                        ak.layout.NumpyArray(np_results[3]),
+                    ),
+                    ("px", "py", "pz", "E"),
+                ),
+            )
+        )
+        return out
+
+    def jets(self):
+        np_results = self._results.to_numpy_jets()
+        of = np.insert(np_results[-1], len(np_results[-1]), len(np_results[0]))
+        out = ak.Array(
+            ak.layout.ListOffsetArray64(
+                ak.layout.Index64(of),
+                ak.layout.RecordArray(
+                    (
+                        ak.layout.NumpyArray(np_results[0]),
+                        ak.layout.NumpyArray(np_results[1]),
+                        ak.layout.NumpyArray(np_results[2]),
+                        ak.layout.NumpyArray(np_results[3]),
+                    ),
+                    ("px", "py", "pz", "E"),
+                ),
+            )
+        )
         return out

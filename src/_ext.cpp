@@ -1572,8 +1572,289 @@ PYBIND11_MODULE(_ext, m) {
           min_pt: Minimum jet pt to include. Default: 0.
         Returns:
           pt, eta, phi, m of inclusive jets.
-      )pbdoc");
+      )pbdoc")
+      .def("to_numpy_unique_history_order",
+      [](const output_wrapper ow) {
+        auto css = ow.cse;
+        auto len = css.size();
+        int jk = 0;
+        for(unsigned int i = 0; i<len; i++){
 
+          jk += css[i]->unique_history_order().size();
+        }
+        auto parid = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {jk}, {sizeof(int)}));
+        auto bufparid = parid.request();
+        int *ptrid = (int *)bufparid.ptr;
+        auto eventoffsets = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len}, {sizeof(int)}));
+        auto bufeventoffsets = eventoffsets.request();
+        int *ptreventoffsets = (int *)bufeventoffsets.ptr;
+        size_t eventidx = 0;
+        size_t idxh = 0;
+        auto eventprev = 0;
+        for (unsigned int i = 0; i < css.size(); i++){
+        auto info= css[i]->unique_history_order();
+        for(unsigned int j =0; j < info.size(); j++){
+        ptrid[idxh] = info[j];
+        idxh++;}
+        ptreventoffsets[eventidx] = info.size()+eventprev;
+        eventprev = ptreventoffsets[eventidx];
+        eventidx++;
+          }
+        return std::make_tuple(
+            parid,
+            eventoffsets
+          );
+      }, R"pbdoc(
+        Retrieves the inclusive jets and converts them to numpy arrays.
+        Args:
+          min_pt: Minimum jet pt to include. Default: 0.
+        Returns:
+          pt, eta, phi, m of inclusive jets.
+      )pbdoc")
+      .def("to_numpy_n_particles",
+      [](const output_wrapper ow) {
+        auto css = ow.cse;
+        auto len = css.size();
+        auto jk = len;
+
+        auto parid = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len}, {sizeof(int)}));
+        auto bufparid = parid.request();
+        int *ptrid = (int *)bufparid.ptr;
+
+        auto eventoffsets = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len}, {sizeof(int)}));
+        auto bufeventoffsets = eventoffsets.request();
+        int *ptreventoffsets = (int *)bufeventoffsets.ptr;
+        size_t eventidx = 0;
+        size_t idxh = 0;
+        auto eventprev = 0;
+
+        for (unsigned int i = 0; i < css.size(); i++){
+        ptrid[idxh] = css[i]->n_particles();
+        idxh++;
+        ptreventoffsets[eventidx] = 1+eventprev;
+        eventprev = ptreventoffsets[eventidx];
+        eventidx++;
+          }
+        return std::make_tuple(
+            parid,
+            eventoffsets
+          );
+      }, R"pbdoc(
+        Gets n_particles.
+        Args:
+          None.
+        Returns:
+          pt, eta, phi, m of inclusive jets.
+      )pbdoc")
+      .def("to_numpy_n_exclusive_jets",
+      [](const output_wrapper ow, double dcut) {
+        auto css = ow.cse;
+        auto len = css.size();
+        auto jk = len;
+
+        auto parid = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len}, {sizeof(int)}));
+        auto bufparid = parid.request();
+        int *ptrid = (int *)bufparid.ptr;
+
+        auto eventoffsets = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len}, {sizeof(int)}));
+        auto bufeventoffsets = eventoffsets.request();
+        int *ptreventoffsets = (int *)bufeventoffsets.ptr;
+        size_t eventidx = 0;
+        size_t idxh = 0;
+        auto eventprev = 0;
+
+        for (unsigned int i = 0; i < css.size(); i++){
+        ptrid[idxh] = css[i]->n_exclusive_jets(dcut);
+        idxh++;
+        ptreventoffsets[eventidx] = 1+eventprev;
+        eventprev = ptreventoffsets[eventidx];
+        eventidx++;
+          }
+        return std::make_tuple(
+            parid,
+            eventoffsets
+          );
+      }, R"pbdoc(
+        Gets n_exclusive_jets.
+        Args:
+          None.
+        Returns:
+          pt, eta, phi, m of inclusive jets.
+      )pbdoc")
+      .def("to_numpy_unclustered_particles",
+      [](const output_wrapper ow) {
+        auto css = ow.cse;
+        auto len = css.size();
+        // Don't specify the size if using push_back.
+        auto jk = 0;
+        for(int i = 0; i < len; i++){
+        jk += css[i]->unclustered_particles().size();
+        }
+        auto px = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
+        auto bufpx = px.request();
+        double *ptrpx = (double *)bufpx.ptr;
+
+        auto py = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
+        auto bufpy = py.request();
+        double *ptrpy = (double *)bufpy.ptr;
+
+        auto pz = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
+        auto bufpz = pz.request();
+        double *ptrpz = (double *)bufpz.ptr;
+
+        auto E = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
+        auto bufE = E.request();
+        double *ptrE = (double *)bufE.ptr;
+
+        auto off = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len}, {sizeof(int)}));
+        auto bufoff = off.request();
+        int *ptroff = (int *)bufoff.ptr;
+        size_t idxe = 0;
+        *ptroff = 0;
+        ptroff++;
+        for(int i = 0; i < len; i++){
+        auto jets = ow.cse[i]->unclustered_particles();
+        for (unsigned int j = 0; j < jets.size(); j++)
+        {
+          ptrpx[idxe] = jets[j].px();
+          ptrpy[idxe] = jets[j].py();
+          ptrpz[idxe] = jets[j].pz();
+          ptrE[idxe] = jets[j].E();
+          idxe++;
+        }
+        *ptroff = jets.size()+*(ptroff-1);
+        ptroff++;
+        }
+        return std::make_tuple(
+            px,
+            py,
+            pz,
+            E,
+            off
+          );
+      }, R"pbdoc(
+        Retrieves the unclustered particles from multievent clustering and converts them to numpy arrays.
+        Args:
+          None.
+        Returns:
+          pt, eta, phi, m of inclusive jets.
+      )pbdoc")
+      .def("to_numpy_childless_pseudojets",
+      [](const output_wrapper ow) {
+        auto css = ow.cse;
+        auto len = css.size();
+        // Don't specify the size if using push_back.
+        auto jk = 0;
+        for(int i = 0; i < len; i++){
+        jk += css[i]->childless_pseudojets().size();
+        }
+        auto px = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
+        auto bufpx = px.request();
+        double *ptrpx = (double *)bufpx.ptr;
+
+        auto py = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
+        auto bufpy = py.request();
+        double *ptrpy = (double *)bufpy.ptr;
+
+        auto pz = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
+        auto bufpz = pz.request();
+        double *ptrpz = (double *)bufpz.ptr;
+
+        auto E = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
+        auto bufE = E.request();
+        double *ptrE = (double *)bufE.ptr;
+
+        auto off = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len}, {sizeof(int)}));
+        auto bufoff = off.request();
+        int *ptroff = (int *)bufoff.ptr;
+        size_t idxe = 0;
+        *ptroff = 0;
+        ptroff++;
+        for(int i = 0; i < len; i++){
+        auto jets = ow.cse[i]->childless_pseudojets();
+        for (unsigned int j = 0; j < jets.size(); j++)
+        {
+          ptrpx[idxe] = jets[j].px();
+          ptrpy[idxe] = jets[j].py();
+          ptrpz[idxe] = jets[j].pz();
+          ptrE[idxe] = jets[j].E();
+          idxe++;
+        }
+        *ptroff = jets.size()+*(ptroff-1);
+        ptroff++;
+        }
+        return std::make_tuple(
+            px,
+            py,
+            pz,
+            E,
+            off
+          );
+      }, R"pbdoc(
+        Retrieves the childless pseudojets from multievent clustering and converts them to numpy arrays.
+        Args:
+          None.
+        Returns:
+          pt, eta, phi, m of inclusive jets.
+      )pbdoc")
+      .def("to_numpy_jets",
+      [](const output_wrapper ow) {
+        auto css = ow.cse;
+        auto len = css.size();
+        // Don't specify the size if using push_back.
+        auto jk = 0;
+        for(int i = 0; i < len; i++){
+        jk += css[i]->jets().size();
+        }
+        auto px = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
+        auto bufpx = px.request();
+        double *ptrpx = (double *)bufpx.ptr;
+
+        auto py = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
+        auto bufpy = py.request();
+        double *ptrpy = (double *)bufpy.ptr;
+
+        auto pz = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
+        auto bufpz = pz.request();
+        double *ptrpz = (double *)bufpz.ptr;
+
+        auto E = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
+        auto bufE = E.request();
+        double *ptrE = (double *)bufE.ptr;
+
+        auto off = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len}, {sizeof(int)}));
+        auto bufoff = off.request();
+        int *ptroff = (int *)bufoff.ptr;
+        size_t idxe = 0;
+        *ptroff = 0;
+        ptroff++;
+        for(int i = 0; i < len; i++){
+        auto jets = ow.cse[i]->jets();
+        for (unsigned int j = 0; j < jets.size(); j++)
+        {
+          ptrpx[idxe] = jets[j].px();
+          ptrpy[idxe] = jets[j].py();
+          ptrpz[idxe] = jets[j].pz();
+          ptrE[idxe] = jets[j].E();
+          idxe++;
+        }
+        *ptroff = jets.size()+*(ptroff-1);
+        ptroff++;
+        }
+        return std::make_tuple(
+            px,
+            py,
+            pz,
+            E,
+            off
+          );
+      }, R"pbdoc(
+        Retrieves the childless pseudojets from multievent clustering and converts them to numpy arrays.
+        Args:
+          None.
+        Returns:
+          pt, eta, phi, m of inclusive jets.
+      )pbdoc");
 
   py::class_<JetDefinition>(m, "JetDefinition", "Jet definition")
     .def(py::init<JetAlgorithm, RecombinationScheme, Strategy>(), "jet_algorithm"_a, "recombination_scheme"_a = E_scheme, "strategy"_a = Best)
@@ -1786,52 +2067,6 @@ PYBIND11_MODULE(_ext, m) {
           );
       }, "min_pt"_a = 0, R"pbdoc(
         Retrieves the inclusive jets and converts them to numpy arrays.
-        Args:
-          min_pt: Minimum jet pt to include. Default: 0.
-        Returns:
-          pt, eta, phi, m of inclusive jets.
-      )pbdoc")
-    .def("to_numpy_unclustered",
-      [](const ClusterSequence &cs) {
-        auto parts = cs.unclustered_particles();
-        // Don't specify the size if using push_back.
-        auto jk = parts.size();
-        auto px = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
-        auto bufpx = px.request();
-        double *ptrpx = (double *)bufpx.ptr;
-
-        auto py = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
-        auto bufpy = py.request();
-        double *ptrpy = (double *)bufpy.ptr;
-
-        auto pz = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
-        auto bufpz = pz.request();
-        double *ptrpz = (double *)bufpz.ptr;
-
-        auto E = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
-        auto bufE = E.request();
-        double *ptrE = (double *)bufE.ptr;
-        size_t idxe = 0;
-
-        std::cout << "        pt y phi" << std::endl;
-        for (unsigned int i = 0; i < parts.size(); i++)
-        {
-          std::cout << "jet " << i << ": " << parts[i].px() << " "
-                    << parts[i].py() << " " << parts[i].pz() << std::endl;
-          ptrpx[idxe] = parts[i].px();
-          ptrpy[idxe] = parts[i].py();
-          ptrpz[idxe] = parts[i].pz();
-          ptrE[idxe] = parts[i].E();
-          idxe++;
-        }
-        return std::make_tuple(
-            px,
-            py,
-            pz,
-            E
-          );
-      }, R"pbdoc(
-        Retrieves the unclustered particles and converts them to numpy arrays.
         Args:
           min_pt: Minimum jet pt to include. Default: 0.
         Returns:
