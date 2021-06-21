@@ -341,3 +341,9 @@ class _classsingleevent:
         out = np_results[0]
         out = out[0]
         return out
+
+    def n_particles(self):
+        np_results = self._results.to_numpy_n_particles()
+        out = np_results[0]
+        out = out[0]
+        return out

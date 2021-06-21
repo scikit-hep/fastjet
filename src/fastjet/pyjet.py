@@ -153,3 +153,7 @@ class AwkwardClusterSequence:
     def unique_history_order(self):
         """Routine that returns an order in which to read the history such that clusterings that lead to identical jet compositions but different histories (because of degeneracies in the clustering order) will have matching constituents for each matching entry in the unique_history_order."""
         return self._internalrep.unique_history_order()
+
+    def n_particles(self):
+        """Returns the number of particles that were provided to the clustering algorithm."""
+        return self._internalrep.n_particles()
