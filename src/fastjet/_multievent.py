@@ -337,3 +337,8 @@ class _classmultievent:
         np_results = self._results.to_numpy_n_particles()
         out = ak.Array(ak.layout.NumpyArray(np_results[0]))
         return out
+
+    def n_exclusive_jets(self, dcut):
+        np_results = self._results.to_numpy_n_exclusive_jets(dcut)
+        out = ak.Array(ak.layout.NumpyArray(np_results[0]))
+        return out

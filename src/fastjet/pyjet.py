@@ -157,3 +157,7 @@ class AwkwardClusterSequence:
     def n_particles(self):
         """Returns the number of particles that were provided to the clustering algorithm."""
         return self._internalrep.n_particles()
+
+    def n_exclusive_jets(self, dcut=0):
+        """Returns the number of particles that were provided to the clustering algorithm."""
+        return self._internalrep.n_exclusive_jets(dcut)

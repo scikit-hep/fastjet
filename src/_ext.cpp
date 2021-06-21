@@ -1645,6 +1645,41 @@ PYBIND11_MODULE(_ext, m) {
           None.
         Returns:
           pt, eta, phi, m of inclusive jets.
+      )pbdoc")
+      .def("to_numpy_n_exclusive_jets",
+      [](const output_wrapper ow, double dcut) {
+        auto css = ow.cse;
+        auto len = css.size();
+        auto jk = len;
+
+        auto parid = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len}, {sizeof(int)}));
+        auto bufparid = parid.request();
+        int *ptrid = (int *)bufparid.ptr;
+
+        auto eventoffsets = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len}, {sizeof(int)}));
+        auto bufeventoffsets = eventoffsets.request();
+        int *ptreventoffsets = (int *)bufeventoffsets.ptr;
+        size_t eventidx = 0;
+        size_t idxh = 0;
+        auto eventprev = 0;
+
+        for (unsigned int i = 0; i < css.size(); i++){
+        ptrid[idxh] = css[i]->n_exclusive_jets(dcut);
+        idxh++;
+        ptreventoffsets[eventidx] = 1+eventprev;
+        eventprev = ptreventoffsets[eventidx];
+        eventidx++;
+          }
+        return std::make_tuple(
+            parid,
+            eventoffsets
+          );
+      }, R"pbdoc(
+        Gets n_exclusive_jets.
+        Args:
+          None.
+        Returns:
+          pt, eta, phi, m of inclusive jets.
       )pbdoc");
 
 

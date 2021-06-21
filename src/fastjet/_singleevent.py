@@ -347,3 +347,9 @@ class _classsingleevent:
         out = np_results[0]
         out = out[0]
         return out
+
+    def n_exclusive_jets(self, dcut):
+        np_results = self._results.to_numpy_n_exclusive_jets(dcut)
+        out = np_results[0]
+        out = out[0]
+        return out
