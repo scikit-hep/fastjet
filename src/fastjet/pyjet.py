@@ -165,3 +165,7 @@ class AwkwardClusterSequence:
     def childless_pseudojets(self):
         """Return the list of pseudojets in the ClusterSequence that do not have children (and are not among the inclusive jets)."""
         return self._internalrep.childless_pseudojets()
+
+    def jets(self):
+        """Allows the user to access the internally stored _jets() array, which contains both the initial particles and the various intermediate and final stages of recombination."""
+        return self._internalrep.jets()

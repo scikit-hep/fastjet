@@ -368,3 +368,18 @@ class _classsingleevent:
             )
         )
         return out
+
+    def jets(self):
+        np_results = self._results.to_numpy_jets()
+        out = ak.Array(
+            ak.layout.RecordArray(
+                (
+                    ak.layout.NumpyArray(np_results[0]),
+                    ak.layout.NumpyArray(np_results[1]),
+                    ak.layout.NumpyArray(np_results[2]),
+                    ak.layout.NumpyArray(np_results[3]),
+                ),
+                ("px", "py", "pz", "E"),
+            )
+        )
+        return out
