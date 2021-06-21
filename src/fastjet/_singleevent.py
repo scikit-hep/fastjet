@@ -70,8 +70,8 @@ class _classsingleevent:
         )
         return out
 
-    def unclustered_particles(self, min_pt):
-        np_results = self._results.to_numpy_unclustered_particles(min_pt)
+    def unclustered_particles(self):
+        np_results = self._results.to_numpy_unclustered_particles()
         out = ak.Array(
             ak.layout.RecordArray(
                 (
