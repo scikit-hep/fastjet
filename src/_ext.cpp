@@ -1854,8 +1854,226 @@ PYBIND11_MODULE(_ext, m) {
           None.
         Returns:
           pt, eta, phi, m of inclusive jets.
-      )pbdoc");
+      )pbdoc")
+      .def("to_numpy_get_parents",
+      [](const output_wrapper ow, py::array_t<double, py::array::c_style | py::array::forcecast> pxi, py::array_t<double, py::array::c_style | py::array::forcecast> pyi, py::array_t<double, py::array::c_style | py::array::forcecast> pzi, py::array_t<double, py::array::c_style | py::array::forcecast> Ei) {
+        py::buffer_info infopx = pxi.request();
+        py::buffer_info infopy = pyi.request();  // requesting buffer information of the input
+        py::buffer_info infopz = pzi.request();
+        py::buffer_info infoE = Ei.request();
 
+        auto pxptr = static_cast<double *>(infopx.ptr);
+        auto pyptr = static_cast<double *>(infopy.ptr);  // pointer to the initial value
+        auto pzptr = static_cast<double *>(infopz.ptr);
+        auto Eptr = static_cast<double *>(infoE.ptr);
+
+        int dimpx = infopx.shape[0];
+        int dimpy = infopy.shape[0];
+        int dimpz = infopz.shape[0];
+        int dimE = infoE.shape[0];
+        auto css = ow.cse;
+        auto len = css.size();
+        // Don't specify the size if using push_back.
+
+        std::vector<fj::PseudoJet> particles;
+        for(int j = 0; j < dimpx; j++ ){
+          particles.push_back(fj::PseudoJet(*pxptr, *pyptr, *pzptr, *Eptr));
+          pxptr++;
+          pyptr++;
+          pzptr++;
+          Eptr++;
+          }
+
+        std::vector<int> indices;
+        for(unsigned int i = 0 ; i < len; i++){
+          std::unordered_map<double, int> umap;
+          auto jets = ow.cse[i]->inclusive_jets();
+          for(unsigned int j = 0 ; j < jets.size(); j++){
+            umap.insert({jets[j].rap(),j});
+          }
+          auto got = umap.find(particles[i].rap());
+          if (got == umap.end()){
+              throw "Jet Not in this ClusterSequence";
+          }
+          if(got == umap.end()){
+          }
+          indices.push_back(got->second);
+        }
+        // Don't specify the size if using push_back.
+        auto jk = 0;
+        for(int i = 0; i < len; i++){
+        auto incjets = ow.cse[i]->inclusive_jets();
+        fj::PseudoJet pj1(0,0,0,0);
+        fj::PseudoJet pj2(0,0,0,0);
+        auto value = css[i]->has_parents(incjets[indices[i]],pj1, pj2);
+        if(value == true){
+        jk += 2;}
+        }
+        auto px = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
+        auto bufpx = px.request();
+        double *ptrpx = (double *)bufpx.ptr;
+
+        auto py = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
+        auto bufpy = py.request();
+        double *ptrpy = (double *)bufpy.ptr;
+
+        auto pz = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
+        auto bufpz = pz.request();
+        double *ptrpz = (double *)bufpz.ptr;
+
+        auto E = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
+        auto bufE = E.request();
+        double *ptrE = (double *)bufE.ptr;
+
+        auto off = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len+1}, {sizeof(int)}));
+        auto bufoff = off.request();
+        int *ptroff = (int *)bufoff.ptr;
+        size_t idxe = 0;
+        *ptroff = 0;
+        ptroff++;
+        for(int i = 0; i < len; i++){
+        auto incjets = ow.cse[i]->inclusive_jets();
+        fj::PseudoJet pj1(0,0,0,0);
+        fj::PseudoJet pj2(0,0,0,0);
+        auto value = css[i]->has_parents(incjets[indices[i]],pj1, pj2);
+        if(value == true){
+        ptrpx[idxe] = pj1.px();
+        ptrpy[idxe] = pj1.py();
+        ptrpz[idxe] = pj1.pz();
+        ptrE[idxe] = pj1.E();
+        idxe++;
+        ptrpx[idxe] = pj2.px();
+        ptrpy[idxe] = pj2.py();
+        ptrpz[idxe] = pj2.pz();
+        ptrE[idxe] = pj2.E();
+        idxe++;
+        *ptroff = 2+ *(ptroff-1);
+        }
+        else{
+          *ptroff = *(ptroff-1);
+        }
+        ptroff++;
+        }
+        return std::make_tuple(
+            px,
+            py,
+            pz,
+            E,
+            off
+          );
+      }, R"pbdoc(
+        Retrieves the unclustered particles from multievent clustering and converts them to numpy arrays.
+        Args:
+          None.
+        Returns:
+          pt, eta, phi, m of inclusive jets.
+      )pbdoc")
+    .def("to_numpy_get_child",
+      [](const output_wrapper ow, py::array_t<double, py::array::c_style | py::array::forcecast> pxi, py::array_t<double, py::array::c_style | py::array::forcecast> pyi, py::array_t<double, py::array::c_style | py::array::forcecast> pzi, py::array_t<double, py::array::c_style | py::array::forcecast> Ei) {
+        py::buffer_info infopx = pxi.request();
+        py::buffer_info infopy = pyi.request();  // requesting buffer information of the input
+        py::buffer_info infopz = pzi.request();
+        py::buffer_info infoE = Ei.request();
+
+        auto pxptr = static_cast<double *>(infopx.ptr);
+        auto pyptr = static_cast<double *>(infopy.ptr);  // pointer to the initial value
+        auto pzptr = static_cast<double *>(infopz.ptr);
+        auto Eptr = static_cast<double *>(infoE.ptr);
+
+        int dimpx = infopx.shape[0];
+        int dimpy = infopy.shape[0];
+        int dimpz = infopz.shape[0];
+        int dimE = infoE.shape[0];
+        auto css = ow.cse;
+        auto len = css.size();
+        // Don't specify the size if using push_back.
+
+        std::vector<fj::PseudoJet> particles;
+        for(int j = 0; j < dimpx; j++ ){
+          particles.push_back(fj::PseudoJet(*pxptr, *pyptr, *pzptr, *Eptr));
+          pxptr++;
+          pyptr++;
+          pzptr++;
+          Eptr++;
+          }
+
+        std::vector<int> indices;
+        for(unsigned int i = 0 ; i < len; i++){
+          std::unordered_map<double, int> umap;
+          auto jets = ow.cse[i]->inclusive_jets();
+          for(unsigned int j = 0 ; j < jets.size(); j++){
+            umap.insert({jets[j].rap(),j});
+          }
+          auto got = umap.find(particles[i].rap());
+          if (got == umap.end()){
+              throw "Jet Not in this ClusterSequence";
+          }
+          if(got == umap.end()){
+          }
+          indices.push_back(got->second);
+        }
+        // Don't specify the size if using push_back.
+        auto jk = 0;
+        for(int i = 0; i < len; i++){
+        auto incjets = ow.cse[i]->inclusive_jets();
+        fj::PseudoJet pj1(0,0,0,0);
+        auto value = css[i]->has_child(incjets[indices[i]],pj1);
+        if(value == true){
+        jk += 1;}
+        }
+        auto px = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
+        auto bufpx = px.request();
+        double *ptrpx = (double *)bufpx.ptr;
+
+        auto py = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
+        auto bufpy = py.request();
+        double *ptrpy = (double *)bufpy.ptr;
+
+        auto pz = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
+        auto bufpz = pz.request();
+        double *ptrpz = (double *)bufpz.ptr;
+
+        auto E = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
+        auto bufE = E.request();
+        double *ptrE = (double *)bufE.ptr;
+
+        auto off = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len+1}, {sizeof(int)}));
+        auto bufoff = off.request();
+        int *ptroff = (int *)bufoff.ptr;
+        size_t idxe = 0;
+        *ptroff = 0;
+        ptroff++;
+        for(int i = 0; i < len; i++){
+        auto incjets = ow.cse[i]->inclusive_jets();
+        fj::PseudoJet pj1(0,0,0,0);
+        auto value = css[i]->has_child(incjets[indices[i]],pj1);
+        if(value == true){
+        ptrpx[idxe] = pj1.px();
+        ptrpy[idxe] = pj1.py();
+        ptrpz[idxe] = pj1.pz();
+        ptrE[idxe] = pj1.E();
+        idxe++;
+        *ptroff = 1+ *(ptroff-1);
+        }
+        else{
+          *ptroff = *(ptroff-1);
+        }
+        ptroff++;
+        }
+        return std::make_tuple(
+            px,
+            py,
+            pz,
+            E,
+            off
+          );
+      }, R"pbdoc(
+        Retrieves the unclustered particles from multievent clustering and converts them to numpy arrays.
+        Args:
+          None.
+        Returns:
+          pt, eta, phi, m of inclusive jets.
+      )pbdoc");
   py::class_<JetDefinition>(m, "JetDefinition", "Jet definition")
     .def(py::init<JetAlgorithm, RecombinationScheme, Strategy>(), "jet_algorithm"_a, "recombination_scheme"_a = E_scheme, "strategy"_a = Best)
     .def(py::init<JetAlgorithm, double, RecombinationScheme, Strategy>(), "jet_algorithm"_a, "R"_a, "recombination_scheme"_a = E_scheme, "strategy"_a = Best)

@@ -3,12 +3,13 @@ import awkward as ak
 import fastjet._ext  # noqa: F401, E402
 import fastjet._multievent
 import fastjet._singleevent
+from fastjet.__init__ import ClusterSequence
 from fastjet.version import __version__  # noqa: E402
 
 __all__ = ("__version__",)
 
 
-class AwkwardClusterSequence:
+class AwkwardClusterSequence(ClusterSequence):
     def __init__(self, data, jetdef):
         """The base class for all clustering"""
         if not isinstance(data, ak.Array):
@@ -169,3 +170,15 @@ class AwkwardClusterSequence:
     def jets(self):
         """Allows the user to access the internally stored _jets() array, which contains both the initial particles and the various intermediate and final stages of recombination."""
         return self._internalrep.jets()
+
+    def get_parents(self, data):
+        """If the jet has parents in the clustering, it returns them."""
+        if not isinstance(data, ak.Array):
+            raise TypeError("The input data is not an Awkward Array")
+        return self._internalrep.get_parents(data)
+
+    def get_child(self, data):
+        """If the jet has parents in the clustering, it returns them."""
+        if not isinstance(data, ak.Array):
+            raise TypeError("The input data is not an Awkward Array")
+        return self._internalrep.get_child(data)
