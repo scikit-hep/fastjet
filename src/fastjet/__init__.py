@@ -1,7 +1,10 @@
 # BSD 3-Clause License; see https://github.com/scikit-hep/fastjet/blob/main/LICENSE
-
 import ctypes
 import pathlib
+
+import awkward as ak
+
+import fastjet.pyjet
 
 # import numpy as np
 
@@ -30,7 +33,6 @@ from fastjet._swig import BIpt_scheme  # noqa: F401, E402
 from fastjet._swig import Boost  # noqa: F401, E402
 from fastjet._swig import CASubJetTagger  # noqa: F401, E402
 from fastjet._swig import CASubJetTaggerStructure  # noqa: F401, E402
-from fastjet._swig import ClusterSequence  # noqa: F401, E402
 from fastjet._swig import ClusterSequence1GhostPassiveArea  # noqa: F401, E402
 from fastjet._swig import ClusterSequence_fastjet_banner_stream  # noqa: F401, E402
 from fastjet._swig import ClusterSequence_print_banner  # noqa: F401, E402
@@ -207,3 +209,24 @@ from fastjet._utils import theta  # noqa: F401, E402
 from fastjet.version import __version__  # noqa: E402
 
 __all__ = ("__version__",)
+
+
+class ClusterSequence:  # The super class
+    def __init__(self, data, jetdef):
+        if not isinstance(jetdef, fastjet._swig.JetDefinition):
+            raise AttributeError("JetDefinition is not correct")
+        if isinstance(data, ak.Array):
+            self.__class__ = fastjet.pyjet.AwkwardClusterSequence
+            fastjet.pyjet.AwkwardClusterSequence.__init__(
+                self, data=data, jetdef=jetdef
+            )
+        if isinstance(data, list):
+            self.__class__ = fastjet._swig.ClusterSequence
+            fastjet._swig.ClusterSequence.__init__(self, data, jetdef)
+
+
+class multi_inheritor(
+    fastjet._swig.ClusterSequence, ClusterSequence
+):  # class that inherits both the custom ClusterSequence and swig ClusterSequence and acts as a trampoline
+    def __init__(self):
+        pass
