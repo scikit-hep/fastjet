@@ -4,8 +4,6 @@ import pathlib
 
 import awkward as ak
 
-import fastjet.pyjet
-
 # import numpy as np
 
 _fastjet_core = pathlib.Path(__file__).parent.resolve() / "_fastjet_core" / "lib"
@@ -17,9 +15,9 @@ _libsiscone_spherical = ctypes.cdll.LoadLibrary(
 )
 _libfastjetplugins = ctypes.cdll.LoadLibrary(_fastjet_core / "libfastjetplugins.so")
 
-
 import fastjet._ext  # noqa: F401, E402
 import fastjet._swig  # noqa: F401, E402
+import fastjet.pyjet  # noqa: F401, E402
 from fastjet._swig import AreaDefinition  # noqa: F401, E402
 from fastjet._swig import BackgroundEstimatorBase  # noqa: F401, E402
 from fastjet._swig import BackgroundJetPtDensity  # noqa: F401, E402
