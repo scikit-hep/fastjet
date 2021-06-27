@@ -87,7 +87,7 @@ The classes (clustering and clustering specification) are the same for all the i
 
 ```python
 jetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.6)
-cluster = fastjet.ClusterSequence(array, jetdef)
+cluster = fastjet.ClusterSequence(input_data, jetdef)
 ```
 ## Outputs
 The output can be extracted using function calls (output can be an Awkward Array or a list of PseudoJets depending on the input).
