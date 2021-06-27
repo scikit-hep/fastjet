@@ -14,7 +14,7 @@
 
 
 
-[actions-badge]:            https://github.com/aryan26roy/fastjet.git/workflows/CI/badge.svg
+[actions-badge]:            https://github.com/scikit-hep/fastjet/workflows/CI/badge.svg
 [actions-link]:             https://github.com/scikit-hep/fastjet/actions
 [black-badge]:              https://img.shields.io/badge/code%20style-black-000000.svg
 [black-link]:               https://github.com/psf/black
