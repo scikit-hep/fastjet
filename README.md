@@ -95,6 +95,3 @@ The output can be extracted using function calls (output can be an Awkward Array
 ```python
 inclusive_jets = cluster.inclusive_jets()
 ```
-
-
-
