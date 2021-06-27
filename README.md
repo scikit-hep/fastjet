@@ -31,4 +31,28 @@
 [rtd-link]:                 https://fastjet.readthedocs.io/en/latest/?badge=latest
 [sk-badge]:                 https://scikit-hep.org/assets/images/Scikit--HEP-Project-blue.svg
 
-Vectorized and non-vectorized Python interfaces to FastJet
+Official FastJet bindings to Python and Awkward Array.
+
+Main features of Fastjet :
+  * Contains Vectorized as well as Non-Vectorized interface for Fastjet.
+  * Compiled against the complete Fastjet library in C++.
+  * Has Awkward Array and Vector as dependency
+  * Provides the functionality to cluster multiple events at a time.
+  * Input data can be in any coordinate system.
+
+# Installation
+The package can be installed from pypi using the following command :
+``` bash
+pip install fastjet
+```
+# Overview
+
+Some of the basic functionalities of Fastjet and how to use them are listed below.
+
+``` python
+import fastjet
+import awkward as ak
+import vector
+```
+
+
