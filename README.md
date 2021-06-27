@@ -54,5 +54,47 @@ import fastjet
 import awkward as ak
 import vector
 ```
+The input data can be either a awkward array or a list of Pseudojets.
+
+## Awkward Array
+```python
+input_data = ak.Array(
+    [
+        [
+            {"px": 1.2, "py": 3.2, "pz": 5.4, "E": 2.5, "ex": 0.78},
+            {"px": 32.2, "py": 64.21, "pz": 543.34, "E": 24.12, "ex": 0.35},
+            {"px": 32.45, "py": 63.21, "pz": 543.14, "E": 24.56, "ex": 0.0},
+        ],
+        [
+            {"px": 1.2, "py": 3.2, "pz": 5.4, "E": 2.5, "ex": 0.78},
+            {"px": 32.2, "py": 64.21, "pz": 543.34, "E": 24.12, "ex": 0.35},
+            {"px": 32.45, "py": 63.21, "pz": 543.14, "E": 24.56, "ex": 0.0},
+        ],
+    ],
+    with_name="Momentum4D",
+)
+```
+## List of PseudoJets
+```Python
+input_data = [fastjet.PseudoJet(1,1,1,1)
+             ,fastjet.PseudoJet(1.2,1.2,1.2,1.2)
+             ,fastjet.PseudoJet(3,3,3,3)
+             ,fastjet.PseudoJet(-1,-12,2,1)
+             ,fastjet.PseudoJet(-1,-12,2.1,0.9)]
+```
+## Clustering
+The classes (clustering and clustering specification) are the same for all the input types:
+
+```python
+jetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.6)
+cluster = fastjet.ClusterSequence(array, jetdef)
+```
+## Outputs
+The output can be extracted using function calls (output can be an Awkward Array or a list of PseudoJets depending on the input).
+
+```python
+inclusive_jets = cluster.inclusive_jets()
+```
+
 
 
