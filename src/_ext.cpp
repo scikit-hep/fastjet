@@ -88,8 +88,6 @@ fj::ClusterSequence interface(py::array_t<double, py::array::c_style | py::array
   auto jet_def = swigtocpp<fj::JetDefinition*>(jetdef);
   fj::ClusterSequence cs(particles, *jet_def);
   jets = fj::sorted_by_pt(cs.inclusive_jets());
-  //auto out = output_wrapper(cs, particles);
-  std::cout << "Clustering with " << jet_def->description() << std::endl;
   return cs;
 }
 
@@ -133,11 +131,6 @@ output_wrapper interfacemulti(py::array_t<double, py::array::c_style | py::array
   std::shared_ptr<std::vector<fj::PseudoJet>> pj = std::make_shared<std::vector<fj::PseudoJet>>(particles);
   std::shared_ptr<fastjet::ClusterSequence> cs = std::make_shared<fastjet::ClusterSequence>(*pj, *jet_def);
   auto j = cs->inclusive_jets();
-  std::cout<<j.size()<<std::endl;
-  for (unsigned i = 0; i < j.size(); i++)
-  {std::cout << "jet " << i << ": "<< j[i].px() << " "<< j[i].py() << " " << j[i].pz() << std::endl;}
-
-  std::cout << "Clustering with " << jet_def->description() << std::endl;
   offptr++;
   ow.cse.push_back(cs);
   ow.parts.push_back(pj);
@@ -222,7 +215,6 @@ std::vector<fastjet::PseudoJet> constructPseudojetsFromNumpy(const py::array_t<d
   // This defines our numpy array shape.
   int nParticles = info.shape[0];
   int nParams = info.shape[1];
-  //std::cout << "nParams: " << nParams << ", nParticles: " << nParticles << "\n";
 
   // Validation.
   if (nParams != 4)
@@ -232,8 +224,7 @@ std::vector<fastjet::PseudoJet> constructPseudojetsFromNumpy(const py::array_t<d
   // Convert the arrays
   for (size_t i = 0; i < nParticles; ++i)
   {
-    /*std::cout << "i: " << i << " inputs: " << inputJets[i * nParams + 0] << " " << inputJets[i * nParams + 1]
-      << " " << inputJets[i * nParams + 2] << " " <<  inputJets[i * nParams + 3] << "\n";*/
+
     outputJets.push_back(fastjet::PseudoJet(
         inputJets[i * nParams + 0], inputJets[i * nParams + 1],
         inputJets[i * nParams + 2], inputJets[i * nParams + 3]));
@@ -393,9 +384,6 @@ PYBIND11_MODULE(_ext, m) {
         int *ptrjetoffsets = (int *)bufjetoffsets.ptr;
         size_t jetidx = 0;
 
-        //for(auto x : ow.particles){
-          //std::cout<<x.px()<<x.py()<<x.pz()<<std::endl;
-        //}
         size_t idxh = 0;
         ptrjetoffsets[jetidx] = 0;
         jetidx++;
@@ -412,7 +400,6 @@ PYBIND11_MODULE(_ext, m) {
 
         for (unsigned int j = 0; j < jets.size(); j++){
         ptrjetoffsets[jetidx] = jets[j].constituents().size() + prev;
-        std::cout<<ptrjetoffsets[jetidx]<<std::endl;
         prev = ptrjetoffsets[jetidx];
         jetidx++;
         }
@@ -591,7 +578,6 @@ PYBIND11_MODULE(_ext, m) {
         ptroff++;
         for(int i = 0; i < len; i++){
         auto jets = ow.cse[i]->exclusive_jets_ycut(ycut);
-        std::cout<<jets.size()<<std::endl;
         for (unsigned int j = 0; j < jets.size(); j++){
           ptrpx[idxe] = jets[j].px();
           ptrpy[idxe] = jets[j].py();
@@ -2265,12 +2251,9 @@ PYBIND11_MODULE(_ext, m) {
         auto bufE = E.request();
         double *ptrE = (double *)bufE.ptr;
         size_t idxe = 0;
-
-        std::cout << "        pt y phi" << std::endl;
         for (unsigned int i = 0; i < jets.size(); i++)
         {
-          std::cout << "jet " << i << ": " << jets[i].px() << " "
-                    << jets[i].py() << " " << jets[i].pz() << std::endl;
+
           ptrpx[idxe] = jets[i].px();
           ptrpy[idxe] = jets[i].py();
           ptrpz[idxe] = jets[i].pz();
@@ -2317,12 +2300,9 @@ PYBIND11_MODULE(_ext, m) {
         int *ptroffsets = (int *)bufoffsets.ptr;
 
         size_t off = 0;
-        std::cout << "        pt y phi" << std::endl;
         int prev = 0;
         for (unsigned int i = 0; i < jets.size(); i++)
         {
-          std::cout << "jet " << i << ": " << jets[i].px() << " "
-                    << jets[i].py() << " " << jets[i].pz() << std::endl;
           ptrpx[idxe] = jets[i].px();
           ptrpy[idxe] = jets[i].py();
           ptrpz[idxe] = jets[i].pz();
@@ -2331,22 +2311,16 @@ PYBIND11_MODULE(_ext, m) {
           std::vector<fj::PseudoJet> constituents = jets[i].constituents();
           ptroffsets[off] = constituents.size() + prev;
           prev = ptroffsets[off];
-          //std::cout<<constituents.size()<<std::endl;
           off++;
-          for (unsigned j = 0; j < constituents.size(); j++)
-          {std::cout << "    constituent " << j << "’s px: "<< constituents[j].px() << " " << constituents[j].py() << " " << constituents[j].pz()<< std::endl;}
         }
         auto size = jets.size();
         auto sizepar = cse.n_particles();
-        //std::cout<<sizepar<<std::endl;
+
 
 
         auto parid = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {sizepar}, {sizeof(int)}));
         auto bufparid = parid.request();
         int *ptrid = (int *)bufparid.ptr;
-        //for(auto x : ow.particles){
-          //std::cout<<x.px()<<x.py()<<x.pz()<<std::endl;
-        //}
         auto idx = cse.particle_jet_indices(jets);
 
         size_t idxh = 0;
