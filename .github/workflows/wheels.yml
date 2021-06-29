@@ -33,15 +33,13 @@ jobs:
       with:
         submodules: recursive
 
-    - name: Install extra deps on Linux
-      if: runner.os == 'Linux'
-      run: sudo apt-get update && sudo apt-get install -y libmpfr-dev libboost-dev
-
     - uses: pypa/cibuildwheel@v1.12.0
       env:
+        CIBW_BEFORE_ALL_LINUX: "yum update && yum install -y libmpfr-devel libboost-devel"
         CIBW_SKIP: cp27*
         CIBW_TEST_EXTRAS: test
         CIBW_TEST_COMMAND: pytest {project}/tests
+
 
     - name: Upload wheels
       uses: actions/upload-artifact@v2
