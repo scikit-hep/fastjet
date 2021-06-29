@@ -35,7 +35,7 @@ jobs:
 
     - uses: pypa/cibuildwheel@v1.12.0
       env:
-        CIBW_BEFORE_ALL_LINUX: "yum update && yum install -y mpfr-devel boost-devel"
+        CIBW_BEFORE_ALL_LINUX: "yum update && yum install -y mpfr-devel boost-devel gcc-gfortran"
         CIBW_SKIP: cp27*
         CIBW_TEST_EXTRAS: test
         CIBW_TEST_COMMAND: pytest {project}/tests
