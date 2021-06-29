@@ -2,7 +2,7 @@ import awkward as ak  # noqa: F401
 import numpy as np  # noqa: F401
 import pytest  # noqa: F401
 
-import fastjet.pyjet  # noqa: F401
+import fastjet._pyjet  # noqa: F401
 
 vector = pytest.importorskip("vector")  # noqa: F401
 
@@ -18,7 +18,7 @@ def test_vector_single():
         behavior=vector._backends.awkward_.behavior,
     )
     jetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.6)
-    cluster = fastjet.pyjet.AwkwardClusterSequence(array, jetdef)
+    cluster = fastjet._pyjet.AwkwardClusterSequence(array, jetdef)
     exclusive_dcut = [
         {
             "px": 1.9567318741740376,
@@ -107,7 +107,7 @@ def test_vector_multi():
         behavior=vector._backends.awkward_.behavior,
     )
     jetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.6)
-    cluster = fastjet.pyjet.AwkwardClusterSequence(array, jetdef)
+    cluster = fastjet._pyjet.AwkwardClusterSequence(array, jetdef)
     exclusive_dcut = [
         [
             {

@@ -3,7 +3,7 @@ import numpy as np  # noqa: F401
 import pytest  # noqa: F401
 
 import fastjet
-import fastjet.pyjet  # noqa: F401
+import fastjet._pyjet  # noqa: F401
 
 
 def test_exclusive_subjets_multi():
@@ -24,7 +24,7 @@ def test_exclusive_subjets_multi():
         with_name="Momentum4D",
     )
     jetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.6)
-    cluster = fastjet.pyjet.AwkwardClusterSequence(array, jetdef)
+    cluster = fastjet._pyjet.AwkwardClusterSequence(array, jetdef)
     test_input = ak.Array(
         [
             {"px": 64.65, "py": 127.41999999999999, "pz": 1086.48, "E": 48.68},
@@ -54,7 +54,7 @@ def test_exclusive_subjets_single():
         with_name="Momentum4D",
     )
     jetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.6)
-    cluster = fastjet.pyjet.AwkwardClusterSequence(array, jetdef)
+    cluster = fastjet._pyjet.AwkwardClusterSequence(array, jetdef)
     test_input = ak.Array(
         [
             {"px": 64.65, "py": 127.41999999999999, "pz": 1086.48, "E": 48.68},
@@ -80,7 +80,7 @@ def test_exclusive_subjets_up_to_single():
         with_name="Momentum4D",
     )
     jetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.6)
-    cluster = fastjet.pyjet.AwkwardClusterSequence(array, jetdef)
+    cluster = fastjet._pyjet.AwkwardClusterSequence(array, jetdef)
     test_input = ak.Array(
         [
             {"px": 64.65, "py": 127.41999999999999, "pz": 1086.48, "E": 48.68},
@@ -111,7 +111,7 @@ def test_exclusive_subjets_up_to_multi():
         with_name="Momentum4D",
     )
     jetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.6)
-    cluster = fastjet.pyjet.AwkwardClusterSequence(array, jetdef)
+    cluster = fastjet._pyjet.AwkwardClusterSequence(array, jetdef)
     test_input = ak.Array(
         [
             {"px": 64.65, "py": 127.41999999999999, "pz": 1086.48, "E": 48.68},
@@ -136,7 +136,7 @@ def test_exclusive_subdmerge_single():
         with_name="Momentum4D",
     )
     jetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.6)
-    cluster = fastjet.pyjet.AwkwardClusterSequence(array, jetdef)
+    cluster = fastjet._pyjet.AwkwardClusterSequence(array, jetdef)
     test_input = ak.Array(
         [{"px": 64.65, "py": 127.41999999999999, "pz": 1086.48, "E": 48.68}]
     )
@@ -162,7 +162,7 @@ def test_exclusive_subdmerge_multi():
         with_name="Momentum4D",
     )
     jetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.6)
-    cluster = fastjet.pyjet.AwkwardClusterSequence(array, jetdef)
+    cluster = fastjet._pyjet.AwkwardClusterSequence(array, jetdef)
     test_input = ak.Array(
         [
             {"px": 64.65, "py": 127.41999999999999, "pz": 1086.48, "E": 48.68},
@@ -191,7 +191,7 @@ def test_exclusive_subdmerge_max_multi():
         with_name="Momentum4D",
     )
     jetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.6)
-    cluster = fastjet.pyjet.AwkwardClusterSequence(array, jetdef)
+    cluster = fastjet._pyjet.AwkwardClusterSequence(array, jetdef)
     test_input = ak.Array(
         [
             {"px": 64.65, "py": 127.41999999999999, "pz": 1086.48, "E": 48.68},
@@ -213,7 +213,7 @@ def test_exclusive_subdmerge_max_single():
         with_name="Momentum4D",
     )
     jetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.6)
-    cluster = fastjet.pyjet.AwkwardClusterSequence(array, jetdef)
+    cluster = fastjet._pyjet.AwkwardClusterSequence(array, jetdef)
     test_input = ak.Array(
         [{"px": 64.65, "py": 127.41999999999999, "pz": 1086.48, "E": 48.68}]
     )
@@ -239,7 +239,7 @@ def test_n_exclusive_subjets_multi():
         with_name="Momentum4D",
     )
     jetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.6)
-    cluster = fastjet.pyjet.AwkwardClusterSequence(array, jetdef)
+    cluster = fastjet._pyjet.AwkwardClusterSequence(array, jetdef)
     test_input = ak.Array(
         [
             {"px": 64.65, "py": 127.41999999999999, "pz": 1086.48, "E": 48.68},
@@ -261,7 +261,7 @@ def test_n_exclusive_subjets_single():
         with_name="Momentum4D",
     )
     jetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.6)
-    cluster = fastjet.pyjet.AwkwardClusterSequence(array, jetdef)
+    cluster = fastjet._pyjet.AwkwardClusterSequence(array, jetdef)
     test_input = ak.Array(
         [
             {"px": 64.65, "py": 127.41999999999999, "pz": 1086.48, "E": 48.68},
@@ -289,7 +289,7 @@ def test_has_parents_multi():
         with_name="Momentum4D",
     )
     jetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.6)
-    cluster = fastjet.pyjet.AwkwardClusterSequence(array, jetdef)
+    cluster = fastjet._pyjet.AwkwardClusterSequence(array, jetdef)
     test_input = ak.Array(
         [
             {"px": 1.2, "py": 3.2, "pz": 5.4, "E": 2.5, "ex": 0.78},
@@ -311,7 +311,7 @@ def test_has_parents_single():
         with_name="Momentum4D",
     )
     jetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.6)
-    cluster = fastjet.pyjet.AwkwardClusterSequence(array, jetdef)
+    cluster = fastjet._pyjet.AwkwardClusterSequence(array, jetdef)
     test_input = ak.Array(
         [
             {"px": 64.65, "py": 127.41999999999999, "pz": 1086.48, "E": 48.68},
@@ -332,7 +332,7 @@ def test_has_child_single():
         with_name="Momentum4D",
     )
     jetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.6)
-    cluster = fastjet.pyjet.AwkwardClusterSequence(array, jetdef)
+    cluster = fastjet._pyjet.AwkwardClusterSequence(array, jetdef)
     test_input = ak.Array(
         [
             {"px": 64.65, "py": 127.41999999999999, "pz": 1086.48, "E": 48.68},
@@ -360,7 +360,7 @@ def test_has_child_multi():
         with_name="Momentum4D",
     )
     jetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.6)
-    cluster = fastjet.pyjet.AwkwardClusterSequence(array, jetdef)
+    cluster = fastjet._pyjet.AwkwardClusterSequence(array, jetdef)
     test_input = ak.Array(
         [
             {"px": 1.2, "py": 3.2, "pz": 5.4, "E": 2.5, "ex": 0.78},
@@ -389,7 +389,7 @@ def test_jet_scale_for_algorithm_multi():
         with_name="Momentum4D",
     )
     jetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.6)
-    cluster = fastjet.pyjet.AwkwardClusterSequence(array, jetdef)
+    cluster = fastjet._pyjet.AwkwardClusterSequence(array, jetdef)
     test_input = ak.Array(
         [
             {"px": 64.65, "py": 127.41999999999999, "pz": 1086.48, "E": 48.68},
@@ -411,7 +411,7 @@ def test_jet_scale_for_algorithm_single():
         with_name="Momentum4D",
     )
     jetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.6)
-    cluster = fastjet.pyjet.AwkwardClusterSequence(array, jetdef)
+    cluster = fastjet._pyjet.AwkwardClusterSequence(array, jetdef)
     test_input = ak.Array(
         [
             {"px": 1.2, "py": 3.2, "pz": 5.4, "E": 2.5, "ex": 0.78},
@@ -438,7 +438,7 @@ def test_get_parents_multi():
         with_name="Momentum4D",
     )
     jetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.6)
-    cluster = fastjet.pyjet.AwkwardClusterSequence(array, jetdef)
+    cluster = fastjet._pyjet.AwkwardClusterSequence(array, jetdef)
     test_input = ak.Array(
         [
             {"px": 1.2, "py": 3.2, "pz": 5.4, "E": 2.5, "ex": 0.78},
@@ -465,7 +465,7 @@ def test_get_parents_single():
         with_name="Momentum4D",
     )
     jetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.6)
-    cluster = fastjet.pyjet.AwkwardClusterSequence(array, jetdef)
+    cluster = fastjet._pyjet.AwkwardClusterSequence(array, jetdef)
     test_input = ak.Array(
         [
             {"px": 64.65, "py": 127.41999999999999, "pz": 1086.48, "E": 48.68},
@@ -488,7 +488,7 @@ def test_get_child_single():
         with_name="Momentum4D",
     )
     jetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.6)
-    cluster = fastjet.pyjet.AwkwardClusterSequence(array, jetdef)
+    cluster = fastjet._pyjet.AwkwardClusterSequence(array, jetdef)
     test_input = ak.Array(
         [
             {"px": 64.65, "py": 127.41999999999999, "pz": 1086.48, "E": 48.68},
@@ -515,7 +515,7 @@ def test_get_child_multi():
         with_name="Momentum4D",
     )
     jetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.6)
-    cluster = fastjet.pyjet.AwkwardClusterSequence(array, jetdef)
+    cluster = fastjet._pyjet.AwkwardClusterSequence(array, jetdef)
     test_input = ak.Array(
         [
             {"px": 1.2, "py": 3.2, "pz": 5.4, "E": 2.5, "ex": 0.78},

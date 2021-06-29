@@ -16,8 +16,8 @@ _libsiscone_spherical = ctypes.cdll.LoadLibrary(
 _libfastjetplugins = ctypes.cdll.LoadLibrary(_fastjet_core / "libfastjetplugins.so")
 
 import fastjet._ext  # noqa: F401, E402
+import fastjet._pyjet  # noqa: F401, E402
 import fastjet._swig  # noqa: F401, E402
-import fastjet.pyjet  # noqa: F401, E402
 from fastjet._swig import AreaDefinition  # noqa: F401, E402
 from fastjet._swig import BackgroundEstimatorBase  # noqa: F401, E402
 from fastjet._swig import BackgroundJetPtDensity  # noqa: F401, E402
@@ -214,8 +214,8 @@ class ClusterSequence:  # The super class
         if not isinstance(jetdef, fastjet._swig.JetDefinition):
             raise AttributeError("JetDefinition is not correct")
         if isinstance(data, ak.Array):
-            self.__class__ = fastjet.pyjet.AwkwardClusterSequence
-            fastjet.pyjet.AwkwardClusterSequence.__init__(
+            self.__class__ = fastjet._pyjet.AwkwardClusterSequence
+            fastjet._pyjet.AwkwardClusterSequence.__init__(
                 self, data=data, jetdef=jetdef
             )
         if isinstance(data, list):
