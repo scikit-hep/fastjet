@@ -63,3 +63,20 @@ jobs:
 
     - name: Test package
       run: python -m pytest -vv -rs -Wd
+
+
+  test_wheels:
+    name: Wheel on linux
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+      with:
+        submodules: recursive
+
+    - uses: pypa/cibuildwheel@v2.0.0a4
+
+    - name: Upload wheels
+      uses: actions/upload-artifact@v2
+      with:
+        path: wheelhouse/*.whl

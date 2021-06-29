@@ -33,13 +33,7 @@ jobs:
       with:
         submodules: recursive
 
-    - uses: pypa/cibuildwheel@v1.12.0
-      env:
-        CIBW_BEFORE_ALL_LINUX: "yum update && yum install -y mpfr-devel boost-devel gcc-gfortran"
-        CIBW_SKIP: cp27*
-        CIBW_TEST_EXTRAS: test
-        CIBW_TEST_COMMAND: pytest {project}/tests
-
+    - uses: pypa/cibuildwheel@v2.0.0a4
 
     - name: Upload wheels
       uses: actions/upload-artifact@v2

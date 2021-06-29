@@ -6,3 +6,16 @@ requires = [
     "pybind11>=2.6.1",
 ]
 build-backend = "setuptools.build_meta"
+
+[tool.cibuildwheel]
+skip = "pp*"
+test-extras = "test"
+test-command = "pytest {project}/tests"
+manylinux-x86_64-image = "manylinux2014"
+manylinux-i686-image = "manylinux2014"
+
+[tool.cibuildwheel.linux]
+before-all = [
+    "yum update -y",
+    "yum install -y mpfr-devel boost-devel gcc-gfortran",
+]
