@@ -11,11 +11,11 @@ build-backend = "setuptools.build_meta"
 skip = "pp*"
 test-extras = "test"
 test-command = "pytest {project}/tests"
-manylinux-x86_64-image = "manylinux2014"
-manylinux-i686-image = "manylinux2014"
+manylinux-x86_64-image = "manylinux_2_24"
+manylinux-i686-image = "manylinux_2_24"
 
 [tool.cibuildwheel.linux]
 before-all = [
-    "yum update -y",
-    "yum install -y mpfr-devel boost-devel gcc-gfortran",
+    "apt-get update -y",
+    "apt-get install -y libmpfr-dev libboost-dev",
 ]
