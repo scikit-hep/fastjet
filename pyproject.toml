@@ -20,6 +20,6 @@ before-all = [
     "apt-get install -y libmpfr-dev libboost-dev",
 ]
 repair-wheel-command = [
-    "export LD_LIBRARY_PATH=$PWD/_fastjet_core/lib",
+    "export LD_LIBRARY_PATH=$PWD/_fastjet_core/lib/libfastjet.so.0",
     "auditwheel repair -w {dest_dir} {wheel}",
 ]
