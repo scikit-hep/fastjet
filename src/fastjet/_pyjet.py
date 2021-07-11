@@ -1,7 +1,7 @@
 import awkward as ak
 
-import fastjet._generalevent
 import fastjet._ext  # noqa: F401, E402
+import fastjet._generalevent
 import fastjet._multievent
 import fastjet._singleevent
 from fastjet.__init__ import ClusterSequence
