@@ -43,8 +43,6 @@ class AwkwardClusterSequence(ClusterSequence):
                 ak.layout.IndexedArray64,
                 ak.layout.IndexedArray32,
                 ak.layout.IndexedArrayU32,
-                ak.layout.IndexOptionArray64,
-                ak.layout.IndexOptionArray32,
             ),
         )
         return out
