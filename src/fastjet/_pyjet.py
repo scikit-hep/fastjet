@@ -1,6 +1,6 @@
 import awkward as ak
 
-import fastjet._complexevent
+import fastjet._generalevent
 import fastjet._ext  # noqa: F401, E402
 import fastjet._multievent
 import fastjet._singleevent
@@ -25,8 +25,8 @@ class AwkwardClusterSequence(ClusterSequence):
             self._internalrep = fastjet._singleevent._classsingleevent(
                 data, self._jetdef
             )
-        if self._jagedness >= 2 and self._check_listoffset(data):
-            self._internalrep = fastjet._complexevent._classcomplexevent(data, jetdef)
+        if self._jagedness >= 2 or self._check_general(data):
+            self._internalrep = fastjet._generalevent._classgeneralevent(data, jetdef)
 
     def _check_jaggedness(self, data):
         """Internal function for checking the jaggedness of awkward array"""
@@ -34,6 +34,20 @@ class AwkwardClusterSequence(ClusterSequence):
             return 1 + self._check_jaggedness(ak.Array(data.layout.content))
         else:
             return 0
+
+    def _check_general(self, data):
+        """Internal function for checking whether the given array is a general case or not"""
+        out = isinstance(
+            data.layout,
+            (
+                ak.layout.IndexedArray64,
+                ak.layout.IndexedArray32,
+                ak.layout.IndexedArrayU32,
+                ak.layout.IndexOptionArray64,
+                ak.layout.IndexOptionArray32,
+            ),
+        )
+        return out
 
     def _check_listoffset(self, data):
         """Internal function for checking whether the given array is a listoffset array or not"""
