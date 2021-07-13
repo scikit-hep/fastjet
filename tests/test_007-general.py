@@ -32,7 +32,24 @@ def test_listoffset_inclusive():
     jetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.6)
     cluster = fastjet._pyjet.AwkwardClusterSequence(array, jetdef)
     inclusive_jets_out = [
-        [[[{"px": 1.2, "py": 3.2, "pz": 5.4, "E": 2.5}]]],
-        [[[{"px": 32.2, "py": 64.21, "pz": 543.34, "E": 24.12}]]],
+        [
+            [
+                [
+                    {"px": 1.2, "py": 3.2, "pz": 5.4, "E": 2.5},
+                    {"px": 64.65, "py": 127.41999999999999, "pz": 1086.48, "E": 48.68},
+                ]
+            ]
+        ],
+        [
+            [
+                [
+                    {"px": 11.2, "py": 3.2, "pz": 5.4, "E": 2.5},
+                    {"px": 64.65, "py": 127.41999999999999, "pz": 1086.48, "E": 48.68},
+                ]
+            ]
+        ],
     ]
+
     assert inclusive_jets_out == cluster.inclusive_jets().to_list()
+    constituent_index_out = [[[[[0], [1, 2]]]], [[[[0], [1, 2]]]]]
+    assert constituent_index_out == cluster.constituent_index().to_list()

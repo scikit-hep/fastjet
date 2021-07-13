@@ -12,7 +12,7 @@ class _classgeneralevent:
             self.multi_layered_listoffset(self.data)
         if self._check_general(self.data):
             self.multi_layered_listoffset(ak.Array(self.data.layout.project()))
-        px, py, pz, E, offsets = self.extract_cons(self.data)
+        px, py, pz, E, offsets = self.extract_cons(self._clusterable_level)
         px = self.correct_byteorder(px)
         py = self.correct_byteorder(py)
         pz = self.correct_byteorder(pz)
@@ -122,6 +122,20 @@ class _classgeneralevent:
                     ("px", "py", "pz", "E"),
                 ),
             )
+        )
+        res = ak.Array(self.replace(self.data.layout))
+        return res
+
+    def constituent_index(self, min_pt):
+        np_results = self._results.to_numpy_with_constituents(min_pt)
+        off = np.insert(np_results[-1], 0, 0)
+        out = ak.Array(
+            ak.layout.ListOffsetArray64(
+                ak.layout.Index64(np_results[0]), ak.layout.NumpyArray(np_results[1])
+            )
+        )
+        self.out = ak.Array(
+            ak.layout.ListOffsetArray64(ak.layout.Index64(off), out.layout)
         )
         res = ak.Array(self.replace(self.data.layout))
         return res
