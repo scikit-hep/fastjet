@@ -38,14 +38,28 @@ class _classgeneralevent:
                 ak.layout.ListOffsetArray64,
                 ak.layout.ListOffsetArray32,
                 ak.layout.ListOffsetArrayU32,
+                ak.layout.RegularArray,
             ),
         )
         return out
 
+    def _check_record(self, data):
+        out = isinstance(
+            data.layout,
+            (
+                ak.layout.RecordArray,
+                ak.layout.NumpyArray,
+            ),
+        )
+
+        return out
+
     def multi_layered_listoffset(self, data):
-        if isinstance(
-            ak.Array(ak.Array(data.layout.content).layout.content).layout,
-            ak.layout.RecordArray,
+        if (
+            self._check_record(
+                ak.Array(ak.Array(data.layout.content).layout.content),
+            )
+            and self._check_listoffset(data)
         ):
             self._clusterable_level = ak.Array(data.layout.content)
         else:
@@ -66,3 +80,48 @@ class _classgeneralevent:
         off = np.asarray(array.layout.stops)
         off = np.insert(off, 0, 0)
         return px, py, pz, E, off
+
+    def replace(self, layout):
+        if isinstance(
+            layout,
+            (
+                ak.layout.ListOffsetArray64,
+                ak.layout.ListOffsetArray32,
+                ak.layout.ListOffsetArrayU32,
+                ak.layout.RegularArray,
+            ),
+        ) and isinstance(
+            layout.content,
+            (
+                ak.layout.RecordArray,
+                ak.layout.NumpyArray,
+            ),
+        ):
+            return self.out.layout
+        elif isinstance(layout, ak.layout.ListOffsetArray64):
+            return ak.layout.ListOffsetArray64(
+                layout.offsets,
+                self.replace(layout.content),
+            )
+        else:
+            raise AssertionError(layout)
+
+    def inclusive_jets(self, min_pt):
+        np_results = self._results.to_numpy(min_pt)
+        of = np.insert(np_results[-1], len(np_results[-1]), len(np_results[0]))
+        self.out = ak.Array(
+            ak.layout.ListOffsetArray64(
+                ak.layout.Index64(of),
+                ak.layout.RecordArray(
+                    (
+                        ak.layout.NumpyArray(np_results[0]),
+                        ak.layout.NumpyArray(np_results[1]),
+                        ak.layout.NumpyArray(np_results[2]),
+                        ak.layout.NumpyArray(np_results[3]),
+                    ),
+                    ("px", "py", "pz", "E"),
+                ),
+            )
+        )
+        res = ak.Array(self.replace(self.data.layout))
+        return res
