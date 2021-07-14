@@ -7,6 +7,7 @@ import fastjet._ext  # noqa: F401, E402
 class _classmultievent:
     def __init__(self, data, jetdef):
         self.jetdef = jetdef
+        # data = ak.Array(data.layout.toListOffsetArray64(True)) If I do this vector can't convert the coordinates
         self.data = data
         px, py, pz, E, offsets = self.extract_cons(self.data)
         px = self.correct_byteorder(px)

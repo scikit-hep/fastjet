@@ -28,6 +28,11 @@ class AwkwardClusterSequence(ClusterSequence):
         if self._jagedness >= 2 or self._check_general(data):
             self._internalrep = fastjet._generalevent._classgeneralevent(data, jetdef)
 
+    # else:
+    # raise TypeError(
+    #    "This kind of Awkward Array is not supported yet. Please contact the maintainers for further action."
+    # )
+
     def _check_jaggedness(self, data):
         """Internal function for checking the jaggedness of awkward array"""
         if isinstance(data.layout, ak.layout.ListOffsetArray64):
@@ -43,6 +48,7 @@ class AwkwardClusterSequence(ClusterSequence):
                 ak.layout.IndexedArray64,
                 ak.layout.IndexedArray32,
                 ak.layout.IndexedArrayU32,
+                ak.layout.ByteMaskedArray,
             ),
         )
         return out

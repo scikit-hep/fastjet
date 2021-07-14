@@ -8,10 +8,10 @@ class _classgeneralevent:
     def __init__(self, data, jetdef):
         self.jetdef = jetdef
         self.data = data
-        if self._check_listoffset(self.data):
-            self.multi_layered_listoffset(self.data)
-        if self._check_general(self.data):
-            self.multi_layered_listoffset(ak.Array(self.data.layout.project()))
+        self.multi_layered_listoffset(self.data)
+        self._clusterable_level = ak.Array(
+            self._clusterable_level.layout.toListOffsetArray64(True)
+        )
         px, py, pz, E, offsets = self.extract_cons(self._clusterable_level)
         px = self.correct_byteorder(px)
         py = self.correct_byteorder(py)
@@ -39,6 +39,7 @@ class _classgeneralevent:
                 ak.layout.ListOffsetArray32,
                 ak.layout.ListOffsetArrayU32,
                 ak.layout.RegularArray,
+                ak.layout.ByteMaskedArray,
             ),
         )
         return out
@@ -59,9 +60,16 @@ class _classgeneralevent:
             self._check_record(
                 ak.Array(ak.Array(data.layout.content).layout.content),
             )
-            and self._check_listoffset(data)
+            and self._check_listoffset(ak.Array(data.layout.content))
         ):
-            self._clusterable_level = ak.Array(data.layout.content)
+            attributes = dir(data)
+            if (
+                "px" in attributes
+                and "py" in attributes
+                and "pz" in attributes
+                and "E" in attributes
+            ):
+                self._clusterable_level = ak.Array(data.layout.content)
         else:
             self.multi_layered_listoffset(ak.Array(data.layout.content))
 
@@ -97,8 +105,17 @@ class _classgeneralevent:
                 ak.layout.NumpyArray,
             ),
         ):
-            return self.out.layout
-        elif isinstance(layout, ak.layout.ListOffsetArray64):
+            attributes = dir(ak.Array(layout))
+            if (
+                "px" in attributes
+                and "py" in attributes
+                and "pz" in attributes
+                and "E" in attributes
+            ):
+                return self.out.layout
+        elif self._check_general(ak.Array(layout)) or self._check_listoffset(
+            ak.Array(layout)
+        ):
             return ak.layout.ListOffsetArray64(
                 layout.offsets,
                 self.replace(layout.content),
