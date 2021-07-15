@@ -64,7 +64,6 @@ jobs:
     - name: Test package
       run: python -m pytest -vv -rs -Wd
 
-
   test_wheels:
     name: Wheel on linux
     runs-on: ubuntu-latest

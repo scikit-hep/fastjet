@@ -32,6 +32,7 @@ OUTPUT = PYTHON / "_fastjet_core"
 
 LIBS = ["fastjet", "fastjettools", "siscone", "siscone_spherical", "fastjetplugins"]
 
+
 def get_version() -> str:
     g = {}
     with open(PYTHON / "version.py") as f:
