@@ -39,7 +39,6 @@ class _classgeneralevent:
                 ak.layout.ListOffsetArray32,
                 ak.layout.ListOffsetArrayU32,
                 ak.layout.RegularArray,
-                ak.layout.ByteMaskedArray,
             ),
         )
         return out
@@ -119,6 +118,10 @@ class _classgeneralevent:
             return ak.layout.ListOffsetArray64(
                 layout.offsets,
                 self.replace(layout.content),
+            )
+        elif isinstance(layout, ak.layout.ByteMaskedArray):
+            return ak.layout.ByteMaskedArray(
+                layout.bytemask(), self.replace(layout.content), not layout.valid_when
             )
         else:
             raise AssertionError(layout)
