@@ -123,6 +123,12 @@ class _classgeneralevent:
             return ak.layout.ByteMaskedArray(
                 layout.bytemask(), self.replace(layout.content), not layout.valid_when
             )
+        elif isinstance(layout, ak.layout.BitMaskedArray):
+            return ak.layout.BitMaskedArray(
+                layout.mask(), self.replace(layout.content), not layout.valid_when
+            )
+        elif isinstance(layout, ak.layout.UnmaskedArray):
+            return ak.layout.UnmaskedArray(self.replace(layout.content))
         else:
             raise AssertionError(layout)
 
