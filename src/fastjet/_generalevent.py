@@ -123,13 +123,22 @@ class _classgeneralevent:
                 and "E" in attributes
             ):
                 return self.out.layout
-        elif self._check_general(ak.Array(layout)) or self._check_listoffset(
-            ak.Array(layout)
-        ):
-            return ak.layout.ListOffsetArray64(
-                layout.offsets,
-                self.replace(layout.content),
-            )
+        elif self._check_listoffset(ak.Array(layout)):
+            if isinstance(layout, ak.layout.ListOffsetArray64):
+                return ak.layout.ListOffsetArray64(
+                    layout.offsets,
+                    self.replace(layout.content),
+                )
+            if isinstance(layout, ak.layout.ListOffsetArray32):
+                return ak.layout.ListOffsetArray32(
+                    layout.offsets,
+                    self.replace(layout.content),
+                )
+            if isinstance(layout, ak.layout.ListOffsetArrayU32):
+                return ak.layout.ListOffsetArrayU32(
+                    layout.offsets,
+                    self.replace(layout.content),
+                )
         elif isinstance(layout, ak.layout.ByteMaskedArray):
             return ak.layout.ByteMaskedArray(
                 layout.bytemask(), self.replace(layout.content), not layout.valid_when
@@ -142,6 +151,18 @@ class _classgeneralevent:
             return ak.layout.UnmaskedArray(self.replace(layout.content))
         elif isinstance(layout, ak.layout.RegularArray):
             return ak.layout.RegularArray(self.replace(layout.content), layout.size)
+        elif isinstance(layout, ak.layout.ListArray64):
+            return ak.layout.ListArray64(
+                layout.starts, layout.stops, self.replace(layout.content)
+            )
+        elif isinstance(layout, ak.layout.ListArray32):
+            return ak.layout.ListArray32(
+                layout.starts, layout.stops, self.replace(layout.content)
+            )
+        elif isinstance(layout, ak.layout.ListArrayU32):
+            return ak.layout.ListArrayU32(
+                layout.starts, layout.stops, self.replace(layout.content)
+            )
         else:
             raise AssertionError(layout)
 
