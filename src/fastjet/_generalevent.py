@@ -31,7 +31,7 @@ class _classgeneralevent:
         )
         return out
 
-    def _check_listoffset(self, data):
+    def _check_listoffset_subtree(self, data):
         out = isinstance(
             data.layout,
             (
@@ -39,6 +39,17 @@ class _classgeneralevent:
                 ak.layout.ListOffsetArray32,
                 ak.layout.ListOffsetArrayU32,
                 ak.layout.RegularArray,
+            ),
+        )
+        return out
+
+    def _check_listoffset(self, data):
+        out = isinstance(
+            data.layout,
+            (
+                ak.layout.ListOffsetArray64,
+                ak.layout.ListOffsetArray32,
+                ak.layout.ListOffsetArrayU32,
             ),
         )
         return out
@@ -59,7 +70,7 @@ class _classgeneralevent:
             self._check_record(
                 ak.Array(ak.Array(data.layout.content).layout.content),
             )
-            and self._check_listoffset(ak.Array(data.layout.content))
+            and self._check_listoffset_subtree(ak.Array(data.layout.content))
         ):
             attributes = dir(data)
             if (
@@ -129,6 +140,8 @@ class _classgeneralevent:
             )
         elif isinstance(layout, ak.layout.UnmaskedArray):
             return ak.layout.UnmaskedArray(self.replace(layout.content))
+        elif isinstance(layout, ak.layout.RegularArray):
+            return ak.layout.RegularArray(self.replace(layout.content), layout.size)
         else:
             raise AssertionError(layout)
 

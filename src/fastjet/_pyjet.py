@@ -35,7 +35,7 @@ class AwkwardClusterSequence(ClusterSequence):
 
     def _check_jaggedness(self, data):
         """Internal function for checking the jaggedness of awkward array"""
-        if isinstance(data.layout, ak.layout.ListOffsetArray64):
+        if self._check_general(data) or self._check_listoffset(data):
             return 1 + self._check_jaggedness(ak.Array(data.layout.content))
         else:
             return 0
@@ -63,6 +63,7 @@ class AwkwardClusterSequence(ClusterSequence):
                 ak.layout.ListOffsetArray64,
                 ak.layout.ListOffsetArray32,
                 ak.layout.ListOffsetArrayU32,
+                ak.layout.RegularArray,
             ),
         )
         return out
