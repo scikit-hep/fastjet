@@ -20,17 +20,6 @@ class _classgeneralevent:
         offsets = self.correct_byteorder(offsets)
         self._results = fastjet._ext.interfacemulti(px, py, pz, E, offsets, jetdef)
 
-    def _check_general(self, data):
-        out = isinstance(
-            data.layout,
-            (
-                ak.layout.IndexedArray64,
-                ak.layout.IndexedArray32,
-                ak.layout.IndexedArrayU32,
-            ),
-        )
-        return out
-
     def _check_listoffset_subtree(self, data):
         out = isinstance(
             data.layout,
@@ -163,6 +152,12 @@ class _classgeneralevent:
             return ak.layout.ListArrayU32(
                 layout.starts, layout.stops, self.replace(layout.content)
             )
+        elif isinstance(layout, ak.layout.IndexedArray64):
+            return ak.layout.IndexedArray64(layout.index, self.replace(layout.content))
+        elif isinstance(layout, ak.layout.IndexedArray32):
+            return ak.layout.IndexedArray32(layout.index, self.replace(layout.content))
+        elif isinstance(layout, ak.layout.IndexedArrayU32):
+            return ak.layout.IndexedArrayU32(layout.index, self.replace(layout.content))
         else:
             raise AssertionError(layout)
 
