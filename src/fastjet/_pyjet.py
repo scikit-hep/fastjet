@@ -51,6 +51,8 @@ class AwkwardClusterSequence(ClusterSequence):
                 ak.layout.ByteMaskedArray,
                 ak.layout.BitMaskedArray,
                 ak.layout.UnmaskedArray,
+                ak.layout.IndexedOptionArray64,
+                ak.layout.IndexedOptionArray32,
             ),
         )
         return out

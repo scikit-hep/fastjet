@@ -158,6 +158,14 @@ class _classgeneralevent:
             return ak.layout.IndexedArray32(layout.index, self.replace(layout.content))
         elif isinstance(layout, ak.layout.IndexedArrayU32):
             return ak.layout.IndexedArrayU32(layout.index, self.replace(layout.content))
+        elif isinstance(layout, ak.layout.IndexedOptionArray64):
+            return ak.layout.IndexedOptionArray64(
+                layout.index, self.replace(layout.content)
+            )
+        elif isinstance(layout, ak.layout.IndexedOptionArray32):
+            return ak.layout.IndexedOptionArray32(
+                layout.index, self.replace(layout.content)
+            )
         else:
             raise AssertionError(layout)
 
