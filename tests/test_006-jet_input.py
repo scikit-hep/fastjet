@@ -141,7 +141,7 @@ def test_exclusive_subdmerge_single():
         [{"px": 64.65, "py": 127.41999999999999, "pz": 1086.48, "E": 48.68}]
     )
     nsub_out = 1.1713099970894107e-07
-    assert nsub_out == cluster.exclusive_subdmerge(test_input, nsub=1)
+    assert nsub_out == pytest.approx(cluster.exclusive_subdmerge(test_input, nsub=1))
 
 
 def test_exclusive_subdmerge_multi():
@@ -170,7 +170,9 @@ def test_exclusive_subdmerge_multi():
         ]
     )
     nsub_out = [1.1713099970894107e-07, 0.0]
-    assert nsub_out == cluster.exclusive_subdmerge(test_input, nsub=1).to_list()
+    assert nsub_out == pytest.approx(
+        cluster.exclusive_subdmerge(test_input, nsub=1).to_list()
+    )
 
 
 def test_exclusive_subdmerge_max_multi():
@@ -199,7 +201,9 @@ def test_exclusive_subdmerge_max_multi():
         ]
     )
     nsub_out = [1.1713099970894107e-07, 0.0]
-    assert nsub_out == cluster.exclusive_subdmerge_max(test_input, nsub=1).to_list()
+    assert nsub_out == pytest.approx(
+        cluster.exclusive_subdmerge_max(test_input, nsub=1).to_list()
+    )
 
 
 def test_exclusive_subdmerge_max_single():
@@ -218,7 +222,9 @@ def test_exclusive_subdmerge_max_single():
         [{"px": 64.65, "py": 127.41999999999999, "pz": 1086.48, "E": 48.68}]
     )
     nsub_out = 1.1713099970894107e-07
-    assert nsub_out == cluster.exclusive_subdmerge_max(test_input, nsub=1)
+    assert nsub_out == pytest.approx(
+        cluster.exclusive_subdmerge_max(test_input, nsub=1)
+    )
 
 
 def test_n_exclusive_subjets_multi():
@@ -397,7 +403,9 @@ def test_jet_scale_for_algorithm_multi():
         ]
     )
     nsub_out = [4.898244145524307e-05, 0.08561643835616438]
-    assert nsub_out == cluster.jet_scale_for_algorithm(test_input).to_list()
+    assert nsub_out == pytest.approx(
+        cluster.jet_scale_for_algorithm(test_input).to_list()
+    )
 
 
 def test_jet_scale_for_algorithm_single():
@@ -418,7 +426,7 @@ def test_jet_scale_for_algorithm_single():
         ]
     )
     nsub_out = 0.08561643835616438
-    assert nsub_out == cluster.jet_scale_for_algorithm(test_input)
+    assert nsub_out == pytest.approx(cluster.jet_scale_for_algorithm(test_input))
 
 
 def test_get_parents_multi():
