@@ -15,6 +15,7 @@ manylinux-x86_64-image = "manylinux_2_24"
 manylinux-i686-image = "manylinux_2_24"
 
 [tool.cibuildwheel.linux]
+architectures = ["Architecture.x86_64: 'x86_64'"]
 before-all = [
     "apt-get update -y",
     "apt-get install -y libmpfr-dev libboost-dev",
