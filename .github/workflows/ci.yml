@@ -52,14 +52,32 @@ jobs:
       if: runner.os == 'Linux'
       run: sudo apt-get update && sudo apt-get install -y libmpfr-dev libboost-dev
 
-    - name: Install dependency
-      run: python -m pip install awkward
+    #- name: Install dependency
+    #  run: python -m pip install awkward
 
-    - name: Install dependency
-      run: python -m pip install vector
+    #- name: Install dependency
+    #  run: python -m pip install vector
 
     - name: Install package
       run: python -m pip install .[test] -v
 
     - name: Test package
       run: python -m pytest -vv -rs -Wd
+
+  test_wheels:
+    name: Wheel on linux
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+      with:
+        submodules: recursive
+
+    - uses: pypa/cibuildwheel@v2.0.0a4
+      env:
+        CIBW_BUILD: cp39-manylinux_x86_64
+
+    - name: Upload wheels
+      uses: actions/upload-artifact@v2
+      with:
+        path: wheelhouse/*.whl

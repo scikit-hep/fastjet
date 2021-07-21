@@ -30,6 +30,8 @@ FASTJET = DIR / "fastjet-core"
 PYTHON = DIR / "src/fastjet"
 OUTPUT = PYTHON / "_fastjet_core"
 
+LIBS = ["fastjet", "fastjettools", "siscone", "siscone_spherical", "fastjetplugins"]
+
 
 def get_version() -> str:
     g = {}
@@ -108,7 +110,8 @@ ext_modules = [
         cxx_std=11,
         include_dirs=[str(OUTPUT / "include")],
         library_dirs=[str(OUTPUT / "lib")],
-        libraries=["fastjet"],
+        runtime_library_dirs=["$ORIGIN/_fastjet_core/lib"],
+        libraries=LIBS,
     ),
 ]
 

@@ -6,3 +6,17 @@ requires = [
     "pybind11>=2.6.1",
 ]
 build-backend = "setuptools.build_meta"
+
+[tool.cibuildwheel]
+skip = "pp*"
+test-extras = "test"
+test-command = "pytest {project}/tests"
+manylinux-x86_64-image = "manylinux_2_24"
+manylinux-i686-image = "manylinux_2_24"
+
+[tool.cibuildwheel.linux]
+before-all = [
+    "apt-get update -y",
+    "apt-get install -y libmpfr-dev libboost-dev",
+]
+repair-wheel-command = []

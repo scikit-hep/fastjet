@@ -24,7 +24,7 @@ def test_exclusive_dmerge_multi():
     jetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.6)
     cluster = fastjet._pyjet.AwkwardClusterSequence(array, jetdef)
     out = [4.898244145524306e-05, 4.898244145524306e-05]
-    assert out == cluster.exclusive_dmerge(njets=1).to_list()
+    assert out == pytest.approx(cluster.exclusive_dmerge(njets=1).to_list())
 
 
 def test_exclusive_dmerge_single():
@@ -39,7 +39,7 @@ def test_exclusive_dmerge_single():
     jetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.6)
     cluster = fastjet._pyjet.AwkwardClusterSequence(array, jetdef)
     out = 4.898244145524306e-05
-    assert out == cluster.exclusive_dmerge(njets=1)
+    assert out == pytest.approx(cluster.exclusive_dmerge(njets=1))
 
 
 def test_exclusive_dmerge_max_single():
@@ -54,7 +54,7 @@ def test_exclusive_dmerge_max_single():
     jetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.6)
     cluster = fastjet._pyjet.AwkwardClusterSequence(array, jetdef)
     out = 4.898244145524306e-05
-    assert out == cluster.exclusive_dmerge_max(njets=1)
+    assert out == pytest.approx(cluster.exclusive_dmerge_max(njets=1))
 
 
 def test_exclusive_dmerge_max_multi():
@@ -76,7 +76,7 @@ def test_exclusive_dmerge_max_multi():
     jetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.6)
     cluster = fastjet._pyjet.AwkwardClusterSequence(array, jetdef)
     out = [4.898244145524306e-05, 4.898244145524306e-05]
-    assert out == cluster.exclusive_dmerge_max(njets=1).to_list()
+    assert out == pytest.approx(cluster.exclusive_dmerge_max(njets=1).to_list())
 
 
 def test_exclusive_ymerge_max_multi():
@@ -98,7 +98,7 @@ def test_exclusive_ymerge_max_multi():
     jetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.6)
     cluster = fastjet._pyjet.AwkwardClusterSequence(array, jetdef)
     out = [1.8699925011328223e-08, 1.8699925011328223e-08]
-    assert out == cluster.exclusive_ymerge_max(njets=1).to_list()
+    assert out == pytest.approx(cluster.exclusive_ymerge_max(njets=1).to_list())
 
 
 def test_exclusive_ymerge_multi():
@@ -120,7 +120,7 @@ def test_exclusive_ymerge_multi():
     jetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.6)
     cluster = fastjet._pyjet.AwkwardClusterSequence(array, jetdef)
     out = [1.8699925011328223e-08, 1.8699925011328223e-08]
-    assert out == cluster.exclusive_ymerge(njets=1).to_list()
+    assert out == pytest.approx(cluster.exclusive_ymerge(njets=1).to_list())
 
 
 def test_exclusive_ymerge_single():
@@ -135,7 +135,7 @@ def test_exclusive_ymerge_single():
     jetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.6)
     cluster = fastjet._pyjet.AwkwardClusterSequence(array, jetdef)
     out = 1.8699925011328223e-08
-    assert out == cluster.exclusive_ymerge(njets=1)
+    assert out == pytest.approx(cluster.exclusive_ymerge(njets=1))
 
 
 def test_exclusive_ymerge_max_single():
@@ -150,7 +150,7 @@ def test_exclusive_ymerge_max_single():
     jetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.6)
     cluster = fastjet._pyjet.AwkwardClusterSequence(array, jetdef)
     out = 4.471685865353395e-11
-    assert out == cluster.exclusive_ymerge_max(njets=2)
+    assert out == pytest.approx(cluster.exclusive_ymerge_max(njets=2))
 
 
 def test_Q_single():
