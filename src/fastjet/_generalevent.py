@@ -55,22 +55,20 @@ class _classgeneralevent:
         return out
 
     def multi_layered_listoffset(self, data):
-        if (
-            self._check_record(
+        if self._check_listoffset_subtree(ak.Array(data.layout.content)):
+            if self._check_record(
                 ak.Array(ak.Array(data.layout.content).layout.content),
-            )
-            and self._check_listoffset_subtree(ak.Array(data.layout.content))
-        ):
-            attributes = dir(data)
-            if (
-                "px" in attributes
-                and "py" in attributes
-                and "pz" in attributes
-                and "E" in attributes
             ):
-                self._clusterable_level = ak.Array(data.layout.content)
-        else:
-            self.multi_layered_listoffset(ak.Array(data.layout.content))
+                attributes = dir(data)
+                if (
+                    "px" in attributes
+                    and "py" in attributes
+                    and "pz" in attributes
+                    and "E" in attributes
+                ):
+                    self._clusterable_level = ak.Array(data.layout.content)
+            else:
+                self.multi_layered_listoffset(ak.Array(data.layout.content))
 
     def correct_byteorder(self, data):
         if data.dtype.byteorder == "=":
@@ -117,54 +115,157 @@ class _classgeneralevent:
                 return ak.layout.ListOffsetArray64(
                     layout.offsets,
                     self.replace(layout.content),
+                    layout.identities,
+                    layout.parameters,
                 )
             if isinstance(layout, ak.layout.ListOffsetArray32):
                 return ak.layout.ListOffsetArray32(
                     layout.offsets,
                     self.replace(layout.content),
+                    layout.identities,
+                    layout.parameters,
                 )
             if isinstance(layout, ak.layout.ListOffsetArrayU32):
                 return ak.layout.ListOffsetArrayU32(
                     layout.offsets,
                     self.replace(layout.content),
+                    layout.identities,
+                    layout.parameters,
                 )
         elif isinstance(layout, ak.layout.ByteMaskedArray):
             return ak.layout.ByteMaskedArray(
-                layout.bytemask(), self.replace(layout.content), not layout.valid_when
+                layout.mask,
+                self.replace(layout.content),
+                layout.valid_when,
+                layout.identities,
+                layout.parameters,
             )
         elif isinstance(layout, ak.layout.BitMaskedArray):
             return ak.layout.BitMaskedArray(
-                layout.mask(), self.replace(layout.content), not layout.valid_when
+                layout.mask,
+                self.replace(layout.content),
+                layout.valid_when,
+                len(layout),
+                layout.lsb_order,
+                layout.identities,
+                layout.parameters,
             )
         elif isinstance(layout, ak.layout.UnmaskedArray):
-            return ak.layout.UnmaskedArray(self.replace(layout.content))
+            return ak.layout.UnmaskedArray(
+                self.replace(layout.content),
+                layout.identities,
+                layout.parameters,
+            )
         elif isinstance(layout, ak.layout.RegularArray):
-            return ak.layout.RegularArray(self.replace(layout.content), layout.size)
+            return ak.layout.RegularArray(
+                self.replace(layout.content),
+                layout.size,
+                len(layout),
+                layout.identities,
+                layout.parameters,
+            )
         elif isinstance(layout, ak.layout.ListArray64):
             return ak.layout.ListArray64(
-                layout.starts, layout.stops, self.replace(layout.content)
+                layout.starts,
+                layout.stops,
+                self.replace(layout.content),
+                layout.identities,
+                layout.parameters,
             )
         elif isinstance(layout, ak.layout.ListArray32):
             return ak.layout.ListArray32(
-                layout.starts, layout.stops, self.replace(layout.content)
+                layout.starts,
+                layout.stops,
+                self.replace(layout.content),
+                layout.identities,
+                layout.parameters,
             )
         elif isinstance(layout, ak.layout.ListArrayU32):
             return ak.layout.ListArrayU32(
-                layout.starts, layout.stops, self.replace(layout.content)
+                layout.starts,
+                layout.stops,
+                self.replace(layout.content),
+                layout.identities,
+                layout.parameters,
             )
         elif isinstance(layout, ak.layout.IndexedArray64):
-            return ak.layout.IndexedArray64(layout.index, self.replace(layout.content))
+            return ak.layout.IndexedArray64(
+                layout.index,
+                self.replace(layout.content),
+                layout.identities,
+                layout.parameters,
+            )
         elif isinstance(layout, ak.layout.IndexedArray32):
-            return ak.layout.IndexedArray32(layout.index, self.replace(layout.content))
+            return ak.layout.IndexedArray32(
+                layout.index,
+                self.replace(layout.content),
+                layout.identities,
+                layout.parameters,
+            )
         elif isinstance(layout, ak.layout.IndexedArrayU32):
-            return ak.layout.IndexedArrayU32(layout.index, self.replace(layout.content))
+            return ak.layout.IndexedArrayU32(
+                layout.index,
+                self.replace(layout.content),
+                layout.identities,
+                layout.parameters,
+            )
         elif isinstance(layout, ak.layout.IndexedOptionArray64):
             return ak.layout.IndexedOptionArray64(
-                layout.index, self.replace(layout.content)
+                layout.index,
+                self.replace(layout.content),
+                layout.identities,
+                layout.parameters,
             )
         elif isinstance(layout, ak.layout.IndexedOptionArray32):
             return ak.layout.IndexedOptionArray32(
-                layout.index, self.replace(layout.content)
+                layout.index,
+                self.replace(layout.content),
+                layout.identities,
+                layout.parameters,
+            )
+        elif isinstance(layout, ak.layout.RecordArray):
+            return ak.layout.RecordArray(
+                [self.replace(x) for x in layout.contents],
+                layout.recordlookup,
+                len(layout),
+                layout.identities,
+                layout.parameters,
+            )
+        elif isinstance(layout, ak.layout.Record):
+            return ak.layout.Record(
+                self.replace(layout.array),
+                layout.at,
+            )
+        elif isinstance(layout, ak.layout.UnionArray8_32):
+            return ak.layout.UnionArray8_32(
+                layout.tags,
+                layout.index,
+                [self.replace(x) for x in layout.contents],
+                layout.identities,
+                layout.parameters,
+            )
+        elif isinstance(layout, ak.layout.UnionArray8_U32):
+            return ak.layout.UnionArray8_U32(
+                layout.tags,
+                layout.index,
+                [self.replace(x) for x in layout.contents],
+                layout.identities,
+                layout.parameters,
+            )
+        elif isinstance(layout, ak.layout.UnionArray8_64):
+            return ak.layout.UnionArray8_64(
+                layout.tags,
+                layout.index,
+                [self.replace(x) for x in layout.contents],
+                layout.identities,
+                layout.parameters,
+            )
+        elif isinstance(layout, ak.layout.VirtualArray):
+            return self.replace(layout.array)
+
+        if isinstance(layout, ak.partition.PartitionedArray):
+            return ak.partition.IrregularlyPartitionedArray(
+                [self.replace(x) for x in layout.partitions]
             )
         else:
             raise AssertionError(layout)
