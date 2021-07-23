@@ -35,8 +35,10 @@ class AwkwardClusterSequence(ClusterSequence):
 
     def _check_jaggedness(self, data):
         """Internal function for checking the jaggedness of awkward array"""
-        if self._check_general(data) or self._check_listoffset(data):
+        if self._check_general_jaggedness(data) or self._check_listoffset(data):
             return 1 + self._check_jaggedness(ak.Array(data.layout.content))
+        if isinstance(data.layout, ak.layout.VirtualArray):
+            return 1 + self._check_jaggedness(ak.Array(data.layout.array))
         else:
             return 0
 
@@ -53,6 +55,34 @@ class AwkwardClusterSequence(ClusterSequence):
                 ak.layout.UnmaskedArray,
                 ak.layout.IndexedOptionArray64,
                 ak.layout.IndexedOptionArray32,
+                ak.layout.VirtualArray,
+                ak.partition.PartitionedArray,
+                ak.layout.UnionArray8_32,
+                ak.layout.UnionArray8_U32,
+                ak.layout.UnionArray8_64,
+                ak.layout.Record,
+            ),
+        )
+        return out
+
+    def _check_general_jaggedness(self, data):
+        """Internal function for checking whether the given array is a general case or not for depth"""
+        out = isinstance(
+            data.layout,
+            (
+                ak.layout.IndexedArray64,
+                ak.layout.IndexedArray32,
+                ak.layout.IndexedArrayU32,
+                ak.layout.ByteMaskedArray,
+                ak.layout.BitMaskedArray,
+                ak.layout.UnmaskedArray,
+                ak.layout.IndexedOptionArray64,
+                ak.layout.IndexedOptionArray32,
+                ak.partition.PartitionedArray,
+                ak.layout.UnionArray8_32,
+                ak.layout.UnionArray8_U32,
+                ak.layout.UnionArray8_64,
+                ak.layout.Record,
             ),
         )
         return out

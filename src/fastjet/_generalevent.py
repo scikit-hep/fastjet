@@ -55,7 +55,9 @@ class _classgeneralevent:
         return out
 
     def multi_layered_listoffset(self, data):
-        if self._check_listoffset_subtree(ak.Array(data.layout.content)):
+        if isinstance(data.layout, ak.layout.VirtualArray):
+            self.multi_layered_listoffset(ak.Array(data.layout.array))
+        elif self._check_listoffset_subtree(ak.Array(data.layout.content)):
             if self._check_record(
                 ak.Array(ak.Array(data.layout.content).layout.content),
             ):
