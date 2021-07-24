@@ -27,6 +27,9 @@ class _classgeneralevent:
                 ak.layout.ListOffsetArray64,
                 ak.layout.ListOffsetArray32,
                 ak.layout.ListOffsetArrayU32,
+                ak.layout.ListArray64,
+                ak.layout.ListArray32,
+                ak.layout.ListArrayU32,
                 ak.layout.RegularArray,
             ),
         )
@@ -71,6 +74,8 @@ class _classgeneralevent:
                     self._clusterable_level = ak.Array(data.layout.content)
             else:
                 self.multi_layered_listoffset(ak.Array(data.layout.content))
+        else:
+            self.multi_layered_listoffset(ak.Array(data.layout.content))
 
     def correct_byteorder(self, data):
         if data.dtype.byteorder == "=":
