@@ -1,6 +1,7 @@
 import awkward as ak
 
 import fastjet._ext  # noqa: F401, E402
+import fastjet._generalevent
 import fastjet._multievent
 import fastjet._singleevent
 from fastjet.__init__ import ClusterSequence
@@ -18,22 +19,73 @@ class AwkwardClusterSequence(ClusterSequence):
             raise TypeError("JetDefinition is not of valid type")
         self._jetdef = jetdef
         self._jagedness = self._check_jaggedness(data)
-        if self._check_listoffset(data):
-            if self._jagedness >= 1:
-                self._internalrep = fastjet._multievent._classmultievent(
-                    data, self._jetdef
-                )
-        if self._jagedness == 0:
+        if self._check_listoffset(data) and self._jagedness == 1:
+            self._internalrep = fastjet._multievent._classmultievent(data, self._jetdef)
+        if self._jagedness == 0 and isinstance(data.layout, ak.layout.RecordArray):
             self._internalrep = fastjet._singleevent._classsingleevent(
                 data, self._jetdef
             )
+        if self._jagedness >= 2 or self._check_general(data):
+            self._internalrep = fastjet._generalevent._classgeneralevent(data, jetdef)
+
+    # else:
+    # raise TypeError(
+    #    "This kind of Awkward Array is not supported yet. Please contact the maintainers for further action."
+    # )
 
     def _check_jaggedness(self, data):
         """Internal function for checking the jaggedness of awkward array"""
-        if isinstance(data.layout, ak.layout.ListOffsetArray64):
+        if self._check_general_jaggedness(data) or self._check_listoffset(data):
             return 1 + self._check_jaggedness(ak.Array(data.layout.content))
+        if isinstance(data.layout, ak.layout.VirtualArray):
+            return 1 + self._check_jaggedness(ak.Array(data.layout.array))
         else:
             return 0
+
+    def _check_general(self, data):
+        """Internal function for checking whether the given array is a general case or not"""
+        out = isinstance(
+            data.layout,
+            (
+                ak.layout.IndexedArray64,
+                ak.layout.IndexedArray32,
+                ak.layout.IndexedArrayU32,
+                ak.layout.ByteMaskedArray,
+                ak.layout.BitMaskedArray,
+                ak.layout.UnmaskedArray,
+                ak.layout.IndexedOptionArray64,
+                ak.layout.IndexedOptionArray32,
+                ak.layout.VirtualArray,
+                ak.partition.PartitionedArray,
+                ak.layout.UnionArray8_32,
+                ak.layout.UnionArray8_U32,
+                ak.layout.UnionArray8_64,
+                ak.layout.Record,
+            ),
+        )
+        return out
+
+    def _check_general_jaggedness(self, data):
+        """Internal function for checking whether the given array is a general case or not for depth"""
+        out = isinstance(
+            data.layout,
+            (
+                ak.layout.IndexedArray64,
+                ak.layout.IndexedArray32,
+                ak.layout.IndexedArrayU32,
+                ak.layout.ByteMaskedArray,
+                ak.layout.BitMaskedArray,
+                ak.layout.UnmaskedArray,
+                ak.layout.IndexedOptionArray64,
+                ak.layout.IndexedOptionArray32,
+                ak.partition.PartitionedArray,
+                ak.layout.UnionArray8_32,
+                ak.layout.UnionArray8_U32,
+                ak.layout.UnionArray8_64,
+                ak.layout.Record,
+            ),
+        )
+        return out
 
     def _check_listoffset(self, data):
         """Internal function for checking whether the given array is a listoffset array or not"""
@@ -43,6 +95,10 @@ class AwkwardClusterSequence(ClusterSequence):
                 ak.layout.ListOffsetArray64,
                 ak.layout.ListOffsetArray32,
                 ak.layout.ListOffsetArrayU32,
+                ak.layout.ListArray64,
+                ak.layout.ListArray32,
+                ak.layout.ListArrayU32,
+                ak.layout.RegularArray,
             ),
         )
         return out
