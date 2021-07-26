@@ -57,6 +57,20 @@ class _classgeneralevent:
 
         return out
 
+    def _check_indexed(self, data):
+        out = isinstance(
+            data.layout,
+            (
+                ak.layout.IndexedArray64,
+                ak.layout.IndexedArray32,
+                ak.layout.IndexedArray32,
+                ak.layout.IndexedOptionArray64,
+                ak.layout.IndexedOptionArray32,
+            ),
+        )
+
+        return out
+
     def multi_layered_listoffset(self, data):
         if isinstance(data.layout, ak.layout.VirtualArray):
             self.multi_layered_listoffset(ak.Array(data.layout.array))
@@ -72,6 +86,26 @@ class _classgeneralevent:
                     and "E" in attributes
                 ):
                     self._clusterable_level = ak.Array(data.layout.content)
+            elif self._check_indexed(
+                ak.Array(ak.Array(data.layout.content).layout.content),
+            ):
+                if self._check_record(
+                    ak.Array(
+                        ak.Array(
+                            ak.Array(data.layout.content).layout.content
+                        ).layout.content
+                    ),
+                ):
+                    attributes = dir(data)
+                    if (
+                        "px" in attributes
+                        and "py" in attributes
+                        and "pz" in attributes
+                        and "E" in attributes
+                    ):
+                        self._clusterable_level = ak.Array(data.layout.content)
+                else:
+                    self.multi_layered_listoffset(ak.Array(data.layout.content))
             else:
                 self.multi_layered_listoffset(ak.Array(data.layout.content))
         else:
@@ -108,6 +142,43 @@ class _classgeneralevent:
                 ak.layout.RecordArray,
                 ak.layout.NumpyArray,
             ),
+        ):
+            attributes = dir(ak.Array(layout))
+            if (
+                "px" in attributes
+                and "py" in attributes
+                and "pz" in attributes
+                and "E" in attributes
+            ):
+                return self.out.layout
+
+        elif (
+            isinstance(
+                layout,
+                (
+                    ak.layout.ListOffsetArray64,
+                    ak.layout.ListOffsetArray32,
+                    ak.layout.ListOffsetArrayU32,
+                    ak.layout.RegularArray,
+                ),
+            )
+            and isinstance(
+                layout.content.content,
+                (
+                    ak.layout.RecordArray,
+                    ak.layout.NumpyArray,
+                ),
+            )
+            and isinstance(
+                layout.content,
+                (
+                    ak.layout.IndexedArray64,
+                    ak.layout.IndexedArray32,
+                    ak.layout.IndexedArray32,
+                    ak.layout.IndexedOptionArray64,
+                    ak.layout.IndexedOptionArray32,
+                ),
+            )
         ):
             attributes = dir(ak.Array(layout))
             if (
