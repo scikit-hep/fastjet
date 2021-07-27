@@ -44,6 +44,12 @@ jobs:
       #with:
         #path: wheelhouse/*.whl
 
+  test_sdist:
+    needs: [make_sdist]
+    runs-on: ubuntu-latest
+    steps:
+    - python -m pip install dist/*.tar.gz
+
   upload_all:
     needs: [make_sdist] #[build_wheels,
     runs-on: ubuntu-latest
