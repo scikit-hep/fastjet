@@ -48,7 +48,7 @@ jobs:
     needs: [make_sdist]
     runs-on: ubuntu-latest
     steps:
-    - uses : actions/upload-artifact@v2
+    - uses : actions/download-artifact@v2
       with:
         path: dist/*.tar.gz
     - name: test sdist
