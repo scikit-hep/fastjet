@@ -48,7 +48,11 @@ jobs:
     needs: [make_sdist]
     runs-on: ubuntu-latest
     steps:
-    - python -m pip install dist/*.tar.gz
+    - uses : actions/checkout@v2
+      with:
+        submodules: recursive
+    - name: test sdist
+      run: python -m pip install dist/*.tar.gz
 
   upload_all:
     needs: [make_sdist] #[build_wheels,
