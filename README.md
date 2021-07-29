@@ -95,3 +95,13 @@ The output can be extracted using function calls (output can be an Awkward Array
 ```python
 inclusive_jets = cluster.inclusive_jets()
 ```
+# Installation For Developers
+Clone this repository recursively to get the dependencies.
+Run the following command before building it :
+``` bash
+sudo apt-get update && sudo apt-get install -y libmpfr-dev libboost-dev
+```
+Then you can build it using the following command:
+``` bash
+pip install .[test]
+```
