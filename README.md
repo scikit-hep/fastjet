@@ -99,7 +99,7 @@ inclusive_jets = cluster.inclusive_jets()
 Clone this repository recursively to get the dependencies.
 
 ```
-git clone --recursive git@github.com:scikit-hep/fastjet.git
+git clone --recursive https://github.com/scikit-hep/fastjet.git
 ```
 
 ## Build dependencies
