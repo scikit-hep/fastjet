@@ -33,7 +33,7 @@
 
 Official FastJet bindings to Python and Awkward Array.
 
-Main features of Fastjet :
+Main features of Fastjet:
   * Contains Vectorized as well as Non-Vectorized interface for Fastjet.
   * Compiled against the complete Fastjet library in C++.
   * Has Awkward Array and Vector as dependency.
@@ -41,9 +41,9 @@ Main features of Fastjet :
   * Input data can be in any coordinate system.
 
 # Installation
-The package can be installed from pypi using the following command :
+The package can be installed from PyPI using the following command:
 ``` bash
-pip install fastjet
+python -m pip install fastjet
 ```
 # Overview
 
@@ -103,5 +103,5 @@ sudo apt-get update && sudo apt-get install -y libmpfr-dev libboost-dev
 ```
 Then you can build it using the following command:
 ``` bash
-pip install .[test]
+python -m pip install .[test]
 ```
