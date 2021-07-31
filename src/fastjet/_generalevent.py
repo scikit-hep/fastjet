@@ -8,7 +8,8 @@ class _classgeneralevent:
     def __init__(self, data, jetdef):
         self.jetdef = jetdef
         self.data = data
-        self.multi_layered_listoffset(self.data)
+        self._bread_list = []
+        self.multi_layered_listoffset(self.data, ())
         self._clusterable_level = ak.Array(
             self._clusterable_level.layout.toListOffsetArray64(True)
         )
@@ -71,9 +72,23 @@ class _classgeneralevent:
 
         return out
 
-    def multi_layered_listoffset(self, data):
+    def multi_layered_listoffset(self, data, crumb_list):
         if isinstance(data.layout, ak.layout.VirtualArray):
-            self.multi_layered_listoffset(ak.Array(data.layout.array))
+            crumb_list = crumb_list + (None,)
+            self.multi_layered_listoffset(ak.Array(data.layout.array), crumb_list)
+        elif isinstance(
+            data.layout,
+            (
+                ak.layout.UnionArray8_32,
+                ak.layout.UnionArray8_U32,
+                ak.layout.UnionArray8_64,
+            ),
+        ):
+            for i in range(len(data.layout.contents)):
+                temp_crumb = crumb_list + (i,)
+                self.multi_layered_listoffset(
+                    ak.Array(data.layout.contents[i]), temp_crumb
+                )
         elif self._check_listoffset_subtree(ak.Array(data.layout.content)):
             if self._check_record(
                 ak.Array(ak.Array(data.layout.content).layout.content),
@@ -85,6 +100,8 @@ class _classgeneralevent:
                     and "pz" in attributes
                     and "E" in attributes
                 ):
+                    crumb_list = crumb_list + (None,)
+                    self._bread_list.append(crumb_list)
                     self._clusterable_level = ak.Array(data.layout.content)
             elif self._check_indexed(
                 ak.Array(ak.Array(data.layout.content).layout.content),
@@ -103,13 +120,20 @@ class _classgeneralevent:
                         and "pz" in attributes
                         and "E" in attributes
                     ):
+                        crumb_list = crumb_list + (None,)
+                        self._bread_list.append(crumb_list)
                         self._clusterable_level = ak.Array(data.layout.content)
                 else:
-                    self.multi_layered_listoffset(ak.Array(data.layout.content))
+                    crumb_list = crumb_list + (None,)
+                    self.multi_layered_listoffset(
+                        ak.Array(data.layout.content), crumb_list
+                    )
             else:
-                self.multi_layered_listoffset(ak.Array(data.layout.content))
+                crumb_list = crumb_list + (None,)
+                self.multi_layered_listoffset(ak.Array(data.layout.content), crumb_list)
         else:
-            self.multi_layered_listoffset(ak.Array(data.layout.content))
+            crumb_list = crumb_list + (None,)
+            self.multi_layered_listoffset(ak.Array(data.layout.content), crumb_list)
 
     def correct_byteorder(self, data):
         if data.dtype.byteorder == "=":

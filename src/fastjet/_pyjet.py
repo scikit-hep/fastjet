@@ -37,6 +37,17 @@ class AwkwardClusterSequence(ClusterSequence):
         """Internal function for checking the jaggedness of awkward array"""
         if self._check_general_jaggedness(data) or self._check_listoffset(data):
             return 1 + self._check_jaggedness(ak.Array(data.layout.content))
+        if isinstance(
+            data.layout,
+            (
+                ak.layout.UnionArray8_32,
+                ak.layout.UnionArray8_U32,
+                ak.layout.UnionArray8_64,
+            ),
+        ):
+            return 1 + max(
+                [self._check_jaggedness(ak.Array(x)) for x in data.layout.contents]
+            )
         if isinstance(data.layout, ak.layout.VirtualArray):
             return 1 + self._check_jaggedness(ak.Array(data.layout.array))
         else:
@@ -79,9 +90,6 @@ class AwkwardClusterSequence(ClusterSequence):
                 ak.layout.IndexedOptionArray64,
                 ak.layout.IndexedOptionArray32,
                 ak.partition.PartitionedArray,
-                ak.layout.UnionArray8_32,
-                ak.layout.UnionArray8_U32,
-                ak.layout.UnionArray8_64,
                 ak.layout.Record,
             ),
         )
