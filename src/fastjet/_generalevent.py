@@ -157,13 +157,15 @@ class _classgeneralevent:
         off = np.insert(off, 0, 0)
         return px, py, pz, E, off
 
-    def _replace_multi(self, layout):
+    def _replace_multi(self):
         for i in range(len(self._clusterable_level)):
-            self._mod_data = ak.Array(self.replace(layout, i, 0))
-        return self._mod_data
+            self._mod_data = ak.Array(self.replace(self._mod_data.layout, i, 0))
+        return self._mod_data.layout
 
     def replace(self, layout, cluster, level):
-        if isinstance(
+        if level == len(self._bread_list[cluster]):
+            return self._out[cluster].layout
+        elif isinstance(
             layout,
             (
                 ak.layout.ListOffsetArray64,
@@ -350,26 +352,68 @@ class _classgeneralevent:
                 layout.at,
             )
         elif isinstance(layout, ak.layout.UnionArray8_32):
+            nextcontents = []
+            for i in range(len(layout.contents)):
+                if i == self._bread_list[cluster][level]:
+                    nextcontents.append(
+                        self.replace(
+                            layout.contents[self._bread_list[cluster][level]],
+                            cluster,
+                            level + 1,
+                        )
+                    )
+                else:
+                    nextcontents.append(
+                        layout.contents[i],
+                    )
             return ak.layout.UnionArray8_32(
                 layout.tags,
                 layout.index,
-                [self.replace(x, cluster, level + 1) for x in layout.contents],
+                nextcontents,
                 layout.identities,
                 layout.parameters,
             )
         elif isinstance(layout, ak.layout.UnionArray8_U32):
+            nextcontents = []
+            for i in range(len(layout.contents)):
+                if i == self._bread_list[cluster][level]:
+                    nextcontents.append(
+                        self.replace(
+                            layout.contents[self._bread_list[cluster][level]],
+                            cluster,
+                            level + 1,
+                        )
+                    )
+                else:
+                    nextcontents.append(
+                        layout.contents[i],
+                    )
             return ak.layout.UnionArray8_U32(
                 layout.tags,
                 layout.index,
-                [self.replace(x, cluster, level + 1) for x in layout.contents],
+                nextcontents,
                 layout.identities,
                 layout.parameters,
             )
         elif isinstance(layout, ak.layout.UnionArray8_64):
+            nextcontents = []
+            for i in range(len(layout.contents)):
+                if i == self._bread_list[cluster][level]:
+                    nextcontents.append(
+                        self.replace(
+                            layout.contents[self._bread_list[cluster][level]],
+                            cluster,
+                            level + 1,
+                        )
+                    )
+                else:
+                    nextcontents.append(
+                        layout.contents[i],
+                    )
             return ak.layout.UnionArray8_64(
                 layout.tags,
                 layout.index,
-                [self.replace(x, cluster, level + 1) for x in layout.contents],
+                nextcontents,
                 layout.identities,
                 layout.parameters,
             )
@@ -404,7 +448,7 @@ class _classgeneralevent:
                     )
                 )
             )
-        res = ak.Array(self._replace_multi(self._mod_data.layout))
+        res = ak.Array(self._replace_multi())
         return res
 
     def constituent_index(self, min_pt):
@@ -423,5 +467,5 @@ class _classgeneralevent:
                     ak.layout.ListOffsetArray64(ak.layout.Index64(off), out.layout)
                 )
             )
-        res = ak.Array(self._replace_multi(self.data.layout))
+        res = ak.Array(self._replace_multi())
         return res
