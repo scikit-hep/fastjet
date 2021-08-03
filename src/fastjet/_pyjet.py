@@ -25,7 +25,11 @@ class AwkwardClusterSequence(ClusterSequence):
             self._internalrep = fastjet._singleevent._classsingleevent(
                 data, self._jetdef
             )
-        if self._jagedness >= 2 or self._check_general(data):
+        if (
+            self._jagedness >= 2
+            or self._check_general(data)
+            or isinstance(data.layout, ak.partition.IrregularlyPartitionedArray)
+        ):
             self._internalrep = fastjet._generalevent._classgeneralevent(data, jetdef)
 
     # else:
@@ -48,6 +52,13 @@ class AwkwardClusterSequence(ClusterSequence):
             return 1 + max(
                 [self._check_jaggedness(ak.Array(x)) for x in data.layout.contents]
             )
+        if isinstance(
+            data.layout,
+            (ak.partition.IrregularlyPartitionedArray),
+        ):
+            return 1 + max(
+                [self._check_jaggedness(ak.Array(x)) for x in data.layout.partitions]
+            )
         if isinstance(data.layout, ak.layout.VirtualArray):
             return 1 + self._check_jaggedness(ak.Array(data.layout.array))
         else:
@@ -67,7 +78,6 @@ class AwkwardClusterSequence(ClusterSequence):
                 ak.layout.IndexedOptionArray64,
                 ak.layout.IndexedOptionArray32,
                 ak.layout.VirtualArray,
-                ak.partition.PartitionedArray,
                 ak.layout.UnionArray8_32,
                 ak.layout.UnionArray8_U32,
                 ak.layout.UnionArray8_64,
@@ -89,7 +99,6 @@ class AwkwardClusterSequence(ClusterSequence):
                 ak.layout.UnmaskedArray,
                 ak.layout.IndexedOptionArray64,
                 ak.layout.IndexedOptionArray32,
-                ak.partition.PartitionedArray,
                 ak.layout.Record,
             ),
         )

@@ -95,6 +95,15 @@ class _classgeneralevent:
                 self.multi_layered_listoffset(
                     ak.Array(data.layout.contents[i]), temp_crumb
                 )
+        elif isinstance(
+            data.layout,
+            (ak.partition.IrregularlyPartitionedArray,),
+        ):
+            for i in range(len(data.layout.partitions)):
+                temp_crumb = crumb_list + (i,)
+                self.multi_layered_listoffset(
+                    ak.Array(data.layout.partitions[i]), temp_crumb
+                )
         elif self._check_listoffset_subtree(ak.Array(data.layout.content)):
             if self._check_record(
                 ak.Array(ak.Array(data.layout.content).layout.content),
@@ -421,9 +430,21 @@ class _classgeneralevent:
             return self.replace(layout.array, cluster, level + 1)
 
         if isinstance(layout, ak.partition.PartitionedArray):
-            return ak.partition.IrregularlyPartitionedArray(
-                [self.replace(x, cluster, level + 1) for x in layout.partitions]
-            )
+            nextcontents = []
+            for i in range(len(layout.partitions)):
+                if i == self._bread_list[cluster][level]:
+                    nextcontents.append(
+                        self.replace(
+                            layout.partitions[self._bread_list[cluster][level]],
+                            cluster,
+                            level + 1,
+                        )
+                    )
+                else:
+                    nextcontents.append(
+                        layout.partitions[i],
+                    )
+            return ak.partition.IrregularlyPartitionedArray(nextcontents)
         else:
             raise AssertionError(layout)
 
