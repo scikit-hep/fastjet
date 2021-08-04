@@ -63,7 +63,6 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
             args = [
                 f"--prefix={OUTPUT}",
                 "--enable-allplugins",
-                "--disable-shared",
                 "--enable-cgal-header-only",
                 f"--with-cgaldir={cgal_dir}",
                 "--enable-swig",
