@@ -65,7 +65,8 @@ class _classmultievent:
                     ),
                     ("px", "py", "pz", "E"),
                 ),
-            )
+            ),
+            behavior=self.data.behavior,
         )
         return out
 

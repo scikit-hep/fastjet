@@ -466,7 +466,8 @@ class _classgeneralevent:
                             ),
                             ("px", "py", "pz", "E"),
                         ),
-                    )
+                    ),
+                    behavior=self.data.behavior,
                 )
             )
         res = ak.Array(self._replace_multi())
@@ -481,7 +482,8 @@ class _classgeneralevent:
                 ak.layout.ListOffsetArray64(
                     ak.layout.Index64(np_results[0]),
                     ak.layout.NumpyArray(np_results[1]),
-                )
+                ),
+                behavior=self.data.behavior,
             )
             self._out.append(
                 ak.Array(
