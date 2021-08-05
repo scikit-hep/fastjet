@@ -66,7 +66,8 @@ class _classsingleevent:
                     ak.layout.NumpyArray(np_results[3]),
                 ),
                 ("px", "py", "pz", "E"),
-            )
+            ),
+            behavior=self.data.behavior,
         )
         return out
 
@@ -81,7 +82,8 @@ class _classsingleevent:
                     ak.layout.NumpyArray(np_results[3]),
                 ),
                 ("px", "py", "pz", "E"),
-            )
+            ),
+            behavior=self.data.behavior,
         )
         return out
 
@@ -104,7 +106,8 @@ class _classsingleevent:
                     ak.layout.NumpyArray(np_results[3]),
                 ),
                 ("px", "py", "pz", "E"),
-            )
+            ),
+            behavior=self.data.behavior,
         )
         return out
 
@@ -119,7 +122,8 @@ class _classsingleevent:
                     ak.layout.NumpyArray(np_results[3]),
                 ),
                 ("px", "py", "pz", "E"),
-            )
+            ),
+            behavior=self.data.behavior,
         )
         return out
 
@@ -134,7 +138,8 @@ class _classsingleevent:
                     ak.layout.NumpyArray(np_results[3]),
                 ],
                 ["px", "py", "pz", "E"],
-            )
+            ),
+            behavior=self.data.behavior,
         )
         return out
 
@@ -238,7 +243,8 @@ class _classsingleevent:
                     ak.layout.NumpyArray(np_results[3]),
                 ],
                 ["px", "py", "pz", "E"],
-            )
+            ),
+            behavior=self.data.behavior,
         )
         return out
 
@@ -260,7 +266,8 @@ class _classsingleevent:
                     ak.layout.NumpyArray(np_results[3]),
                 ],
                 ["px", "py", "pz", "E"],
-            )
+            ),
+            behavior=self.data.behavior,
         )
         return out
 
@@ -365,7 +372,8 @@ class _classsingleevent:
                     ak.layout.NumpyArray(np_results[3]),
                 ),
                 ("px", "py", "pz", "E"),
-            )
+            ),
+            behavior=self.data.behavior,
         )
         return out
 
@@ -380,7 +388,8 @@ class _classsingleevent:
                     ak.layout.NumpyArray(np_results[3]),
                 ),
                 ("px", "py", "pz", "E"),
-            )
+            ),
+            behavior=self.data.behavior,
         )
         return out
 
@@ -402,7 +411,8 @@ class _classsingleevent:
                     ak.layout.NumpyArray(np_results[3]),
                 ),
                 ("px", "py", "pz", "E"),
-            )
+            ),
+            behavior=self.data.behavior,
         )
         return out
 
@@ -424,6 +434,7 @@ class _classsingleevent:
                     ak.layout.NumpyArray(np_results[3]),
                 ),
                 ("px", "py", "pz", "E"),
-            )
+            ),
+            behavior=self.data.behavior,
         )
         return out

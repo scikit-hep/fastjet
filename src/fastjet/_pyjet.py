@@ -19,13 +19,17 @@ class AwkwardClusterSequence(ClusterSequence):
             raise TypeError("JetDefinition is not of valid type")
         self._jetdef = jetdef
         self._jagedness = self._check_jaggedness(data)
-        if self._check_listoffset(data) and self._jagedness == 1:
+        if self._check_listoffset(data) and self._jagedness == 2:
             self._internalrep = fastjet._multievent._classmultievent(data, self._jetdef)
-        if self._jagedness == 0 and isinstance(data.layout, ak.layout.RecordArray):
+        if self._jagedness == 1 and isinstance(data.layout, ak.layout.RecordArray):
             self._internalrep = fastjet._singleevent._classsingleevent(
                 data, self._jetdef
             )
-        if self._jagedness >= 2 or self._check_general(data):
+        if (
+            self._jagedness >= 3
+            or self._check_general(data)
+            or isinstance(data.layout, ak.partition.IrregularlyPartitionedArray)
+        ):
             self._internalrep = fastjet._generalevent._classgeneralevent(data, jetdef)
 
     # else:
@@ -37,6 +41,31 @@ class AwkwardClusterSequence(ClusterSequence):
         """Internal function for checking the jaggedness of awkward array"""
         if self._check_general_jaggedness(data) or self._check_listoffset(data):
             return 1 + self._check_jaggedness(ak.Array(data.layout.content))
+        if isinstance(
+            data.layout,
+            (
+                ak.layout.UnionArray8_32,
+                ak.layout.UnionArray8_U32,
+                ak.layout.UnionArray8_64,
+            ),
+        ):
+            return 1 + max(
+                [self._check_jaggedness(ak.Array(x)) for x in data.layout.contents]
+            )
+        if isinstance(
+            data.layout,
+            (ak.layout.RecordArray,),
+        ):
+            return 1 + max(
+                [self._check_jaggedness(ak.Array(x)) for x in data.layout.contents]
+            )
+        if isinstance(
+            data.layout,
+            (ak.partition.IrregularlyPartitionedArray),
+        ):
+            return 1 + max(
+                [self._check_jaggedness(ak.Array(x)) for x in data.layout.partitions]
+            )
         if isinstance(data.layout, ak.layout.VirtualArray):
             return 1 + self._check_jaggedness(ak.Array(data.layout.array))
         else:
@@ -56,7 +85,6 @@ class AwkwardClusterSequence(ClusterSequence):
                 ak.layout.IndexedOptionArray64,
                 ak.layout.IndexedOptionArray32,
                 ak.layout.VirtualArray,
-                ak.partition.PartitionedArray,
                 ak.layout.UnionArray8_32,
                 ak.layout.UnionArray8_U32,
                 ak.layout.UnionArray8_64,
@@ -78,10 +106,6 @@ class AwkwardClusterSequence(ClusterSequence):
                 ak.layout.UnmaskedArray,
                 ak.layout.IndexedOptionArray64,
                 ak.layout.IndexedOptionArray32,
-                ak.partition.PartitionedArray,
-                ak.layout.UnionArray8_32,
-                ak.layout.UnionArray8_U32,
-                ak.layout.UnionArray8_64,
                 ak.layout.Record,
             ),
         )
