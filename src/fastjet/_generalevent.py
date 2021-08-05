@@ -92,6 +92,9 @@ class _classgeneralevent:
         ):
             for i in range(len(data.layout.contents)):
                 temp_crumb = crumb_list + (i,)
+                if self._check_subtree(ak.Array(data.layout.contents[i])):
+                    self._bread_list.append(crumb_list)
+                    return
                 self.multi_layered_listoffset(
                     ak.Array(data.layout.contents[i]), temp_crumb
                 )
@@ -114,6 +117,9 @@ class _classgeneralevent:
         ):
             for i in range(len(data.layout.partitions)):
                 temp_crumb = crumb_list + (i,)
+                if self._check_subtree(ak.Array(data.layout.partitions[i])):
+                    self._bread_list.append(crumb_list)
+                    return
                 self.multi_layered_listoffset(
                     ak.Array(data.layout.partitions[i]), temp_crumb
                 )
