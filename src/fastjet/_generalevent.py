@@ -97,6 +97,15 @@ class _classgeneralevent:
                 )
         elif isinstance(
             data.layout,
+            (ak.layout.RecordArray,),
+        ):
+            for elem in data.layout.recordlookup:
+                temp_crumb = crumb_list + (elem,)
+                self.multi_layered_listoffset(
+                    ak.Array(data.layout.field(elem)), temp_crumb
+                )
+        elif isinstance(
+            data.layout,
             (ak.partition.IrregularlyPartitionedArray,),
         ):
             for i in range(len(data.layout.partitions)):
@@ -348,6 +357,20 @@ class _classgeneralevent:
                 layout.parameters,
             )
         elif isinstance(layout, ak.layout.RecordArray):
+            nextcontents = []
+            for elem in layout.recordlookup:
+                if elem == self._bread_list[cluster][level]:
+                    nextcontents.append(
+                        self.replace(
+                            layout.field(self._bread_list[cluster][level]),
+                            cluster,
+                            level + 1,
+                        )
+                    )
+                else:
+                    nextcontents.append(
+                        layout.field(elem),
+                    )
             return ak.layout.RecordArray(
                 [self.replace(x, cluster, level + 1) for x in layout.contents],
                 layout.recordlookup,

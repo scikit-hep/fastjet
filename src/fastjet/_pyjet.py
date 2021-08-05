@@ -19,14 +19,14 @@ class AwkwardClusterSequence(ClusterSequence):
             raise TypeError("JetDefinition is not of valid type")
         self._jetdef = jetdef
         self._jagedness = self._check_jaggedness(data)
-        if self._check_listoffset(data) and self._jagedness == 1:
+        if self._check_listoffset(data) and self._jagedness == 2:
             self._internalrep = fastjet._multievent._classmultievent(data, self._jetdef)
-        if self._jagedness == 0 and isinstance(data.layout, ak.layout.RecordArray):
+        if self._jagedness == 1 and isinstance(data.layout, ak.layout.RecordArray):
             self._internalrep = fastjet._singleevent._classsingleevent(
                 data, self._jetdef
             )
         if (
-            self._jagedness >= 2
+            self._jagedness >= 3
             or self._check_general(data)
             or isinstance(data.layout, ak.partition.IrregularlyPartitionedArray)
         ):
@@ -48,6 +48,13 @@ class AwkwardClusterSequence(ClusterSequence):
                 ak.layout.UnionArray8_U32,
                 ak.layout.UnionArray8_64,
             ),
+        ):
+            return 1 + max(
+                [self._check_jaggedness(ak.Array(x)) for x in data.layout.contents]
+            )
+        if isinstance(
+            data.layout,
+            (ak.layout.RecordArray,),
         ):
             return 1 + max(
                 [self._check_jaggedness(ak.Array(x)) for x in data.layout.contents]
