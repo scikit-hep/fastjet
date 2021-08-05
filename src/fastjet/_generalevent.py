@@ -101,9 +101,13 @@ class _classgeneralevent:
         ):
             for elem in data.layout.recordlookup:
                 temp_crumb = crumb_list + (elem,)
+                if self._check_subtree(ak.Array(data.layout.field(elem))):
+                    self._bread_list.append(crumb_list)
+                    return
                 self.multi_layered_listoffset(
                     ak.Array(data.layout.field(elem)), temp_crumb
                 )
+            return
         elif isinstance(
             data.layout,
             (ak.partition.IrregularlyPartitionedArray,),
@@ -165,6 +169,40 @@ class _classgeneralevent:
         else:
             data = data.dtype.newbyteorder("=")
         return data
+
+    def _check_subtree(self, data):
+        if self._check_listoffset_subtree(ak.Array(data.layout)):
+            if self._check_record(
+                ak.Array(ak.Array(data.layout.content)),
+            ):
+                attributes = dir(data)
+                if (
+                    "px" in attributes
+                    and "py" in attributes
+                    and "pz" in attributes
+                    and "E" in attributes
+                ):
+                    self._clusterable_level.append(data)
+                    return True
+            elif self._check_indexed(
+                ak.Array(data.layout.content),
+            ):
+                if self._check_record(
+                    ak.Array(ak.Array(data.layout.content).layout.content)
+                ):
+                    attributes = dir(data)
+                    if (
+                        "px" in attributes
+                        and "py" in attributes
+                        and "pz" in attributes
+                        and "E" in attributes
+                    ):
+                        self._clusterable_level.append(data)
+                        return True
+            else:
+                return False
+        else:
+            return False
 
     def extract_cons(self, array):
         px = np.asarray(ak.Array(array.layout.content, behavior=array.behavior).px)
@@ -372,7 +410,7 @@ class _classgeneralevent:
                         layout.field(elem),
                     )
             return ak.layout.RecordArray(
-                [self.replace(x, cluster, level + 1) for x in layout.contents],
+                nextcontents,
                 layout.recordlookup,
                 len(layout),
                 layout.identities,
