@@ -17,6 +17,7 @@ jobs:
     - uses: actions/checkout@v2
       with:
         submodules: recursive
+
     - uses: actions/setup-python@v2
     - uses: pre-commit/action@v2.0.3
       with:
@@ -50,7 +51,7 @@ jobs:
 
     - name: Install extra deps on Linux
       if: runner.os == 'Linux'
-      run: sudo apt-get update && sudo apt-get install -y libmpfr-dev libboost-dev
+      run: sudo apt-get update && sudo apt-get install -y libboost-dev gfortran swig autoconf libtool
 
     #- name: Install dependency
     #  run: python -m pip install awkward
@@ -69,11 +70,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
       with:
         submodules: recursive
 
-    - uses: pypa/cibuildwheel@v2.0.0a4
+    - uses: pypa/cibuildwheel@v2.0.1
       env:
         CIBW_BUILD: cp39-manylinux_x86_64
 

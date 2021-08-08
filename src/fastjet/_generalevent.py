@@ -12,6 +12,7 @@ class _classgeneralevent:
         self._bread_list = []
         self._clusterable_level = []
         self._results = []
+
         self._input_mapping = []
         self.multi_layered_listoffset(self.data, ())
         for i in range(len(self._clusterable_level)):
@@ -78,6 +79,7 @@ class _classgeneralevent:
         )
 
         return out
+
 
     def multi_layered_listoffset_input(self, data, crumb_list):
         if isinstance(data.layout, ak.layout.VirtualArray):
@@ -297,6 +299,7 @@ class _classgeneralevent:
                 return False
         else:
             return False
+
 
     def extract_cons(self, array):
         px = np.asarray(ak.Array(array.layout.content, behavior=array.behavior).px)
