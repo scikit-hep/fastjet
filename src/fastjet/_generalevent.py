@@ -80,7 +80,6 @@ class _classgeneralevent:
 
         return out
 
-
     def multi_layered_listoffset_input(self, data, crumb_list):
         if isinstance(data.layout, ak.layout.VirtualArray):
             crumb_list = crumb_list + (None,)
@@ -299,7 +298,6 @@ class _classgeneralevent:
                 return False
         else:
             return False
-
 
     def extract_cons(self, array):
         px = np.asarray(ak.Array(array.layout.content, behavior=array.behavior).px)
