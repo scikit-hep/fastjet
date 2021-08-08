@@ -675,6 +675,7 @@ class _classgeneralevent:
                     self._input_mapping.append(j)
             if idx == -1:
                 continue
+            assert len(self._cluster_inputs[i]) == len(self._clusterable_level[idx])
             np_results = self._results[idx].to_numpy_get_parents(px, py, pz, E)
             self._out.append(
                 ak.Array(
