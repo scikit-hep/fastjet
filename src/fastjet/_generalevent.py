@@ -12,6 +12,7 @@ class _classgeneralevent:
         self._bread_list = []
         self._clusterable_level = []
         self._results = []
+        self._input_mapping = []
         self.multi_layered_listoffset(self.data, ())
         for i in range(len(self._clusterable_level)):
             self._clusterable_level[i] = ak.Array(
@@ -77,6 +78,75 @@ class _classgeneralevent:
         )
 
         return out
+
+    def multi_layered_listoffset_input(self, data, crumb_list):
+        if isinstance(data.layout, ak.layout.VirtualArray):
+            crumb_list = crumb_list + (None,)
+            self.multi_layered_listoffset(ak.Array(data.layout.array), crumb_list)
+        elif isinstance(
+            data.layout,
+            (
+                ak.layout.UnionArray8_32,
+                ak.layout.UnionArray8_U32,
+                ak.layout.UnionArray8_64,
+            ),
+        ):
+            for i in range(len(data.layout.contents)):
+                temp_crumb = crumb_list + (i,)
+                if self._check_subtree_input(ak.Array(data.layout.contents[i])):
+                    self._bread_list_input.append(crumb_list)
+                    return
+                self.multi_layered_listoffset_input(
+                    ak.Array(data.layout.contents[i]), temp_crumb
+                )
+        elif isinstance(
+            data.layout,
+            (ak.layout.RecordArray,),
+        ):
+            for elem in data.layout.recordlookup:
+                temp_crumb = crumb_list + (elem,)
+                if self._check_subtree_input(ak.Array(data.layout.field(elem))):
+                    self._bread_list_input.append(crumb_list)
+                    return
+                self.multi_layered_listoffset_input(
+                    ak.Array(data.layout.field(elem)), temp_crumb
+                )
+            return
+        elif isinstance(
+            data.layout,
+            (ak.partition.IrregularlyPartitionedArray,),
+        ):
+            for i in range(len(data.layout.partitions)):
+                temp_crumb = crumb_list + (i,)
+                if self._check_subtree_input(ak.Array(data.layout.partitions[i])):
+                    self._bread_list_input.append(crumb_list)
+                    return
+                self.multi_layered_listoffset_input(
+                    ak.Array(data.layout.partitions[i]), temp_crumb
+                )
+        elif self._check_record(
+            ak.Array(data.layout.content),
+        ):
+            attributes = dir(data)
+            if (
+                "px" in attributes
+                and "py" in attributes
+                and "pz" in attributes
+                and "E" in attributes
+            ):
+                crumb_list = crumb_list + (None,)
+                self._bread_list_input.append(crumb_list)
+                self._cluster_inputs.append(ak.Array(data.layout.content))
+            else:
+                crumb_list = crumb_list + (None,)
+                self.multi_layered_listoffset_input(
+                    ak.Array(data.layout.content), crumb_list
+                )
+        else:
+            crumb_list = crumb_list + (None,)
+            self.multi_layered_listoffset_input(
+                ak.Array(data.layout.content), crumb_list
+            )
 
     def multi_layered_listoffset(self, data, crumb_list):
         if isinstance(data.layout, ak.layout.VirtualArray):
@@ -210,6 +280,24 @@ class _classgeneralevent:
         else:
             return False
 
+    def _check_subtree_input(self, data):
+        if self._check_record(
+            data,
+        ):
+            attributes = dir(data)
+            if (
+                "px" in attributes
+                and "py" in attributes
+                and "pz" in attributes
+                and "E" in attributes
+            ):
+                self._cluster_inputs.append(data)
+                return True
+            else:
+                return False
+        else:
+            return False
+
     def extract_cons(self, array):
         px = np.asarray(ak.Array(array.layout.content, behavior=array.behavior).px)
         py = np.asarray(ak.Array(array.layout.content, behavior=array.behavior).py)
@@ -220,8 +308,14 @@ class _classgeneralevent:
         return px, py, pz, E, off
 
     def _replace_multi(self):
-        for i in range(len(self._clusterable_level)):
-            self._mod_data = ak.Array(self.replace(self._mod_data.layout, i, 0))
+        if len(self._input_mapping) == 0:
+            for i in range(len(self._clusterable_level)):
+                self._mod_data = ak.Array(self.replace(self._mod_data.layout, i, 0))
+        else:
+            for i in range(len(self._input_mapping)):
+                self._mod_data = ak.Array(
+                    self.replace(self._mod_data.layout, self._input_mapping[i], 0)
+                )
         return self._mod_data.layout
 
     def replace(self, layout, cluster, level):
@@ -555,6 +649,47 @@ class _classgeneralevent:
             self._out.append(
                 ak.Array(
                     ak.layout.ListOffsetArray64(ak.layout.Index64(off), out.layout)
+                )
+            )
+        res = ak.Array(self._replace_multi())
+        return res
+
+    def get_parents(self, data_inp):
+        self._cluster_inputs = []
+        self._bread_list_input = []
+        self._input_mapping = []
+        self._out = []
+        self.multi_layered_listoffset_input(data_inp, ())
+        if len(self._cluster_inputs) == 0:
+            raise TypeError("The Awkward Array is not valid")
+        for i in range(len(self._cluster_inputs)):
+            px = self._cluster_inputs[i].px
+            py = self._cluster_inputs[i].py
+            pz = self._cluster_inputs[i].pz
+            E = self._cluster_inputs[i].E
+            idx = -1
+            for j in range(len(self._bread_list)):
+                if self._bread_list[j] == self._bread_list_input[i]:
+                    idx = j
+                    self._input_mapping.append(j)
+            if idx == -1:
+                continue
+            np_results = self._results[idx].to_numpy_get_parents(px, py, pz, E)
+            self._out.append(
+                ak.Array(
+                    ak.layout.ListOffsetArray64(
+                        ak.layout.Index64(np_results[-1]),
+                        ak.layout.RecordArray(
+                            (
+                                ak.layout.NumpyArray(np_results[0]),
+                                ak.layout.NumpyArray(np_results[1]),
+                                ak.layout.NumpyArray(np_results[2]),
+                                ak.layout.NumpyArray(np_results[3]),
+                            ),
+                            ("px", "py", "pz", "E"),
+                        ),
+                    ),
+                    behavior=self.data.behavior,
                 )
             )
         res = ak.Array(self._replace_multi())
