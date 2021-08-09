@@ -312,76 +312,18 @@ class _classgeneralevent:
         if len(self._input_mapping) == 0:
             for i in range(len(self._clusterable_level)):
                 self._mod_data = ak.Array(self.replace(self._mod_data.layout, i, 0))
+            return self._mod_data
         else:
             for i in range(len(self._input_mapping)):
-                self._mod_data = ak.Array(
-                    self.replace(self._mod_data.layout, self._input_mapping[i], 0)
+                self._mod_data_input = ak.Array(
+                    self.replace(self._mod_data_input.layout, self._input_mapping[i], 0)
                 )
-        return self._mod_data.layout
+            return self._mod_data_input.layout
 
     def replace(self, layout, cluster, level):
         if level == len(self._bread_list[cluster]):
             return self._out[cluster].layout
-        elif isinstance(
-            layout,
-            (
-                ak.layout.ListOffsetArray64,
-                ak.layout.ListOffsetArray32,
-                ak.layout.ListOffsetArrayU32,
-                ak.layout.RegularArray,
-            ),
-        ) and isinstance(
-            layout.content,
-            (
-                ak.layout.RecordArray,
-                ak.layout.NumpyArray,
-            ),
-        ):
-            attributes = dir(ak.Array(layout))
-            if (
-                "px" in attributes
-                and "py" in attributes
-                and "pz" in attributes
-                and "E" in attributes
-            ):
-                return self._out[cluster].layout
 
-        elif (
-            isinstance(
-                layout,
-                (
-                    ak.layout.ListOffsetArray64,
-                    ak.layout.ListOffsetArray32,
-                    ak.layout.ListOffsetArrayU32,
-                    ak.layout.RegularArray,
-                ),
-            )
-            and isinstance(
-                layout.content.content,
-                (
-                    ak.layout.RecordArray,
-                    ak.layout.NumpyArray,
-                ),
-            )
-            and isinstance(
-                layout.content,
-                (
-                    ak.layout.IndexedArray64,
-                    ak.layout.IndexedArray32,
-                    ak.layout.IndexedArray32,
-                    ak.layout.IndexedOptionArray64,
-                    ak.layout.IndexedOptionArray32,
-                ),
-            )
-        ):
-            attributes = dir(ak.Array(layout))
-            if (
-                "px" in attributes
-                and "py" in attributes
-                and "pz" in attributes
-                and "E" in attributes
-            ):
-                return self._out[cluster].layout
         elif self._check_listoffset(ak.Array(layout)):
             if isinstance(layout, ak.layout.ListOffsetArray64):
                 return ak.layout.ListOffsetArray64(
@@ -612,6 +554,7 @@ class _classgeneralevent:
 
     def inclusive_jets(self, min_pt):
         self._out = []
+        self._input_flag = 0
         for i in range(len(self._clusterable_level)):
             np_results = self._results[i].to_numpy(min_pt)
             of = np.insert(np_results[-1], len(np_results[-1]), len(np_results[0]))
@@ -635,8 +578,35 @@ class _classgeneralevent:
         res = ak.Array(self._replace_multi())
         return res
 
+    def unclustered_particles(self):
+        self._out = []
+        self._input_flag = 0
+        for i in range(len(self._clusterable_level)):
+            np_results = self._results[i].to_numpy_unclustered_particles()
+            of = np.insert(np_results[-1], len(np_results[-1]), len(np_results[0]))
+            self._out.append(
+                ak.Array(
+                    ak.layout.ListOffsetArray64(
+                        ak.layout.Index64(of),
+                        ak.layout.RecordArray(
+                            (
+                                ak.layout.NumpyArray(np_results[0]),
+                                ak.layout.NumpyArray(np_results[1]),
+                                ak.layout.NumpyArray(np_results[2]),
+                                ak.layout.NumpyArray(np_results[3]),
+                            ),
+                            ("px", "py", "pz", "E"),
+                        ),
+                    ),
+                    behavior=self.data.behavior,
+                )
+            )
+        res = ak.Array(self._replace_multi())
+        return res
+
     def constituent_index(self, min_pt):
         self._out = []
+        self._input_flag = 0
         for i in range(len(self._clusterable_level)):
             np_results = self._results[i].to_numpy_with_constituents(min_pt)
             off = np.insert(np_results[-1], 0, 0)
@@ -655,11 +625,49 @@ class _classgeneralevent:
         res = ak.Array(self._replace_multi())
         return res
 
+    def exclusive_jets(self, n_jets, dcut):
+        self._out = []
+        self._input_flag = 0
+        for i in range(len(self._clusterable_level)):
+            of = 0
+            np_results = 0
+            if n_jets == 0:
+                raise ValueError("Njets cannot be 0")
+            if dcut == -1 and n_jets != -1:
+                np_results = self._results[i].to_numpy_exclusive_njet(n_jets)
+                of = np.insert(np_results[-1], len(np_results[-1]), len(np_results[0]))
+            if n_jets == -1 and dcut != -1:
+                np_results = self._results[i].to_numpy_exclusive_dcut(dcut)
+                of = np.insert(np_results[-1], len(np_results[-1]), len(np_results[0]))
+            if np_results == 0 and of == 0:
+                raise ValueError("Either NJets or Dcut sould be entered")
+            self._out.append(
+                ak.Array(
+                    ak.layout.ListOffsetArray64(
+                        ak.layout.Index64(of),
+                        ak.layout.RecordArray(
+                            (
+                                ak.layout.NumpyArray(np_results[0]),
+                                ak.layout.NumpyArray(np_results[1]),
+                                ak.layout.NumpyArray(np_results[2]),
+                                ak.layout.NumpyArray(np_results[3]),
+                            ),
+                            ("px", "py", "pz", "E"),
+                        ),
+                    ),
+                    behavior=self.data.behavior,
+                )
+            )
+        res = ak.Array(self._replace_multi())
+        return res
+
     def get_parents(self, data_inp):
         self._cluster_inputs = []
         self._bread_list_input = []
         self._input_mapping = []
         self._out = []
+        self._mod_data_input = data_inp
+        self._input_flag = 1
         self.multi_layered_listoffset_input(data_inp, ())
         if len(self._cluster_inputs) == 0:
             raise TypeError("The Awkward Array is not valid")
@@ -694,5 +702,6 @@ class _classgeneralevent:
                     behavior=self.data.behavior,
                 )
             )
+
         res = ak.Array(self._replace_multi())
         return res
