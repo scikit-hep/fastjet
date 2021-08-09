@@ -309,6 +309,7 @@ class _classgeneralevent:
         return px, py, pz, E, off
 
     def _replace_multi(self):
+        self._mod_data = self.data
         if len(self._input_mapping) == 0:
             for i in range(len(self._clusterable_level)):
                 self._mod_data = ak.Array(self.replace(self._mod_data.layout, i, 0))
@@ -656,6 +657,48 @@ class _classgeneralevent:
                         ),
                     ),
                     behavior=self.data.behavior,
+                )
+            )
+        res = ak.Array(self._replace_multi())
+        return res
+
+    def exclusive_jets_ycut(self, ycut):
+        self._out = []
+        self._input_flag = 0
+        for i in range(len(self._clusterable_level)):
+            np_results = self._results[i].to_numpy_exclusive_ycut(ycut)
+            of = np.insert(np_results[-1], len(np_results[-1]), len(np_results[0]))
+            self._out.append(
+                ak.Array(
+                    ak.layout.ListOffsetArray64(
+                        ak.layout.Index64(of),
+                        ak.layout.RecordArray(
+                            (
+                                ak.layout.NumpyArray(np_results[0]),
+                                ak.layout.NumpyArray(np_results[1]),
+                                ak.layout.NumpyArray(np_results[2]),
+                                ak.layout.NumpyArray(np_results[3]),
+                            ),
+                            ("px", "py", "pz", "E"),
+                        ),
+                    ),
+                    behavior=self.data.behavior,
+                )
+            )
+        res = ak.Array(self._replace_multi())
+        return res
+
+    def unique_history_order(self):
+        self._out = []
+        self._input_flag = 0
+        for i in range(len(self._clusterable_level)):
+            np_results = self._results[i].to_numpy_unique_history_order()
+            off = np.insert(np_results[-1], 0, 0)
+            self._out.append(
+                ak.Array(
+                    ak.layout.ListOffsetArray64(
+                        ak.layout.Index64(off), ak.layout.NumpyArray(np_results[0])
+                    )
                 )
             )
         res = ak.Array(self._replace_multi())
