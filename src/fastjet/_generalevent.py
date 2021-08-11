@@ -312,10 +312,12 @@ class _classgeneralevent:
         self._mod_data = self.data
         if len(self._input_mapping) == 0:
             for i in range(len(self._clusterable_level)):
+                self._cur_idx = i
                 self._mod_data = ak.Array(self.replace(self._mod_data.layout, i, 0))
             return self._mod_data
         else:
             for i in range(len(self._input_mapping)):
+                self._cur_idx = i
                 self._mod_data_input = ak.Array(
                     self.replace(self._mod_data_input.layout, self._input_mapping[i], 0)
                 )
@@ -323,7 +325,7 @@ class _classgeneralevent:
 
     def replace(self, layout, cluster, level):
         if level == len(self._bread_list[cluster]):
-            return self._out[cluster].layout
+            return self._out[self._cur_idx].layout
 
         elif self._check_listoffset(ak.Array(layout)):
             if isinstance(layout, ak.layout.ListOffsetArray64):
