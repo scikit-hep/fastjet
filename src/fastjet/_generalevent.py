@@ -310,7 +310,7 @@ class _classgeneralevent:
 
     def _replace_multi(self):
         self._mod_data = self.data
-        if len(self._input_mapping) == 0:
+        if self._input_flag == 0:
             for i in range(len(self._clusterable_level)):
                 self._cur_idx = i
                 self._mod_data = ak.Array(self.replace(self._mod_data.layout, i, 0))
