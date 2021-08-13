@@ -804,3 +804,35 @@ class _classgeneralevent:
 
         res = ak.Array(self._replace_multi())
         return res
+
+    def exclusive_subdmerge(self, data_inp, nsub):
+        self._cluster_inputs = []
+        self._bread_list_input = []
+        self._input_mapping = []
+        self._out = []
+        self._mod_data_input = data_inp
+        self._input_flag = 1
+        self.multi_layered_listoffset_input(data_inp, ())
+        if len(self._cluster_inputs) == 0:
+            raise TypeError("The Awkward Array is not valid")
+        for i in range(len(self._cluster_inputs)):
+
+            px = self._cluster_inputs[i].px
+            py = self._cluster_inputs[i].py
+            pz = self._cluster_inputs[i].pz
+            E = self._cluster_inputs[i].E
+            idx = -1
+            for j in range(len(self._bread_list)):
+                if self._bread_list[j] == self._bread_list_input[i]:
+                    idx = j
+                    self._input_mapping.append(j)
+            if idx == -1:
+                continue
+            assert len(self._cluster_inputs[i]) == len(self._clusterable_level[idx])
+            np_results = self._results[idx].to_numpy_exclusive_subdmerge(
+                px, py, pz, E, nsub
+            )
+            self._out.append(ak.Array(ak.layout.NumpyArray(np_results[0])))
+
+        res = ak.Array(self._replace_multi())
+        return res
