@@ -706,6 +706,60 @@ class _classgeneralevent:
         res = ak.Array(self._replace_multi())
         return res
 
+    def exclusive_dmerge(self, njets):
+        self._out = []
+        self._input_flag = 0
+        for i in range(len(self._clusterable_level)):
+            np_results = self._results[i].to_numpy_exclusive_dmerge(njets)
+            self._out.append(ak.Array(ak.layout.NumpyArray(np_results[0])))
+        res = ak.Array(self._replace_multi())
+        return res
+
+    def exclusive_dmerge_max(self, njets):
+        self._out = []
+        self._input_flag = 0
+        for i in range(len(self._clusterable_level)):
+            np_results = self._results[i].to_numpy_exclusive_dmerge_max(njets)
+            self._out.append(ak.Array(ak.layout.NumpyArray(np_results[0])))
+        res = ak.Array(self._replace_multi())
+        return res
+
+    def exclusive_ymerge_max(self, njets):
+        self._out = []
+        self._input_flag = 0
+        for i in range(len(self._clusterable_level)):
+            np_results = self._results[i].to_numpy_exclusive_ymerge_max(njets)
+            self._out.append(ak.Array(ak.layout.NumpyArray(np_results[0])))
+        res = ak.Array(self._replace_multi())
+        return res
+
+    def exclusive_ymerge(self, njets):
+        self._out = []
+        self._input_flag = 0
+        for i in range(len(self._clusterable_level)):
+            np_results = self._results[i].to_numpy_exclusive_ymerge(njets)
+            self._out.append(ak.Array(ak.layout.NumpyArray(np_results[0])))
+        res = ak.Array(self._replace_multi())
+        return res
+
+    def Q(self):
+        self._out = []
+        self._input_flag = 0
+        for i in range(len(self._clusterable_level)):
+            np_results = self._results[i].to_numpy_q()
+            self._out.append(ak.Array(ak.layout.NumpyArray(np_results[0])))
+        res = ak.Array(self._replace_multi())
+        return res
+
+    def Q2(self):
+        self._out = []
+        self._input_flag = 0
+        for i in range(len(self._clusterable_level)):
+            np_results = self._results[i].to_numpy_q2()
+            self._out.append(ak.Array(ak.layout.NumpyArray(np_results[0])))
+        res = ak.Array(self._replace_multi())
+        return res
+
     def get_parents(self, data_inp):
         self._cluster_inputs = []
         self._bread_list_input = []
