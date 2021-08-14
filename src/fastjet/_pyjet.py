@@ -98,28 +98,14 @@ class AwkwardClusterSequence(ClusterSequence):
             if self._check_record(
                 ak.Array(ak.Array(data.layout.content)),
             ):
-                attributes = dir(data)
-                if (
-                    "px" in attributes
-                    and "py" in attributes
-                    and "pz" in attributes
-                    and "E" in attributes
-                ):
-                    return True
+                return True
             elif self._check_indexed(
                 ak.Array(data.layout.content),
             ):
                 if self._check_record(
                     ak.Array(ak.Array(data.layout.content).layout.content)
                 ):
-                    attributes = dir(data)
-                    if (
-                        "px" in attributes
-                        and "py" in attributes
-                        and "pz" in attributes
-                        and "E" in attributes
-                    ):
-                        return True
+                    return True
             else:
                 return False
         else:
