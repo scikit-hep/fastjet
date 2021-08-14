@@ -11,9 +11,6 @@ Fastjet is a library for perfomring Jet-Finding *within* the Scikit-HEP ecosyste
 .. note::
    This project is under active development.
 
-.. automodule:: fastjet._pyjet
-    :members:
-    :undoc-members:
 
 .. toctree::
    :maxdepth: 2
@@ -21,6 +18,7 @@ Fastjet is a library for perfomring Jet-Finding *within* the Scikit-HEP ecosyste
    :caption: Contents
    :glob:
 
+   AwkwardClusterSequence
 
 
 

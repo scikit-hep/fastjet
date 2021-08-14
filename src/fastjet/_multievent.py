@@ -17,6 +17,28 @@ class _classmultievent:
         offsets = self.correct_byteorder(offsets)
         self._results = fastjet._ext.interfacemulti(px, py, pz, E, offsets, jetdef)
 
+    def _check_record(self, data):
+        out = isinstance(
+            data.layout,
+            (
+                ak.layout.RecordArray,
+                ak.layout.NumpyArray,
+            ),
+        )
+        return out
+
+    def _add_parameters(self, out_dat):
+        if self._check_record(ak.Array(out_dat.layout.content)):
+            temp_dict = out_dat.layout.content.parameters
+            temp_dict["__record__"] = "Momentum4D"
+            out_dat.layout.content.parameters = temp_dict
+            return out_dat
+        elif self._check_record(ak.Array(out_dat.layout.content.content.content)):
+            temp_dict = out_dat.layout.content.content.content.parameters
+            temp_dict["__record__"] = "Momentum4D"
+            out_dat.layout.content.content.content.parameters = temp_dict
+            return out_dat
+
     def correct_byteorder(self, data):
         if data.dtype.byteorder == "=":
             pass
@@ -68,6 +90,7 @@ class _classmultievent:
             ),
             behavior=self.data.behavior,
         )
+        out = self._add_parameters(out)
         return out
 
     def unclustered_particles(self):
@@ -197,7 +220,9 @@ class _classmultievent:
         total = np.sum(shape)
         duplicate = ak.unflatten(np.zeros(total, np.int64), shape)
         prepared = self.data[:, np.newaxis][duplicate]
-        return prepared[outputs_to_inputs]
+        out = prepared[outputs_to_inputs]
+        out = self._add_parameters(out)
+        return out
 
     def exclusive_subjets(self, data, dcut, nsub):
         try:
