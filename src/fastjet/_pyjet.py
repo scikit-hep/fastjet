@@ -11,29 +11,41 @@ __all__ = ("__version__",)
 
 
 class AwkwardClusterSequence(ClusterSequence):
+    """
+    The base class for Awkward Array clustering.
+
+    Args:
+        data(awkward.highlevel.Array): The data for clustering.
+        jetdef(fastjet._swig.JetDefinition): The JetDefinition for clustering specification.
+
+    Attributes:
+            _jetdef (fastjet._swig.JetDefinition): The jetdefinition that was passed by the user.
+            _jaggedness (int): The maximum depth of the Awkward Array (stored for internal use).
+            _internalrep (fastjet._[type]event): The internal class which performs the Jet clustering, changes depending on the input type.
+    """
+
     def __init__(self, data, jetdef):
-        """The base class for all clustering
-        Attributes:
-                _jetdef (fastjet._swig.JetDefinition): The jetdefinition that was passed by the user.
-                _jaggedness (int): The maximum depth of the Awkward Array (stored for internal use).
-                _internalrep (fastjet._[type]event): The internal class which performs the Jet clustering, changes depending on the input type.
-        """
         if not isinstance(data, ak.Array):
             raise TypeError("The input data is not an Awkward Array")
         if not isinstance(jetdef, fastjet._swig.JetDefinition):
             raise TypeError("JetDefinition is not of valid type")
         self._jetdef = jetdef
         self._jagedness = self._check_jaggedness(data)
-        if self._check_listoffset(data) and self._jagedness == 2:
+        self._flag = 1
+        if (self._check_listoffset(data) and self._jagedness == 2) or (
+            self._check_listoffset_index(data)
+        ):
+            self._flag = 0
             self._internalrep = fastjet._multievent._classmultievent(data, self._jetdef)
-        if self._jagedness == 1 and isinstance(data.layout, ak.layout.RecordArray):
+        elif self._jagedness == 1 and isinstance(data.layout, ak.layout.RecordArray):
             self._internalrep = fastjet._singleevent._classsingleevent(
                 data, self._jetdef
             )
-        if (
+        elif (
             self._jagedness >= 3
             or self._check_general(data)
             or isinstance(data.layout, ak.partition.IrregularlyPartitionedArray)
+            and self._flag == 1
         ):
             self._internalrep = fastjet._generalevent._classgeneralevent(data, jetdef)
 
@@ -80,6 +92,78 @@ class AwkwardClusterSequence(ClusterSequence):
             return 1 + self._check_jaggedness(ak.Array(data.layout.array))
         else:
             return 0
+
+    def _check_listoffset_index(self, data):
+        if self._check_listoffset_subtree(ak.Array(data.layout)):
+            if self._check_record(
+                ak.Array(ak.Array(data.layout.content)),
+            ):
+                attributes = dir(data)
+                if (
+                    "px" in attributes
+                    and "py" in attributes
+                    and "pz" in attributes
+                    and "E" in attributes
+                ):
+                    return True
+            elif self._check_indexed(
+                ak.Array(data.layout.content),
+            ):
+                if self._check_record(
+                    ak.Array(ak.Array(data.layout.content).layout.content)
+                ):
+                    attributes = dir(data)
+                    if (
+                        "px" in attributes
+                        and "py" in attributes
+                        and "pz" in attributes
+                        and "E" in attributes
+                    ):
+                        return True
+            else:
+                return False
+        else:
+            return False
+
+    def _check_record(self, data):
+        out = isinstance(
+            data.layout,
+            (
+                ak.layout.RecordArray,
+                ak.layout.NumpyArray,
+            ),
+        )
+
+        return out
+
+    def _check_indexed(self, data):
+        out = isinstance(
+            data.layout,
+            (
+                ak.layout.IndexedArray64,
+                ak.layout.IndexedArray32,
+                ak.layout.IndexedArray32,
+                ak.layout.IndexedOptionArray64,
+                ak.layout.IndexedOptionArray32,
+            ),
+        )
+
+        return out
+
+    def _check_listoffset_subtree(self, data):
+        out = isinstance(
+            data.layout,
+            (
+                ak.layout.ListOffsetArray64,
+                ak.layout.ListOffsetArray32,
+                ak.layout.ListOffsetArrayU32,
+                ak.layout.ListArray64,
+                ak.layout.ListArray32,
+                ak.layout.ListArrayU32,
+                ak.layout.RegularArray,
+            ),
+        )
+        return out
 
     def _check_general(self, data):
         """Internal function for checking whether the given array is a general Awkward Array or not.

@@ -1,18 +1,26 @@
 
-Welcome to documentation!
-=========================
+**Welcome to documentation!**
+=============================
 
 
 Introduction
 ------------
 
-This should be updated!
+Fastjet is a library for perfomring Jet-Finding *within* the Scikit-HEP ecosystem.
+
+.. note::
+   This project is under active development.
+
+.. automodule:: fastjet._pyjet
+    :members:
+    :undoc-members:
 
 .. toctree::
    :maxdepth: 2
    :titlesonly:
    :caption: Contents
    :glob:
+
 
 
 
