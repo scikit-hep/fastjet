@@ -33,6 +33,11 @@ class _classmultievent:
             temp_dict["__record__"] = "Momentum4D"
             out_dat.layout.content.parameters = temp_dict
             return out_dat
+        elif self._check_record(ak.Array(out_dat.layout.content.content)):
+            temp_dict = out_dat.layout.content.content.parameters
+            temp_dict["__record__"] = "Momentum4D"
+            out_dat.layout.content.content.parameters = temp_dict
+            return out_dat
         elif self._check_record(ak.Array(out_dat.layout.content.content.content)):
             temp_dict = out_dat.layout.content.content.content.parameters
             temp_dict["__record__"] = "Momentum4D"
@@ -111,6 +116,7 @@ class _classmultievent:
             ),
             behavior=self.data.behavior,
         )
+        out = self._add_parameters(out)
         return out
 
     def exclusive_jets(self, n_jets, dcut):
@@ -141,6 +147,7 @@ class _classmultievent:
             ),
             behavior=self.data.behavior,
         )
+        out = self._add_parameters(out)
         return out
 
     def exclusive_jets_ycut(self, ycut):
@@ -161,6 +168,7 @@ class _classmultievent:
             ),
             behavior=self.data.behavior,
         )
+        out = self._add_parameters(out)
         return out
 
     def constituent_index(self, min_pt):
@@ -264,6 +272,7 @@ class _classmultievent:
             ),
             behavior=self.data.behavior,
         )
+        out = self._add_parameters(out)
         return out
 
     def exclusive_subjets_up_to(self, data, nsub):
@@ -291,6 +300,7 @@ class _classmultievent:
             ),
             behavior=self.data.behavior,
         )
+        out = self._add_parameters(out)
         return out
 
     def exclusive_subdmerge(self, data, nsub):
@@ -393,6 +403,7 @@ class _classmultievent:
             ),
             behavior=self.data.behavior,
         )
+        out = self._add_parameters(out)
         return out
 
     def jets(self):
@@ -413,6 +424,7 @@ class _classmultievent:
             ),
             behavior=self.data.behavior,
         )
+        out = self._add_parameters(out)
         return out
 
     def get_parents(self, data):
@@ -439,6 +451,7 @@ class _classmultievent:
             ),
             behavior=self.data.behavior,
         )
+        out = self._add_parameters(out)
         return out
 
     def get_child(self, data):
@@ -465,4 +478,5 @@ class _classmultievent:
             ),
             behavior=self.data.behavior,
         )
+        out = self._add_parameters(out)
         return out

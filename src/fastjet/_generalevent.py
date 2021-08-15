@@ -555,6 +555,23 @@ class _classgeneralevent:
         else:
             raise AssertionError(layout)
 
+    def _add_parameters(self, out_dat):
+        if self._check_record(ak.Array(out_dat.layout.content)):
+            temp_dict = out_dat.layout.content.parameters
+            temp_dict["__record__"] = "Momentum4D"
+            out_dat.layout.content.parameters = temp_dict
+            return out_dat
+        elif self._check_record(ak.Array(out_dat.layout.content.content)):
+            temp_dict = out_dat.layout.content.content.parameters
+            temp_dict["__record__"] = "Momentum4D"
+            out_dat.layout.content.content.parameters = temp_dict
+            return out_dat
+        elif self._check_record(ak.Array(out_dat.layout.content.content.content)):
+            temp_dict = out_dat.layout.content.content.content.parameters
+            temp_dict["__record__"] = "Momentum4D"
+            out_dat.layout.content.content.content.parameters = temp_dict
+            return out_dat
+
     def inclusive_jets(self, min_pt):
         self._out = []
         self._input_flag = 0
@@ -578,6 +595,7 @@ class _classgeneralevent:
                     behavior=self.data.behavior,
                 )
             )
+            self._out[-1] = self._add_parameters(self._out[-1])
         res = ak.Array(self._replace_multi())
         return res
 
@@ -604,6 +622,7 @@ class _classgeneralevent:
                     behavior=self.data.behavior,
                 )
             )
+            self._out[-1] = self._add_parameters(self._out[-1])
         res = ak.Array(self._replace_multi())
         return res
 
@@ -648,6 +667,7 @@ class _classgeneralevent:
                     behavior=self.data.behavior,
                 )
             )
+            self._out[-1] = self._add_parameters(self._out[-1])
         res = ak.Array(self._replace_multi())
         return res
 
@@ -674,6 +694,7 @@ class _classgeneralevent:
                     behavior=self.data.behavior,
                 )
             )
+            self._out[-1] = self._add_parameters(self._out[-1])
         res = ak.Array(self._replace_multi())
         return res
 
@@ -731,6 +752,7 @@ class _classgeneralevent:
                     behavior=self.data.behavior,
                 )
             )
+            self._out[-1] = self._add_parameters(self._out[-1])
         res = ak.Array(self._replace_multi())
         return res
 
@@ -757,6 +779,7 @@ class _classgeneralevent:
                     behavior=self.data.behavior,
                 )
             )
+            self._out[-1] = self._add_parameters(self._out[-1])
         res = ak.Array(self._replace_multi())
         return res
 
@@ -871,6 +894,7 @@ class _classgeneralevent:
                     behavior=self.data.behavior,
                 )
             )
+            self._out[-1] = self._add_parameters(self._out[-1])
 
         res = ak.Array(self._replace_multi())
         return res
@@ -963,6 +987,7 @@ class _classgeneralevent:
                     behavior=self.data.behavior,
                 )
             )
+            self._out[-1] = self._add_parameters(self._out[-1])
         res = ak.Array(self._replace_multi())
         return res
 
@@ -1009,6 +1034,7 @@ class _classgeneralevent:
                     behavior=self.data.behavior,
                 )
             )
+            self._out[-1] = self._add_parameters(self._out[-1])
         res = ak.Array(self._replace_multi())
         return res
 
@@ -1193,5 +1219,6 @@ class _classgeneralevent:
                     behavior=self.data.behavior,
                 )
             )
+            self._out[-1] = self._add_parameters(self._out[-1])
         res = ak.Array(self._replace_multi())
         return res
