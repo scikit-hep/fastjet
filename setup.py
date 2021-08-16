@@ -70,7 +70,9 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
             ]
 
             try:
-                subprocess.run(["./autogen.sh"] + args, cwd=FASTJET, env=env, check=True)
+                subprocess.run(
+                    ["./autogen.sh"] + args, cwd=FASTJET, env=env, check=True
+                )
             except Exception:
                 subprocess.run(["cat", "config.log"], cwd=FASTJET, check=True)
                 raise
