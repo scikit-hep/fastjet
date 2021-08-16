@@ -59,6 +59,7 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
             env["CXXFLAGS"] = "-O3 -Bstatic -lgmp -lgfortran -Bdynamic"
             if sys.platform.startswith("darwin"):
                 env["FC"] = "gfortran"
+            env["ORIGIN"] = "$ORIGIN"  # if evaluated, it will still be '$ORIGIN'
 
             args = [
                 f"--prefix={OUTPUT}",
@@ -67,12 +68,14 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
                 f"--with-cgaldir={cgal_dir}",
                 "--enable-swig",
                 "--enable-pyext",
+                "LDFLAGS=-Wl,-rpath=$$ORIGIN/_fastjet_core/lib",
             ]
 
             subprocess.run(["./autogen.sh"] + args, cwd=FASTJET, env=env, check=True)
 
-            subprocess.run(["make", "-j"], cwd=FASTJET, check=True)
-            subprocess.run(["make", "install"], cwd=FASTJET, check=True)
+            env = {"ORIGIN": "$ORIGIN"}  # if evaluated, it will still be '$ORIGIN'
+            subprocess.run(["make", "-j"], cwd=FASTJET, env=env, check=True)
+            subprocess.run(["make", "install"], cwd=FASTJET, env=env, check=True)
 
             for pythondir in (OUTPUT / "lib").glob("python*"):
                 sitepackages = pythondir / "site-packages"
