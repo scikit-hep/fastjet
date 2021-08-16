@@ -40,10 +40,6 @@ jobs:
       if: runner.os == 'macOS'
       run: brew install automake
 
-    - name: "Try 'xcode-select --install'"
-      if: runner.os == 'macOS'
-      run: xcode-select --install
-
     - uses: pypa/cibuildwheel@v2.0.0a4
       env:
         CIBW_ARCHS: auto64

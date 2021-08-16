@@ -49,10 +49,6 @@ jobs:
       if: runner.os == 'macOS'
       run: brew install automake swig gmp mpfr boost
 
-    - name: "Try 'xcode-select --install'"
-      if: runner.os == 'macOS'
-      run: xcode-select --install
-
     - name: Install extra deps on Linux
       if: runner.os == 'Linux'
       run: sudo apt-get update && sudo apt-get install -y libboost-dev swig autoconf libtool
