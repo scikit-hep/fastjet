@@ -31,9 +31,10 @@ jobs:
       matrix:
         python-version: [3.6, 3.9]
         runs-on: [ubuntu-latest, macos-latest]
-        include:
-        - python-version: pypy-3.6
-          runs-on: ubuntu-latest
+
+        # include:
+        # - python-version: pypy-3.6
+        #   runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v2

@@ -1,10 +1,10 @@
 name: wheels
 
-on:
-  workflow_dispatch:
-  release:
-    types:
-      - published
+# on:
+#   workflow_dispatch:
+#   release:
+#     types:
+#       - published
 
 jobs:
   make_sdist:
@@ -23,7 +23,7 @@ jobs:
         path: dist/*.tar.gz
 
   build_wheels:
-    name: Make ${{ matrix.os }}, ${{ matrix.python-build-version }} Wheels
+    name: Make ${{ matrix.python-build-version }} ${{ matrix.os }} Wheels
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -35,6 +35,14 @@ jobs:
     - uses: actions/checkout@v2
       with:
         submodules: recursive
+
+    - name: Install compiler tools on macOS
+      if: runner.os == 'macOS'
+      run: brew install automake swig gmp mpfr boost
+
+    - name: Install extra deps on Linux
+      if: runner.os == 'Linux'
+      run: sudo apt-get update && sudo apt-get install -y libboost-dev swig autoconf libtool
 
     - uses: pypa/cibuildwheel@v2.0.0a4
       env:
