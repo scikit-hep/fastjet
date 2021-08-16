@@ -1,4 +1,5 @@
 import awkward as ak
+import numpy as np
 
 import fastjet._ext  # noqa: F401, E402
 import fastjet._generalevent
@@ -25,11 +26,15 @@ class AwkwardClusterSequence(ClusterSequence):
     """
 
     def __init__(self, data, jetdef):
-        if not isinstance(data, ak.Array):
-            raise TypeError("The input data is not an Awkward Array")
+        if (not isinstance(data, ak.Array)) and (not isinstance(data, np.ndarray)):
+            raise TypeError("The input data is not an Awkward Array or Numpy Array")
         if not isinstance(jetdef, fastjet._swig.JetDefinition):
             raise TypeError("JetDefinition is not of valid type")
         self._jetdef = jetdef
+        self._was_numpy = False
+        if isinstance(data, np.ndarray):
+            data = ak.from_numpy(data)
+            self._was_numpy = True
         self._jagedness = self._check_jaggedness(data)
         self._flag = 1
         if (self._check_listoffset(data) and self._jagedness == 2) or (
@@ -39,7 +44,7 @@ class AwkwardClusterSequence(ClusterSequence):
             self._internalrep = fastjet._multievent._classmultievent(data, self._jetdef)
         elif self._jagedness == 1 and isinstance(data.layout, ak.layout.RecordArray):
             self._internalrep = fastjet._singleevent._classsingleevent(
-                data, self._jetdef
+                data, self._jetdef, self._was_numpy
             )
         elif (
             self._jagedness >= 3
@@ -349,6 +354,8 @@ class AwkwardClusterSequence(ClusterSequence):
         Returns:
             awkward.highlevel.Array: Returns an Awkward Array of the same type as the input.
         """
+        if self._was_numpy:
+            data = ak.from_numpy(data)
         if not isinstance(data, ak.Array):
             raise TypeError("The input data is not an Awkward Array")
         return self._internalrep.exclusive_subjets(data, dcut, nsub)
@@ -361,6 +368,8 @@ class AwkwardClusterSequence(ClusterSequence):
         Returns:
             awkward.highlevel.Array: Returns an Awkward Array of the same type as the input.
         """
+        if self._was_numpy:
+            data = ak.from_numpy(data)
         if not isinstance(data, ak.Array):
             raise TypeError("The input data is not an Awkward Array")
         return self._internalrep.exclusive_subjets_up_to(data, nsub)
@@ -373,6 +382,8 @@ class AwkwardClusterSequence(ClusterSequence):
         Returns:
             awkward.highlevel.Array: Returns an Awkward Array of the same type as the input.
         """
+        if self._was_numpy:
+            data = ak.from_numpy(data)
         if not isinstance(data, ak.Array):
             raise TypeError("The input data is not an Awkward Array")
         return self._internalrep.exclusive_subdmerge(data, nsub)
@@ -385,6 +396,8 @@ class AwkwardClusterSequence(ClusterSequence):
         Returns:
             awkward.highlevel.Array: Returns an Awkward Array of the same type as the input.
         """
+        if self._was_numpy:
+            data = ak.from_numpy(data)
         if not isinstance(data, ak.Array):
             raise TypeError("The input data is not an Awkward Array")
         return self._internalrep.exclusive_subdmerge_max(data, nsub)
@@ -397,6 +410,8 @@ class AwkwardClusterSequence(ClusterSequence):
         Returns:
             awkward.highlevel.Array: Returns an Awkward Array of the same type as the input.
         """
+        if self._was_numpy:
+            data = ak.from_numpy(data)
         if not isinstance(data, ak.Array):
             raise TypeError("The input data is not an Awkward Array")
         return self._internalrep.n_exclusive_subjets(data, dcut)
@@ -408,6 +423,8 @@ class AwkwardClusterSequence(ClusterSequence):
         Returns:
             awkward.highlevel.Array: Returns an Awkward Array of the same type as the input.
         """
+        if self._was_numpy:
+            data = ak.from_numpy(data)
         if not isinstance(data, ak.Array):
             raise TypeError("The input data is not an Awkward Array")
         return self._internalrep.has_parents(data)
@@ -419,6 +436,8 @@ class AwkwardClusterSequence(ClusterSequence):
         Returns:
             awkward.highlevel.Array: Returns an Awkward Array of the same type as the input.
         """
+        if self._was_numpy:
+            data = ak.from_numpy(data)
         if not isinstance(data, ak.Array):
             raise TypeError("The input data is not an Awkward Array")
         return self._internalrep.has_child(data)
@@ -430,6 +449,8 @@ class AwkwardClusterSequence(ClusterSequence):
         Returns:
             awkward.highlevel.Array: Returns an Awkward Array of the same type as the input.
         """
+        if self._was_numpy:
+            data = ak.from_numpy(data)
         if not isinstance(data, ak.Array):
             raise TypeError("The input data is not an Awkward Array")
         return self._internalrep.jet_scale_for_algorithm(data)
@@ -485,6 +506,8 @@ class AwkwardClusterSequence(ClusterSequence):
             data (awkward.highlevel.Array): An Array containing the Jets.
         Returns:
             awkward.highlevel.Array: Returns an Awkward Array of the same type as the input."""
+        if self._was_numpy:
+            data = ak.from_numpy(data)
         if not isinstance(data, ak.Array):
             raise TypeError("The input data is not an Awkward Array")
         return self._internalrep.get_parents(data)
@@ -496,6 +519,8 @@ class AwkwardClusterSequence(ClusterSequence):
         Returns:
             awkward.highlevel.Array: Returns an Awkward Array of the same type as the input.
         """
+        if self._was_numpy:
+            data = ak.from_numpy(data)
         if not isinstance(data, ak.Array):
             raise TypeError("The input data is not an Awkward Array")
         return self._internalrep.get_child(data)

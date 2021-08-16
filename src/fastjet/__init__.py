@@ -3,6 +3,7 @@ import ctypes
 import pathlib
 
 import awkward as ak
+import numpy as np
 
 _fastjet_core = pathlib.Path(__file__).parent.resolve() / "_fastjet_core" / "lib"
 _libfastjet = ctypes.cdll.LoadLibrary(_fastjet_core / "libfastjet.so")
@@ -213,7 +214,7 @@ class ClusterSequence:  # The super class
     def __init__(self, data, jetdef):
         if not isinstance(jetdef, fastjet._swig.JetDefinition):
             raise AttributeError("JetDefinition is not correct")
-        if isinstance(data, ak.Array):
+        if isinstance(data, ak.Array) or isinstance(data, np.ndarray):
             self.__class__ = fastjet._pyjet.AwkwardClusterSequence
             fastjet._pyjet.AwkwardClusterSequence.__init__(
                 self, data=data, jetdef=jetdef
