@@ -56,14 +56,12 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
             env = os.environ.copy()
             env["PYTHON"] = sys.executable
             env["PYTHON_INCLUDE"] = f'-I{sysconfig.get_path("include")}'
-            env["CXXFLAGS"] = "-O3 -Bstatic -lgmp -lgfortran -Bdynamic"
-            if sys.platform.startswith("darwin"):
-                env["FC"] = "gfortran"
+            env["CXXFLAGS"] = "-O3 -Bstatic -lgmp -Bdynamic"
             env["ORIGIN"] = "$ORIGIN"  # if evaluated, it will still be '$ORIGIN'
 
             args = [
                 f"--prefix={OUTPUT}",
-                "--enable-allplugins",
+                "--enable-allcxxplugins",
                 "--enable-cgal-header-only",
                 f"--with-cgaldir={cgal_dir}",
                 "--enable-swig",
