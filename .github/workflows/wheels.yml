@@ -22,27 +22,27 @@ jobs:
       with:
         path: dist/*.tar.gz
 
-  #build_wheels:
-    #name: Wheel on ${{ matrix.os }}
-    #runs-on: ${{ matrix.os }}
-    #strategy:
-      #fail-fast: false
-      #matrix:
-        #os: [ubuntu-latest] #, macos-latest]
+  build_wheels:
+    name: Wheel on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest] #, macos-latest]
 
-    #steps:
-    #- uses: actions/checkout@v2
-      #with:
-        #submodules: recursive
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive
 
-    #- uses: pypa/cibuildwheel@v2.0.0a4
-      #env:
-        #CIBW_ARCHS: auto64
+    - uses: pypa/cibuildwheel@v2.0.0a4
+      env:
+        CIBW_ARCHS: auto64
 
-    #- name: Upload wheels
-      #uses: actions/upload-artifact@v2
-      #with:
-        #path: wheelhouse/*.whl
+    - name: Upload wheels
+      uses: actions/upload-artifact@v2
+      with:
+        path: wheelhouse/*.whl
 
   test_sdist:
     needs: [make_sdist]
