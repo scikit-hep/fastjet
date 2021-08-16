@@ -1,10 +1,10 @@
 name: wheels
 
-# on:
-#   workflow_dispatch:
-#   release:
-#     types:
-#       - published
+on:
+  workflow_dispatch:
+  release:
+    types:
+      - published
 
 jobs:
   make_sdist:
