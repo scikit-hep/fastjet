@@ -66,7 +66,7 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
                 f"--with-cgaldir={cgal_dir}",
                 "--enable-swig",
                 "--enable-pyext",
-                "LDFLAGS=-Wl,-rpath=$$ORIGIN/_fastjet_core/lib",
+                "LDFLAGS=-Wl,-rpath=$$ORIGIN/_fastjet_core/lib:$$ORIGIN",
             ]
 
             subprocess.run(["./autogen.sh"] + args, cwd=FASTJET, env=env, check=True)
