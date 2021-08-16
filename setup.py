@@ -73,7 +73,8 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
 
             subprocess.run(["./autogen.sh"] + args, cwd=FASTJET, env=env, check=True)
 
-            env = {"ORIGIN": "$ORIGIN"}  # if evaluated, it will still be '$ORIGIN'
+            env = os.environ.copy()
+            env["ORIGIN"] = "$ORIGIN"  # if evaluated, it will still be '$ORIGIN'
             subprocess.run(["make", "-j"], cwd=FASTJET, env=env, check=True)
             subprocess.run(["make", "install"], cwd=FASTJET, env=env, check=True)
 
