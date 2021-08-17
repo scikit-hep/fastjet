@@ -100,9 +100,8 @@ class FastJetInstall(setuptools.command.install.install):
 ' print-pythondir""",
                 shell=True,
                 cwd=FASTJET,
-            )
-            .decode()
-            .strip()
+                universal_newlines=True,
+            ).strip()
         )
 
         pyexecdir = pathlib.Path(
