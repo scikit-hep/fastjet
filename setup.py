@@ -113,8 +113,7 @@ class FastJetInstall(setuptools.command.install.install):
                 shell=True,
                 cwd=FASTJET,
                 universal_newlines=True,
-            )
-            .strip()
+            ).strip()
         )
 
         shutil.copyfile(pythondir / "fastjet.py", fastjetdir / "_swig.py")
