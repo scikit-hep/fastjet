@@ -73,6 +73,7 @@ jobs:
         CIBW_ARCHS: auto64
         CIBW_BUILD: cp39-*
         CIBW_BUILD_VERBOSITY: 2
+        CIBW_REPAIR_WHEEL_COMMAND: ""
 
     - name: Upload wheels
       uses: actions/upload-artifact@v2
