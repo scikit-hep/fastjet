@@ -11,8 +11,6 @@ build-backend = "setuptools.build_meta"
 skip = "pp*"
 test-extras = "test"
 test-command = "pytest {project}/tests"
-manylinux-x86_64-image = "manylinux_2_24"
-manylinux-i686-image = "manylinux_2_24"
 
 [tool.cibuildwheel.linux]
 before-all = [
