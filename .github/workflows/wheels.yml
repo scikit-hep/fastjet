@@ -50,6 +50,22 @@ jobs:
       with:
         path: wheelhouse/*.whl
 
+  test_wheels:
+    name: Wheel on linux
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+      with:
+        submodules: recursive
+
+    - uses: pypa/cibuildwheel@v2.0.0a4
+
+    - name: Upload wheels
+      uses: actions/upload-artifact@v2
+      with:
+        path: wheelhouse/*.whl
+
   test_sdist:
     needs: [make_sdist]
     runs-on: ubuntu-latest
