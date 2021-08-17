@@ -59,7 +59,7 @@ jobs:
       with:
         submodules: recursive
 
-    - uses: pypa/cibuildwheel@v2.0.0a4
+    - uses: pypa/cibuildwheel@v2.1.1
 
     - name: Upload wheels
       uses: actions/upload-artifact@v2
