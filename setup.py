@@ -82,25 +82,7 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
             subprocess.run(["make", "-j"], cwd=FASTJET, env=env, check=True)
             subprocess.run(["make", "install"], cwd=FASTJET, env=env, check=True)
 
-            print("FastJetBuild ========================================")  # noqa: T001
-            tree(str(OUTPUT))
-
-            for pythondir in (OUTPUT / "lib").glob("python*"):
-                sitepackages = pythondir / "site-packages"
-                shutil.copyfile(sitepackages / "fastjet.py", PYTHON / "_swig.py")
-                for sharedobj in sitepackages.glob("*.so*"):
-                    shutil.copyfile(sharedobj, PYTHON / sharedobj.parts[-1])
-
-            print("=====================================================")  # noqa: T001
-
         setuptools.command.build_ext.build_ext.build_extensions(self)
-
-
-def tree(x):
-    print(("{} (dir)" if os.path.isdir(x) else "{}").format(x))  # noqa: T001
-    if os.path.isdir(x):
-        for y in os.listdir(x):
-            tree(os.path.join(x, y))
 
 
 class FastJetInstall(setuptools.command.install.install):
@@ -109,20 +91,34 @@ class FastJetInstall(setuptools.command.install.install):
         plat = sysconfig.get_platform()
         fastjetdir = pathlib.Path(f"build/lib.{plat}-{version}/fastjet")
 
-        shutil.copytree(OUTPUT, fastjetdir / "_fastjet_core")
+        shutil.copytree(OUTPUT, fastjetdir / "_fastjet_core", symlinks=True)
 
-        print("FastJetInstall ======================================")  # noqa: T001
-        tree(str(fastjetdir / "_fastjet_core"))
+        pythondir = pathlib.Path(
+            subprocess.check_output(
+                """make -f pyinterface/Makefile --eval='print-pythondir:
+	@echo $(pythondir)
+' print-pythondir""",
+                shell=True,
+                cwd=FASTJET,
+            )
+            .decode()
+            .strip()
+        )
 
-        for pythondir in (fastjetdir / "_fastjet_core/lib").glob("python*"):
-            sitepackages = pythondir / "site-packages"
-            (sitepackages / "fastjet.py").rename(fastjetdir / "_swig.py")
-            for sharedobj in sitepackages.glob("*.so*"):
-                sharedobj.rename(fastjetdir / sharedobj.parts[-1])
+        pyexecdir = pathlib.Path(
+            subprocess.check_output(
+                """make -f pyinterface/Makefile --eval='print-pyexecdir:
+	@echo $(pyexecdir)
+' print-pyexecdir""",
+                shell=True,
+                cwd=FASTJET,
+            )
+            .decode()
+            .strip()
+        )
 
-            shutil.rmtree(pythondir)
-
-        print("=====================================================")  # noqa: T001
+        shutil.copyfile(pythondir / "fastjet.py", fastjetdir / "_swig.py")
+        shutil.copyfile(pyexecdir / "_fastjet.so", fastjetdir / "_fastjet.so")
 
         setuptools.command.install.install.run(self)
 
