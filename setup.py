@@ -112,8 +112,8 @@ class FastJetInstall(setuptools.command.install.install):
 ' print-pyexecdir""",
                 shell=True,
                 cwd=FASTJET,
+                universal_newlines=True,
             )
-            .decode()
             .strip()
         )
 
