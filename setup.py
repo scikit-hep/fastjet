@@ -56,29 +56,31 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
             env = os.environ.copy()
             env["PYTHON"] = sys.executable
             env["PYTHON_INCLUDE"] = f'-I{sysconfig.get_path("include")}'
-            env["CXXFLAGS"] = "-O3 -Bstatic -lgmp -lgfortran -Bdynamic"
-            if sys.platform.startswith("darwin"):
-                env["FC"] = "gfortran"
+            env["CXXFLAGS"] = "-O3 -Bstatic -lgmp -Bdynamic"
+            env["ORIGIN"] = "$ORIGIN"  # if evaluated, it will still be '$ORIGIN'
 
             args = [
                 f"--prefix={OUTPUT}",
-                "--enable-allplugins",
+                "--enable-allcxxplugins",
                 "--enable-cgal-header-only",
                 f"--with-cgaldir={cgal_dir}",
                 "--enable-swig",
                 "--enable-pyext",
+                "LDFLAGS=-Wl,-rpath=$$ORIGIN/_fastjet_core/lib:$$ORIGIN",
             ]
 
-            subprocess.run(["./autogen.sh"] + args, cwd=FASTJET, env=env, check=True)
+            try:
+                subprocess.run(
+                    ["./autogen.sh"] + args, cwd=FASTJET, env=env, check=True
+                )
+            except Exception:
+                subprocess.run(["cat", "config.log"], cwd=FASTJET, check=True)
+                raise
 
-            subprocess.run(["make", "-j"], cwd=FASTJET, check=True)
-            subprocess.run(["make", "install"], cwd=FASTJET, check=True)
-
-            for pythondir in (OUTPUT / "lib").glob("python*"):
-                sitepackages = pythondir / "site-packages"
-                shutil.copyfile(sitepackages / "fastjet.py", PYTHON / "_swig.py")
-                for sharedobj in sitepackages.glob("*.so*"):
-                    shutil.copyfile(sharedobj, PYTHON / sharedobj.parts[-1])
+            env = os.environ.copy()
+            env["ORIGIN"] = "$ORIGIN"  # if evaluated, it will still be '$ORIGIN'
+            subprocess.run(["make", "-j"], cwd=FASTJET, env=env, check=True)
+            subprocess.run(["make", "install"], cwd=FASTJET, env=env, check=True)
 
         setuptools.command.build_ext.build_ext.build_extensions(self)
 
@@ -89,15 +91,32 @@ class FastJetInstall(setuptools.command.install.install):
         plat = sysconfig.get_platform()
         fastjetdir = pathlib.Path(f"build/lib.{plat}-{version}/fastjet")
 
-        shutil.copytree(OUTPUT, fastjetdir / "_fastjet_core")
+        shutil.copytree(OUTPUT, fastjetdir / "_fastjet_core", symlinks=True)
 
-        for pythondir in (fastjetdir / "_fastjet_core/lib").glob("python*"):
-            sitepackages = pythondir / "site-packages"
-            (sitepackages / "fastjet.py").rename(fastjetdir / "_swig.py")
-            for sharedobj in sitepackages.glob("*.so*"):
-                sharedobj.rename(fastjetdir / sharedobj.parts[-1])
+        pythondir = pathlib.Path(
+            subprocess.check_output(
+                """make -f pyinterface/Makefile --eval='print-pythondir:
+\t@echo $(pythondir)
+' print-pythondir""",
+                shell=True,
+                cwd=FASTJET,
+                universal_newlines=True,
+            ).strip()
+        )
 
-            shutil.rmtree(pythondir)
+        pyexecdir = pathlib.Path(
+            subprocess.check_output(
+                """make -f pyinterface/Makefile --eval='print-pyexecdir:
+\t@echo $(pyexecdir)
+' print-pyexecdir""",
+                shell=True,
+                cwd=FASTJET,
+                universal_newlines=True,
+            ).strip()
+        )
+
+        shutil.copyfile(pythondir / "fastjet.py", fastjetdir / "_swig.py")
+        shutil.copyfile(pyexecdir / "_fastjet.so", fastjetdir / "_fastjet.so")
 
         setuptools.command.install.install.run(self)
 

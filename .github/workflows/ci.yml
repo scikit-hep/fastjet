@@ -30,7 +30,7 @@ jobs:
       fail-fast: false
       matrix:
         python-version: [3.6, 3.9]
-        runs-on: [ubuntu-latest]  # macos-latest isn't setting up cgal yet
+        runs-on: [ubuntu-latest]   # , macos-latest
 
         # include:
         # - python-version: pypy-3.6
@@ -47,17 +47,11 @@ jobs:
 
     - name: Install compiler tools on macOS
       if: runner.os == 'macOS'
-      run: brew install automake swig gmp mpfr boost gfortran
+      run: brew install automake swig gmp mpfr boost
 
     - name: Install extra deps on Linux
       if: runner.os == 'Linux'
-      run: sudo apt-get update && sudo apt-get install -y libboost-dev gfortran swig autoconf libtool
-
-    #- name: Install dependency
-    #  run: python -m pip install awkward
-
-    #- name: Install dependency
-    #  run: python -m pip install vector
+      run: sudo apt-get update && sudo apt-get install -y libboost-dev swig autoconf libtool
 
     - name: Install package
       run: python -m pip install .[test] -v
@@ -66,7 +60,7 @@ jobs:
       run: python -m pytest -vv -rs -Wd
 
   test_wheels:
-    name: Wheel on linux
+    name: Wheel on Linux
     runs-on: ubuntu-latest
 
     steps:
@@ -74,9 +68,11 @@ jobs:
       with:
         submodules: recursive
 
-    - uses: pypa/cibuildwheel@v2.0.1
+    - uses: pypa/cibuildwheel@v2.1.1
       env:
-        CIBW_BUILD: cp39-manylinux_x86_64
+        CIBW_ARCHS: auto64
+        CIBW_BUILD: cp39-*
+        CIBW_BUILD_VERBOSITY: 2
 
     - name: Upload wheels
       uses: actions/upload-artifact@v2
