@@ -5,10 +5,9 @@ import fastjet._ext  # noqa: F401, E402
 
 
 class _classsingleevent:
-    def __init__(self, data, jetdef, was_numpy):
+    def __init__(self, data, jetdef):
         self.jetdef = jetdef
         self.data = self.single_to_jagged(data)
-        self._was_numpy = was_numpy
         px, py, pz, E, offsets = self.extract_cons(self.data)
         px = self.correct_byteorder(px)
         py = self.correct_byteorder(py)
@@ -98,8 +97,6 @@ class _classsingleevent:
             behavior=self.data.behavior,
         )
         out = self._add_parameters(out)
-        if self._was_numpy:
-            out = ak.to_numpy(out)
         return out
 
     def unclustered_particles(self):
@@ -117,8 +114,6 @@ class _classsingleevent:
             behavior=self.data.behavior,
         )
         out = self._add_parameters(out)
-        if self._was_numpy:
-            out = ak.to_numpy(out)
         return out
 
     def exclusive_jets(self, n_jets, dcut):
@@ -144,8 +139,6 @@ class _classsingleevent:
             behavior=self.data.behavior,
         )
         out = self._add_parameters(out)
-        if self._was_numpy:
-            out = ak.to_numpy(out)
         return out
 
     def exclusive_jets_ycut(self, ycut):
@@ -163,8 +156,6 @@ class _classsingleevent:
             behavior=self.data.behavior,
         )
         out = self._add_parameters(out)
-        if self._was_numpy:
-            out = ak.to_numpy(out)
         return out
 
     def constituent_index(self, min_pt):
@@ -176,15 +167,11 @@ class _classsingleevent:
             )
         )
         out = ak.Array(ak.layout.ListOffsetArray64(ak.layout.Index64(off), out.layout))
-        if self._was_numpy:
-            out = ak.to_numpy(out)
         return out[0]
 
     def unique_history_order(self):
         np_results = self._results.to_numpy_unique_history_order()
         out = ak.Array(ak.layout.NumpyArray(np_results[0]))
-        if self._was_numpy:
-            out = ak.to_numpy(out)
         return out
 
     def constituents(self, min_pt):
@@ -204,8 +191,6 @@ class _classsingleevent:
         prepared = self.data[:, np.newaxis][duplicate]
         prepared = prepared[outputs_to_inputs]
         out = self._add_parameters(prepared[0])
-        if self._was_numpy:
-            out = ak.to_numpy(out)
         return out
 
     def exclusive_dmerge(self, njets):
@@ -278,8 +263,6 @@ class _classsingleevent:
             behavior=self.data.behavior,
         )
         out = self._add_parameters(out)
-        if self._was_numpy:
-            out = ak.to_numpy(out)
         return out
 
     def exclusive_subjets_up_to(self, data, nsub):
@@ -304,8 +287,6 @@ class _classsingleevent:
             behavior=self.data.behavior,
         )
         out = self._add_parameters(out)
-        if self._was_numpy:
-            out = ak.to_numpy(out)
         return out
 
     def exclusive_subdmerge(self, data, nsub):
@@ -413,8 +394,6 @@ class _classsingleevent:
             behavior=self.data.behavior,
         )
         out = self._add_parameters(out)
-        if self._was_numpy:
-            out = ak.to_numpy(out)
         return out
 
     def jets(self):
@@ -432,8 +411,6 @@ class _classsingleevent:
             behavior=self.data.behavior,
         )
         out = self._add_parameters(out)
-        if self._was_numpy:
-            out = ak.to_numpy(out)
         return out
 
     def get_parents(self, data):
@@ -458,8 +435,6 @@ class _classsingleevent:
             behavior=self.data.behavior,
         )
         out = self._add_parameters(out)
-        if self._was_numpy:
-            out = ak.to_numpy(out)
         return out
 
     def get_child(self, data):
@@ -484,6 +459,4 @@ class _classsingleevent:
             behavior=self.data.behavior,
         )
         out = self._add_parameters(out)
-        if self._was_numpy:
-            out = ak.to_numpy(out)
         return out
