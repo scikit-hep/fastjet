@@ -38,6 +38,16 @@ class _classsingleevent:
         off = np.insert(off, 0, 0)
         return px, py, pz, E, off
 
+    def _check_record(self, data):
+        out = isinstance(
+            data.layout,
+            (
+                ak.layout.RecordArray,
+                ak.layout.NumpyArray,
+            ),
+        )
+        return out
+
     def single_to_jagged(self, array):
         single = ak.Array(
             ak.layout.ListOffsetArray64(
@@ -55,6 +65,23 @@ class _classsingleevent:
         )
         return single
 
+    def _add_parameters(self, out_dat):
+        if self._check_record(out_dat):
+            temp_dict = out_dat.layout.parameters
+            temp_dict["__record__"] = "Momentum4D"
+            out_dat.layout.parameters = temp_dict
+            return out_dat
+        elif self._check_record(ak.Array(out_dat.layout.content)):
+            temp_dict = out_dat.layout.content.parameters
+            temp_dict["__record__"] = "Momentum4D"
+            out_dat.layout.content.parameters = temp_dict
+            return out_dat
+        elif self._check_record(ak.Array(out_dat.layout.content.content)):
+            temp_dict = out_dat.layout.content.content.parameters
+            temp_dict["__record__"] = "Momentum4D"
+            out_dat.layout.content.content.parameters = temp_dict
+            return out_dat
+
     def inclusive_jets(self, min_pt):
         np_results = self._results.to_numpy(min_pt)
         out = ak.Array(
@@ -69,6 +96,7 @@ class _classsingleevent:
             ),
             behavior=self.data.behavior,
         )
+        out = self._add_parameters(out)
         return out
 
     def unclustered_particles(self):
@@ -85,6 +113,7 @@ class _classsingleevent:
             ),
             behavior=self.data.behavior,
         )
+        out = self._add_parameters(out)
         return out
 
     def exclusive_jets(self, n_jets, dcut):
@@ -109,6 +138,7 @@ class _classsingleevent:
             ),
             behavior=self.data.behavior,
         )
+        out = self._add_parameters(out)
         return out
 
     def exclusive_jets_ycut(self, ycut):
@@ -125,22 +155,7 @@ class _classsingleevent:
             ),
             behavior=self.data.behavior,
         )
-        return out
-
-    def unclustered_parts(self):
-        np_results = self._results.to_numpy_unclustered()
-        out = ak.Array(
-            ak.layout.RecordArray(
-                [
-                    ak.layout.NumpyArray(np_results[0]),
-                    ak.layout.NumpyArray(np_results[1]),
-                    ak.layout.NumpyArray(np_results[2]),
-                    ak.layout.NumpyArray(np_results[3]),
-                ],
-                ["px", "py", "pz", "E"],
-            ),
-            behavior=self.data.behavior,
-        )
+        out = self._add_parameters(out)
         return out
 
     def constituent_index(self, min_pt):
@@ -175,7 +190,8 @@ class _classsingleevent:
         duplicate = ak.unflatten(np.zeros(total, np.int64), shape)
         prepared = self.data[:, np.newaxis][duplicate]
         prepared = prepared[outputs_to_inputs]
-        return prepared[0]
+        out = self._add_parameters(prepared[0])
+        return out
 
     def exclusive_dmerge(self, njets):
         np_results = self._results.to_numpy_exclusive_dmerge(njets)
@@ -246,6 +262,7 @@ class _classsingleevent:
             ),
             behavior=self.data.behavior,
         )
+        out = self._add_parameters(out)
         return out
 
     def exclusive_subjets_up_to(self, data, nsub):
@@ -269,6 +286,7 @@ class _classsingleevent:
             ),
             behavior=self.data.behavior,
         )
+        out = self._add_parameters(out)
         return out
 
     def exclusive_subdmerge(self, data, nsub):
@@ -375,6 +393,7 @@ class _classsingleevent:
             ),
             behavior=self.data.behavior,
         )
+        out = self._add_parameters(out)
         return out
 
     def jets(self):
@@ -391,6 +410,7 @@ class _classsingleevent:
             ),
             behavior=self.data.behavior,
         )
+        out = self._add_parameters(out)
         return out
 
     def get_parents(self, data):
@@ -414,6 +434,7 @@ class _classsingleevent:
             ),
             behavior=self.data.behavior,
         )
+        out = self._add_parameters(out)
         return out
 
     def get_child(self, data):
@@ -437,4 +458,5 @@ class _classsingleevent:
             ),
             behavior=self.data.behavior,
         )
+        out = self._add_parameters(out)
         return out

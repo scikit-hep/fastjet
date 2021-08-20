@@ -1,12 +1,16 @@
 
-Welcome to documentation!
-=========================
+**Welcome to documentation!**
+=============================
 
 
 Introduction
 ------------
 
-This should be updated!
+Fastjet is a library for perfomring Jet-Finding *within* the Scikit-HEP ecosystem.
+
+.. note::
+   This project is under active development.
+
 
 .. toctree::
    :maxdepth: 2
@@ -14,7 +18,11 @@ This should be updated!
    :caption: Contents
    :glob:
 
+   AwkwardClusterSequence
 
+
+.. autoclass:: fastjet.ClusterSequence
+   :members:
 
 Indices and tables
 ==================

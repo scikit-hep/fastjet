@@ -1,6 +1,7 @@
 # BSD 3-Clause License; see https://github.com/scikit-hep/fastjet/blob/main/LICENSE
 
 import awkward as ak
+import numpy as np
 
 import fastjet._ext  # noqa: F401, E402
 import fastjet._pyjet  # noqa: F401, E402
@@ -201,7 +202,7 @@ class ClusterSequence:  # The super class
     def __init__(self, data, jetdef):
         if not isinstance(jetdef, fastjet._swig.JetDefinition):
             raise AttributeError("JetDefinition is not correct")
-        if isinstance(data, ak.Array):
+        if isinstance(data, ak.Array) or isinstance(data, np.ndarray):
             self.__class__ = fastjet._pyjet.AwkwardClusterSequence
             fastjet._pyjet.AwkwardClusterSequence.__init__(
                 self, data=data, jetdef=jetdef
