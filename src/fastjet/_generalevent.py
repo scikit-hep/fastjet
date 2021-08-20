@@ -599,6 +599,53 @@ class _classgeneralevent:
         res = ak.Array(self._replace_multi())
         return res
 
+    def constituents(self, min_pt):
+        self._out = []
+        self._input_flag = 0
+        for i in range(len(self._clusterable_level)):
+            np_results = self._results[i].to_numpy_with_constituents(min_pt)
+            off = np.insert(np_results[-1], 0, 0)
+            out = ak.Array(
+                ak.layout.ListOffsetArray64(
+                    ak.layout.Index64(np_results[0]),
+                    ak.layout.NumpyArray(np_results[1]),
+                ),
+                behavior=self.data.behavior,
+            )
+            outputs_to_inputs = ak.Array(
+                ak.layout.ListOffsetArray64(ak.layout.Index64(off), out.layout)
+            )
+            shape = ak.num(outputs_to_inputs)
+            total = np.sum(shape)
+            duplicate = ak.unflatten(np.zeros(total, np.int64), shape)
+            prepared = self._clusterable_level[i][:, np.newaxis][duplicate]
+            out = prepared[outputs_to_inputs]
+            out = self._add_parameters(out)
+            self._out.append(out)
+        res = ak.Array(self._replace_multi())
+        return res
+
+    def constituent_index(self, min_pt):
+        self._out = []
+        self._input_flag = 0
+        for i in range(len(self._clusterable_level)):
+            np_results = self._results[i].to_numpy_with_constituents(min_pt)
+            off = np.insert(np_results[-1], 0, 0)
+            out = ak.Array(
+                ak.layout.ListOffsetArray64(
+                    ak.layout.Index64(np_results[0]),
+                    ak.layout.NumpyArray(np_results[1]),
+                ),
+                behavior=self.data.behavior,
+            )
+            self._out.append(
+                ak.Array(
+                    ak.layout.ListOffsetArray64(ak.layout.Index64(off), out.layout)
+                )
+            )
+        res = ak.Array(self._replace_multi())
+        return res
+
     def unclustered_particles(self):
         self._out = []
         self._input_flag = 0
@@ -695,27 +742,6 @@ class _classgeneralevent:
                 )
             )
             self._out[-1] = self._add_parameters(self._out[-1])
-        res = ak.Array(self._replace_multi())
-        return res
-
-    def constituent_index(self, min_pt):
-        self._out = []
-        self._input_flag = 0
-        for i in range(len(self._clusterable_level)):
-            np_results = self._results[i].to_numpy_with_constituents(min_pt)
-            off = np.insert(np_results[-1], 0, 0)
-            out = ak.Array(
-                ak.layout.ListOffsetArray64(
-                    ak.layout.Index64(np_results[0]),
-                    ak.layout.NumpyArray(np_results[1]),
-                ),
-                behavior=self.data.behavior,
-            )
-            self._out.append(
-                ak.Array(
-                    ak.layout.ListOffsetArray64(ak.layout.Index64(off), out.layout)
-                )
-            )
         res = ak.Array(self._replace_multi())
         return res
 

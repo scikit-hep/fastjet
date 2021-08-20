@@ -21,6 +21,8 @@ Fastjet is a library for perfomring Jet-Finding *within* the Scikit-HEP ecosyste
    AwkwardClusterSequence
 
 
+.. autoclass:: fastjet.ClusterSequence
+   :members:
 
 Indices and tables
 ==================
