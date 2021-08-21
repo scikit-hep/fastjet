@@ -1,7 +1,6 @@
 # BSD 3-Clause License; see https://github.com/scikit-hep/fastjet/blob/main/LICENSE
 
 import awkward as ak
-import numpy as np
 
 import fastjet._ext  # noqa: F401, E402
 import fastjet._pyjet  # noqa: F401, E402
@@ -200,9 +199,18 @@ __all__ = ("__version__",)
 
 class ClusterSequence:  # The super class
     def __init__(self, data, jetdef):
+        """The base class for Awkward Array clustering.
+        Args:
+            data(awkward.highlevel.Array): The data for clustering.
+            jetdef(fastjet._swig.JetDefinition): The JetDefinition for clustering specification.
+        Attributes:
+            _jetdef (fastjet._swig.JetDefinition): The jetdefinition that was passed by the user.
+            _jaggedness (int): The maximum depth of the Awkward Array (stored for internal use).
+            _internalrep (fastjet._[type]event): The internal class which performs the Jet clustering, changes depending on the input type.
+        """
         if not isinstance(jetdef, fastjet._swig.JetDefinition):
             raise AttributeError("JetDefinition is not correct")
-        if isinstance(data, ak.Array) or isinstance(data, np.ndarray):
+        if isinstance(data, ak.Array):
             self.__class__ = fastjet._pyjet.AwkwardClusterSequence
             fastjet._pyjet.AwkwardClusterSequence.__init__(
                 self, data=data, jetdef=jetdef
@@ -210,6 +218,264 @@ class ClusterSequence:  # The super class
         if isinstance(data, list):
             self.__class__ = fastjet._swig.ClusterSequence
             fastjet._swig.ClusterSequence.__init__(self, data, jetdef)
+
+    def jet_def(self):
+        """Returns the Jet Definition Object associated with the instance
+        Args:
+            None
+        Returns:
+            JetDefinition: Returns the jetdefinition stored as an attribute.
+        """
+        raise AssertionError()
+
+    def inclusive_jets(self, min_pt=0):
+        """Returns the inclusive jets after clustering in the same format as the input awkward array
+        Args:
+            min_pt (float): The minimum value of the pt for the inclusive jets.
+        Returns:
+            awkward.highlevel.Array: Returns an Awkward Array of the same type as the input containting inclusive jets.
+        """
+        raise AssertionError()
+
+    def unclustered_particles(self):
+        """Returns the unclustered particles after clustering in the same format as the input awkward array
+        Args:
+            None
+        Returns:
+            awkward.highlevel.Array: Returns an Awkward Array of the same type as the input contating the unclustered particles.
+        """
+        raise AssertionError()
+
+    def exclusive_jets(self, n_jets=-1, dcut=-1):
+        """Returns the exclusive jets after clustering in the same format as the input awkward array. Either takes njets or dcut as argument.
+        Args:
+            n_jets (int): The number of jets it was clustered to.
+            dcut (float): The dcut for the result.
+        Returns:
+            awkward.highlevel.Array: Returns an Awkward Array of the same type as the input.
+        """
+        raise AssertionError()
+
+    def exclusive_jets_ycut(self, ycut=-1):
+        """Returns the exclusive jets after clustering in the same format as the input awkward array.
+        Args:
+            ycut (float): The dcut for the result.
+        Returns:
+            awkward.highlevel.Array: Returns an Awkward Array of the same type as the input.
+        """
+        raise AssertionError()
+
+    def constituent_index(self, min_pt=0):
+        """Returns the index of the constituent of each Jet.
+        Args:
+            min_pt (float): The minimum value of the pt for the inclusive jets.
+        Returns:
+            awkward.highlevel.Array: Returns an Awkward Array of the same type as the input.
+        """
+        raise AssertionError()
+
+    def constituents(self, min_pt=0):
+        """Returns the particles that make up each Jet.
+        Args:
+            min_pt (float): The minimum value of the pt for the inclusive jets.
+        Returns:
+            awkward.highlevel.Array: Returns an Awkward Array of the same type as the input.
+        """
+        raise AssertionError()
+
+    def exclusive_dmerge(self, njets=10):
+        """Returns the dmin corresponding to the recombination that went from n+1 to n jets.
+        Args:
+            n_jets (int): The number of jets it was clustered to.
+        Returns:
+            awkward.highlevel.Array: Returns an Awkward Array of the same type as the input.
+        """
+        raise AssertionError()
+
+    def exclusive_dmerge_max(self, njets=10):
+        """Returns the maximum of the dmin encountered during all recombinations up to the one that led to an n-jet final state.
+        Args:
+            n_jets (int): The number of jets it was clustered to.
+        Returns:
+            awkward.highlevel.Array: Returns an Awkward Array of the same type as the input.
+        """
+        raise AssertionError()
+
+    def exclusive_ymerge_max(self, njets=10):
+        """Same as exclusive_dmerge_max, but normalised to squared total energy.
+        Args:
+            n_jets (int): The number of jets it was clustered to.
+        Returns:
+            awkward.highlevel.Array: Returns an Awkward Array of the same type as the input.
+        """
+        raise AssertionError()
+
+    def exclusive_ymerge(self, njets=10):
+        """Returns the ymin corresponding to the recombination that went from n+1 to n jets.
+        Args:
+            n_jets (int): The number of jets it was clustered to.
+        Returns:
+            awkward.highlevel.Array: Returns an Awkward Array of the same type as the input.
+        """
+        raise AssertionError()
+
+    def Q(self):
+        """Returns the sum of all energies in the event (relevant mainly for e+e-)
+        Args:
+            None
+        Returns:
+            awkward.highlevel.Array: Returns an Awkward Array of the same type as the input.
+        """
+        raise AssertionError()
+
+    def Q2(self):
+        """Return Q()^2
+        Args:
+            None
+        Returns:
+            awkward.highlevel.Array: Returns an Awkward Array of the same type as the input.
+        """
+        raise AssertionError()
+
+    def exclusive_subjets(self, data, dcut=-1, nsub=-1):
+        """Returns an Awkward Array of all subjets of the current jet (in the sense of the exclusive algorithm) that would be obtained when running the algorithm with the given dcut.
+        Args:
+            data (awkward.highlevel.Array): An Array containing the Jets.
+            dcut (float): The dcut for the result.
+            n_sub (int): The number of subjets.
+        Returns:
+            awkward.highlevel.Array: Returns an Awkward Array of the same type as the input.
+        """
+        raise AssertionError()
+
+    def exclusive_subjets_up_to(self, data, nsub=0):
+        """Returns the list of subjets obtained by unclustering the supplied jet down to nsub subjets (or all constituents if there are fewer than nsub).
+        Args:
+            data (awkward.highlevel.Array): An Awkward Array containing the Jets.
+            n_sub (int): The number of subjets.
+        Returns:
+            awkward.highlevel.Array: Returns an Awkward Array of the same type as the input.
+        """
+        raise AssertionError()
+
+    def exclusive_subdmerge(self, data, nsub=0):
+        """Returns the dij that was present in the merging nsub+1 -> nsub subjets inside this jet.
+        Args:
+            data (awkward.highlevel.Array): An Awkward Array containing the Jets.
+            n_sub (int): The number of subjets.
+        Returns:
+            awkward.highlevel.Array: Returns an Awkward Array of the same type as the input.
+        """
+        raise AssertionError()
+
+    def exclusive_subdmerge_max(self, data, nsub=0):
+        """Returns the maximum dij that occurred in the whole event at the stage that the nsub+1 -> nsub merge of subjets occurred inside this jet.
+        Args:
+            data (awkward.highlevel.Array): An Awkward Array containing the Jets.
+            n_sub (int): The number of subjets.
+        Returns:
+            awkward.highlevel.Array: Returns an Awkward Array of the same type as the input.
+        """
+        raise AssertionError()
+
+    def n_exclusive_subjets(self, data, dcut=0):
+        """Returns the size of exclusive_subjets(...); still n ln n with same coefficient, but marginally more efficient than manually taking len(exclusive_subjets)
+        Args:
+            data (awkward.highlevel.Array): An Array containing the Jets.
+            dcut (float): The dcut for the result.
+        Returns:
+            awkward.highlevel.Array: Returns an Awkward Array of the same type as the input.
+        """
+        raise AssertionError()
+
+    def has_parents(self, data):
+        """if the jet has parents in the clustering, it returns true.
+        Args:
+            data (awkward.highlevel.Array): An Array containing the Jets.
+        Returns:
+            awkward.highlevel.Array: Returns an Awkward Array of the same type as the input.
+        """
+        raise AssertionError()
+
+    def has_child(self, data):
+        """If the jet has children in the clustering, it returns true.
+        Args:
+            data (awkward.highlevel.Array): An Array containing the Jets.
+        Returns:
+            awkward.highlevel.Array: Returns an Awkward Array of the same type as the input.
+        """
+        raise AssertionError()
+
+    def jet_scale_for_algorithm(self, data):
+        """Returns the scale associated with a jet as required for this clustering algorithm (kt^2 for the kt-algorithm, 1 for the Cambridge algorithm).
+        Args:
+            data (awkward.highlevel.Array): An Array containing the Jets.
+        Returns:
+            awkward.highlevel.Array: Returns an Awkward Array of the same type as the input.
+        """
+        raise AssertionError()
+
+    def unique_history_order(self):
+        """Routine that returns an order in which to read the history such that clusterings that lead to identical jet compositions but different histories (because of degeneracies in the clustering order) will have matching constituents for each matching entry in the unique_history_order.
+        Args:
+            None
+        Returns:
+            awkward.highlevel.Array: Returns an Awkward Array of the same type as the input.
+        """
+        raise AssertionError()
+
+    def n_particles(self):
+        """Returns the number of particles that were provided to the clustering algorithm.
+        Args:
+            None
+        Returns:
+            awkward.highlevel.Array: Returns an Awkward Array of the same type as the input.
+        """
+        raise AssertionError()
+
+    def n_exclusive_jets(self, dcut=0):
+        """Returns the number of jets (in the sense of the exclusive algorithm) that would be obtained when running the algorithm with the given dcut.
+        Args:
+            dcut (float): The dcut for the result.
+        Returns:
+            awkward.highlevel.Array: Returns an Awkward Array of the same type as the input.
+        """
+        raise AssertionError()
+
+    def childless_pseudojets(self):
+        """Return the list of pseudojets in the ClusterSequence that do not have children (and are not among the inclusive jets).
+        Args:
+            None
+        Returns:
+            awkward.highlevel.Array: Returns an Awkward Array of the same type as the input.
+        """
+        raise AssertionError()
+
+    def jets(self):
+        """Allows the user to access the internally stored _jets() array, which contains both the initial particles and the various intermediate and final stages of recombination.
+        Args:
+            none
+        Returns:
+            awkward.highlevel.Array: Returns an Awkward Array of the same type as the input.
+        """
+        raise AssertionError()
+
+    def get_parents(self, data):
+        """If the jet has parents in the clustering, it returns them.
+        Args:
+            data (awkward.highlevel.Array): An Array containing the Jets.
+        Returns:
+            awkward.highlevel.Array: Returns an Awkward Array of the same type as the input."""
+        raise AssertionError()
+
+    def get_child(self, data):
+        """If the jet has parents in the clustering, it returns them.
+        Args:
+            data (awkward.highlevel.Array): An Array containing the Jets.
+        Returns:
+            awkward.highlevel.Array: Returns an Awkward Array of the same type as the input.
+        """
+        raise AssertionError()
 
 
 class multi_inheritor(
