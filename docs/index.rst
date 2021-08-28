@@ -55,7 +55,7 @@ The fastjet library contains two interfaces within:
 * **The Awkward interface**
 * **The Classic interface**
 
-The Awkward interface is the new interface made to handle multi-event data, whereas the classic interface is the same as the C++ library, designed to handle the data in a particle-at-a-time fashion. The tutorials are divided to explain how each of the interfaces work. Please take a look at the tutorial section to get started.
+The Awkward interface is the new interface made to handle multi-event data, whereas the classic interface is the same as the C++ library, designed to handle the data in a particle-at-a-time fashion. The tutorials are divided into two to explain how each of the interfaces work. Please take a look at the tutorial section to get started.
 
 
 

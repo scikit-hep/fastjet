@@ -57,7 +57,7 @@ ClusterSequence Class
 
 After defining the JetDefinition class, the user can provide this instance to the ClusterSequence class as an argument, along with the input data to perform the clustering: ::
 
-	>>> fastjet.ClusterSequence(array, jetdef)
+	>>> cluster = fastjet.ClusterSequence(array, jetdef)
            #--------------------------------------------------------------------------
            #                         FastJet release 3.3.4
            #                 M. Cacciari, G.P. Salam and G. Soyez
