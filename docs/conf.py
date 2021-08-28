@@ -17,8 +17,13 @@ project = "fastjet"
 copyright = "2021, The Scikit-HEP admins"
 author = "Aryan Roy"
 
-sys.path.insert(0, os.path.abspath("../src/fastjet"))
+
+curdir = os.path.dirname(__file__)
+finalpath = os.path.join(curdir, "src")
+print(finalpath)
+sys.path.insert(0, os.path.abspath(finalpath))
 sys.path.insert(0, os.path.abspath(".."))
+
 # -- General configuration ---------------------------------------------------
 
 # Add any Sphinx extension module names here, as strings. They can be
