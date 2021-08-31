@@ -2,7 +2,6 @@
 
 [![Actions Status][actions-badge]][actions-link]
 [![PyPI version][pypi-version]][pypi-link]
-[![Documentation Status][rtd-badge]][rtd-link]
 [![Conda-Forge][conda-badge]][conda-link]
 
 [![PyPI platforms][pypi-platforms]][pypi-link]
