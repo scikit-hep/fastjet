@@ -23,15 +23,14 @@ The JetAlgorithms
 ----------------------
 The JetDefinition class takes `JetAlgorithms <http://fastjet.fr/repo/doxygen-3.4.0/namespacefastjet.html#a6377b557cbb936d4046d2aa936170dc0>`__  as arguments. In the above example we have chosen the Anti-kt algorithm. The list of algorithms is as following:
 
-* ee_genkt_algorithm
-* ee_kt_algorithm
-* genkt_algorithm
-* genkt_for_passive_algorithm
-* kt_algorithm
-* cambridge_for_passive_algorithm
-* cambridge_algorithm
-* cambridge_aachen_algorithm
-* antikt_algorithm
+* ``ee_genkt_algorithm`` : The e+e- genkt algorithm (R > 2 and p=1 gives ee_kt)
+* ``ee_kt_algorithm`` : The e+e- kt algorithm
+* ``genkt_algorithm`` : Like the k_t but with distance measures dij = min(kti^{2p},ktj^{2p}) Delta R_{ij}^2 / R^2 diB = 1/kti^{2p} where p = extra_param()
+* ``kt_algorithm`` : The longitudinally invariant kt algorithm
+* ``cambridge_for_passive_algorithm`` : A version of cambridge with a special distance measure for particles whose pt is < extra_param(); This is not usually intended for end users, but is instead automatically selected when requesting a passive Cambridge area.
+* ``cambridge_algorithm`` : The longitudinally invariant variant of the cambridge algorithm (aka Aachen algoithm).
+* ``antikt_algorithm`` : Like the k_t but with distance measures dij = min(1/kti^2,1/ktj^2) Delta R_{ij}^2 / R^2 diB = 1/kti^2
+* There are other algorithms mentioned do not work.
 
 The Data
 ---------
