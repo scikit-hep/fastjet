@@ -19,10 +19,8 @@ author = "Aryan Roy"
 
 
 curdir = os.path.dirname(__file__)
-finalpath = os.path.join(curdir, "src")
-print(finalpath)
-sys.path.insert(0, os.path.abspath(finalpath))
-sys.path.insert(0, os.path.abspath(".."))
+finalpath = os.path.join(curdir, "..", "src")
+sys.path.insert(0, finalpath)
 
 # -- General configuration ---------------------------------------------------
 
