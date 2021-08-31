@@ -33,6 +33,8 @@ extensions = [
     "sphinx.ext.napoleon",
 ]
 
+autodoc_mock_imports = ["fastjet._ext", "fastjet._pyjet", "fastjet._swig"]
+
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
 
