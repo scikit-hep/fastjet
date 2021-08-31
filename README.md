@@ -44,7 +44,7 @@ python -m pip install fastjet
 
 <br>
 <center>
-<p >
+<p>
 <a href = "https://fastjet.readthedocs.io/en/latest/?">
 <img src = "https://readthedocs.org/projects/fastjet/badge/?" width="200" height="50">
 </a>
