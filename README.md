@@ -43,13 +43,11 @@ python -m pip install fastjet
 # Tutorial
 
 <br>
-<center>
-<p>
+<p align = "center">
 <a href = "https://fastjet.readthedocs.io/en/latest/?">
 <img src = "https://readthedocs.org/projects/fastjet/badge/?" width="200" height="50">
 </a>
 </p>
-</center>
 <br>
 
 # Installation For Developers
