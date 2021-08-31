@@ -1,16 +1,16 @@
 The Array Oriented Interface
 ============================
 
-The tutorial on this page describes how the user can use Awkward Arrays to perform clustering on the particle data.
+The tutorial on this page describes how the user can use `Awkward Arrays <https://awkward-array.org/quickstart.html>`__  to perform clustering on the particle data.
 
 Clustering Specification
 -------------------------
 
 The fastjet library has some clases specifically made to provide the different parameters for clustering. This includes the following classes :
 
-* JetDefinition
-* AreaDefinition
-* RangeDefinition
+* `JetDefinition <http://fastjet.fr/repo/doxygen-3.4.0/classfastjet_1_1JetDefinition.html>`__
+* `AreaDefinition <http://fastjet.fr/repo/doxygen-3.4.0/classfastjet_1_1AreaDefinition.html>`__
+* `RangeDefinition <http://fastjet.fr/repo/doxygen-3.4.0/classfastjet_1_1RangeDefinition.html>`__
 
 For example, the JetDefinition class can be instantiated in the following way: ::
 
@@ -19,9 +19,9 @@ For example, the JetDefinition class can be instantiated in the following way: :
 
 The JetDefinition class takes varied number of arguments, the first argument is always the type of algorithm, the number of rest of the arguments depends on how many parameters the given algorithm requires.
 
-The Algorithm Classes
+The JetAlgorithms
 ----------------------
-The JetDefinition class takes algorithm classes as arguments. In the above example we have chosen the Anti-kt algorithm. The list of algorithms is as following:
+The JetDefinition class takes `JetAlgorithms <http://fastjet.fr/repo/doxygen-3.4.0/namespacefastjet.html#a6377b557cbb936d4046d2aa936170dc0>`__  as arguments. In the above example we have chosen the Anti-kt algorithm. The list of algorithms is as following:
 
 * ee_genkt_algorithm
 * ee_kt_algorithm
@@ -58,19 +58,6 @@ ClusterSequence Class
 After defining the JetDefinition class, the user can provide this instance to the ClusterSequence class as an argument, along with the input data to perform the clustering: ::
 
 	>>> cluster = fastjet.ClusterSequence(array, jetdef)
-           #--------------------------------------------------------------------------
-           #                         FastJet release 3.3.4
-           #                 M. Cacciari, G.P. Salam and G. Soyez
-           #     A software package for jet finding and analysis at colliders
-           #                           http://fastjet.fr
-           #
-           # Please cite EPJC72(2012)1896 [arXiv:1111.6097] if you use this package
-           # for scientific work and optionally PLB641(2006)57 [hep-ph/0512210].
-           #
-           # FastJet is provided without warranty under the GNU GPL v2 or higher.
-           # It uses T. Chan's closest pair algorithm, S. Fortune's Voronoi code
-           # and 3rd party plugin jet algorithms. See COPYING file for details.
-           #--------------------------------------------------------------------------
            <fastjet._pyjet.AwkwardClusterSequence object at 0x7f1413120a90>
 
 
@@ -80,3 +67,7 @@ Any output that has to be an Array will be an Awkward Array in the array oriente
 
 	>>> cluster.inclusive_jets()
 	   <Array [{px: 1.2, py: 3.2, ... E: 48.7}] type='2 * Momentum4D["px": float64, "py...'>
+
+Limitations
+-----------
+The Awkward Array interface is only available for the fastjet.ClusterSequence class. The Awkward Array functionality is likely to be expanded to other classes in the future.

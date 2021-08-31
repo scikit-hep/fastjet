@@ -12,9 +12,9 @@ Clustering Specification
 
 The fastjet library has some clases specifically made to provide the different parameters for clustering. This includes the following classes :
 
-* JetDefinition
-* AreaDefinition
-* RangeDefinition
+* `JetDefinition <http://fastjet.fr/repo/doxygen-3.4.0/classfastjet_1_1JetDefinition.html>`__
+* `AreaDefinition <http://fastjet.fr/repo/doxygen-3.4.0/classfastjet_1_1AreaDefinition.html>`__
+* `RangeDefinition <http://fastjet.fr/repo/doxygen-3.4.0/classfastjet_1_1RangeDefinition.html>`__
 
 For example, the JetDefinition class can be instantiated in the following way: ::
 
@@ -23,9 +23,9 @@ For example, the JetDefinition class can be instantiated in the following way: :
 
 The JetDefinition class takes varied number of arguments, the first argument is always the type of algorithm, the number of rest of the arguments depends on how many parameters the given algorithm requires.
 
-The algorithm classes
+The JetAlgorithms
 ----------------------
-The JetDefinition class takes algorithm classes as arguments. In the above example we have chosen the Anti-kt algorithm. The list of algorithms is as following:
+The JetDefinition class takes `JetAlgorithms <http://fastjet.fr/repo/doxygen-3.4.0/namespacefastjet.html#a6377b557cbb936d4046d2aa936170dc0>`__  as arguments. In the above example we have chosen the Anti-kt algorithm. The list of algorithms is as following:
 
 * ee_genkt_algorithm
 * ee_kt_algorithm
