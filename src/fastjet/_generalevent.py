@@ -555,23 +555,6 @@ class _classgeneralevent:
         else:
             raise AssertionError(layout)
 
-    def _add_parameters(self, out_dat):
-        if self._check_record(ak.Array(out_dat.layout.content)):
-            temp_dict = out_dat.layout.content.parameters
-            temp_dict["__record__"] = "Momentum4D"
-            out_dat.layout.content.parameters = temp_dict
-            return out_dat
-        elif self._check_record(ak.Array(out_dat.layout.content.content)):
-            temp_dict = out_dat.layout.content.content.parameters
-            temp_dict["__record__"] = "Momentum4D"
-            out_dat.layout.content.content.parameters = temp_dict
-            return out_dat
-        elif self._check_record(ak.Array(out_dat.layout.content.content.content)):
-            temp_dict = out_dat.layout.content.content.content.parameters
-            temp_dict["__record__"] = "Momentum4D"
-            out_dat.layout.content.content.content.parameters = temp_dict
-            return out_dat
-
     def inclusive_jets(self, min_pt):
         self._out = []
         self._input_flag = 0
@@ -590,12 +573,12 @@ class _classgeneralevent:
                                 ak.layout.NumpyArray(np_results[3]),
                             ),
                             ("px", "py", "pz", "E"),
+                            parameters={"__record__": "Momentum4D"},
                         ),
                     ),
                     behavior=self.data.behavior,
                 )
             )
-            self._out[-1] = self._add_parameters(self._out[-1])
         res = ak.Array(self._replace_multi())
         return res
 
@@ -619,9 +602,7 @@ class _classgeneralevent:
             total = np.sum(shape)
             duplicate = ak.unflatten(np.zeros(total, np.int64), shape)
             prepared = self._clusterable_level[i][:, np.newaxis][duplicate]
-            out = prepared[outputs_to_inputs]
-            out = self._add_parameters(out)
-            self._out.append(out)
+            self._out.append(prepared[outputs_to_inputs])
         res = ak.Array(self._replace_multi())
         return res
 
@@ -664,12 +645,12 @@ class _classgeneralevent:
                                 ak.layout.NumpyArray(np_results[3]),
                             ),
                             ("px", "py", "pz", "E"),
+                            parameters={"__record__": "Momentum4D"},
                         ),
                     ),
                     behavior=self.data.behavior,
                 )
             )
-            self._out[-1] = self._add_parameters(self._out[-1])
         res = ak.Array(self._replace_multi())
         return res
 
@@ -709,12 +690,12 @@ class _classgeneralevent:
                                 ak.layout.NumpyArray(np_results[3]),
                             ),
                             ("px", "py", "pz", "E"),
+                            parameters={"__record__": "Momentum4D"},
                         ),
                     ),
                     behavior=self.data.behavior,
                 )
             )
-            self._out[-1] = self._add_parameters(self._out[-1])
         res = ak.Array(self._replace_multi())
         return res
 
@@ -736,12 +717,12 @@ class _classgeneralevent:
                                 ak.layout.NumpyArray(np_results[3]),
                             ),
                             ("px", "py", "pz", "E"),
+                            parameters={"__record__": "Momentum4D"},
                         ),
                     ),
                     behavior=self.data.behavior,
                 )
             )
-            self._out[-1] = self._add_parameters(self._out[-1])
         res = ak.Array(self._replace_multi())
         return res
 
@@ -773,12 +754,12 @@ class _classgeneralevent:
                                 ak.layout.NumpyArray(np_results[3]),
                             ),
                             ("px", "py", "pz", "E"),
+                            parameters={"__record__": "Momentum4D"},
                         ),
                     ),
                     behavior=self.data.behavior,
                 )
             )
-            self._out[-1] = self._add_parameters(self._out[-1])
         res = ak.Array(self._replace_multi())
         return res
 
@@ -800,12 +781,12 @@ class _classgeneralevent:
                                 ak.layout.NumpyArray(np_results[3]),
                             ),
                             ("px", "py", "pz", "E"),
+                            parameters={"__record__": "Momentum4D"},
                         ),
                     ),
                     behavior=self.data.behavior,
                 )
             )
-            self._out[-1] = self._add_parameters(self._out[-1])
         res = ak.Array(self._replace_multi())
         return res
 
@@ -915,12 +896,12 @@ class _classgeneralevent:
                                 ak.layout.NumpyArray(np_results[3]),
                             ),
                             ("px", "py", "pz", "E"),
+                            parameters={"__record__": "Momentum4D"},
                         ),
                     ),
                     behavior=self.data.behavior,
                 )
             )
-            self._out[-1] = self._add_parameters(self._out[-1])
 
         res = ak.Array(self._replace_multi())
         return res
@@ -1008,12 +989,12 @@ class _classgeneralevent:
                                 ak.layout.NumpyArray(np_results[3]),
                             ),
                             ("px", "py", "pz", "E"),
+                            parameters={"__record__": "Momentum4D"},
                         ),
                     ),
                     behavior=self.data.behavior,
                 )
             )
-            self._out[-1] = self._add_parameters(self._out[-1])
         res = ak.Array(self._replace_multi())
         return res
 
@@ -1055,12 +1036,12 @@ class _classgeneralevent:
                                 ak.layout.NumpyArray(np_results[3]),
                             ),
                             ("px", "py", "pz", "E"),
+                            parameters={"__record__": "Momentum4D"},
                         ),
                     ),
                     behavior=self.data.behavior,
                 )
             )
-            self._out[-1] = self._add_parameters(self._out[-1])
         res = ak.Array(self._replace_multi())
         return res
 
@@ -1240,11 +1221,11 @@ class _classgeneralevent:
                                 ak.layout.NumpyArray(np_results[3]),
                             ),
                             ("px", "py", "pz", "E"),
+                            parameters={"__record__": "Momentum4D"},
                         ),
                     ),
                     behavior=self.data.behavior,
                 )
             )
-            self._out[-1] = self._add_parameters(self._out[-1])
         res = ak.Array(self._replace_multi())
         return res
