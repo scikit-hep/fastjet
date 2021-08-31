@@ -17,8 +17,11 @@ project = "fastjet"
 copyright = "2021, The Scikit-HEP admins"
 author = "Aryan Roy"
 
-sys.path.insert(0, os.path.abspath("../src/fastjet"))
-sys.path.insert(0, os.path.abspath(".."))
+
+curdir = os.path.dirname(__file__)
+finalpath = os.path.join(curdir, "..", "src")
+sys.path.insert(0, finalpath)
+
 # -- General configuration ---------------------------------------------------
 
 # Add any Sphinx extension module names here, as strings. They can be
@@ -29,6 +32,8 @@ extensions = [
     "sphinx.ext.mathjax",
     "sphinx.ext.napoleon",
 ]
+
+autodoc_mock_imports = ["fastjet._ext", "fastjet._pyjet", "fastjet._swig"]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
@@ -45,6 +50,10 @@ exclude_patterns = ["_build", "**.ipynb_checkpoints", "Thumbs.db", ".DS_Store", 
 # a list of builtin themes.
 #
 html_theme = "sphinx_rtd_theme"
+
+html_show_sourcelink = False
+html_logo = "../docs/logo.svg"
+html_theme_options = {"logo_only": True, "style_nav_header_background": "#fcfcfc"}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
