@@ -42,6 +42,8 @@ python -m pip install fastjet
 ```
 # Tutorial
 
+For a tutorial please look at the tutorial section of readthedocs page of this package.
+
 <br>
 <p align = "center">
 <a href = "https://fastjet.readthedocs.io/en/latest/?">
