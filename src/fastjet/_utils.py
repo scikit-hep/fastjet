@@ -12,7 +12,7 @@ def sorted_by_E(data):
         except AttributeError:
             raise AttributeError(
                 "Needs either correct coordinates or embedded vector backend"
-            )
+            ) from None
         tmpsort = ak.argsort(tempE, axis=-1)
         return data[tmpsort]
     else:
