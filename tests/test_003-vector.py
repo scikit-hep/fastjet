@@ -27,9 +27,9 @@ def test_vector_single():
             "E": 2.5,
         }
     ]
-    assert exclusive_dcut == pytest.approx(
-        cluster.exclusive_jets(dcut=0.0001).to_list()
-    )
+    assert exclusive_dcut == [
+        pytest.approx(x) for x in cluster.exclusive_jets(dcut=0.0001).to_list()
+    ]
     exclusive_njets = [
         {
             "px": 1.9567318741740376,
@@ -38,7 +38,9 @@ def test_vector_single():
             "E": 2.5,
         }
     ]
-    assert exclusive_njets == pytest.approx(cluster.exclusive_jets(n_jets=1).to_list())
+    assert exclusive_njets == [
+        pytest.approx(x) for x in cluster.exclusive_jets(n_jets=1).to_list()
+    ]
     inclusive_jets = [
         {
             "px": 1.9567318741740376,
@@ -59,7 +61,9 @@ def test_vector_single():
             "E": 24.12,
         },
     ]
-    assert inclusive_jets == pytest.approx(cluster.inclusive_jets().to_list())
+    assert inclusive_jets == [
+        pytest.approx(x) for x in cluster.inclusive_jets().to_list()
+    ]
     constituents = [
         [
             {
@@ -86,7 +90,9 @@ def test_vector_single():
             }
         ],
     ]
-    assert constituents == [pytest.approx(x) for x in cluster.constituents().to_list()]
+    assert constituents == [
+        [pytest.approx(y) for y in x] for x in cluster.constituents().to_list()
+    ]
     constituent_index = [[0], [2], [1]]
     assert constituent_index == [
         pytest.approx(x) for x in cluster.constituent_index().to_list()
@@ -132,7 +138,8 @@ def test_vector_multi():
     ]
 
     assert exclusive_dcut == [
-        pytest.approx(x) for x in cluster.exclusive_jets(dcut=0.0001).to_list()
+        [pytest.approx(y) for y in x]
+        for x in cluster.exclusive_jets(dcut=0.0001).to_list()
     ]
     exclusive_njets = [
         [
@@ -154,7 +161,8 @@ def test_vector_multi():
     ]
 
     assert exclusive_njets == [
-        pytest.approx(x) for x in cluster.exclusive_jets(n_jets=1).to_list()
+        [pytest.approx(y) for y in x]
+        for x in cluster.exclusive_jets(n_jets=1).to_list()
     ]
     inclusive_jets = [
         [
@@ -199,7 +207,7 @@ def test_vector_multi():
         ],
     ]
     assert inclusive_jets == [
-        pytest.approx(x) for x in cluster.inclusive_jets().to_list()
+        [pytest.approx(y) for y in x] for x in cluster.inclusive_jets().to_list()
     ]
     constituents = [
         [
@@ -215,7 +223,8 @@ def test_vector_multi():
     ]
 
     assert constituents == [
-        [pytest.approx(y) for y in x] for x in cluster.constituents().to_list()
+        [[pytest.approx(z) for z in y] for y in x]
+        for x in cluster.constituents().to_list()
     ]
     constituent_index = [[[0], [2], [1]], [[0], [2], [1]]]
     assert constituent_index == [
