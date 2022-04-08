@@ -1,6 +1,5 @@
 [build-system]
 requires = [
-    "wheel",
     "setuptools>=42",
     "setuptools_scm[toml]>=3.4",
     "pybind11>=2.6.1",
