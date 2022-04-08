@@ -53,21 +53,21 @@ class AwkwardClusterSequence(ClusterSequence):
             ),
         ):
             return 1 + max(
-                [self._check_jaggedness(ak.Array(x)) for x in data.layout.contents]
+                self._check_jaggedness(ak.Array(x)) for x in data.layout.contents
             )
         if isinstance(
             data.layout,
             (ak.layout.RecordArray,),
         ):
             return 1 + max(
-                [self._check_jaggedness(ak.Array(x)) for x in data.layout.contents]
+                self._check_jaggedness(ak.Array(x)) for x in data.layout.contents
             )
         if isinstance(
             data.layout,
             (ak.partition.IrregularlyPartitionedArray),
         ):
             return 1 + max(
-                [self._check_jaggedness(ak.Array(x)) for x in data.layout.partitions]
+                self._check_jaggedness(ak.Array(x)) for x in data.layout.partitions
             )
         if isinstance(data.layout, ak.layout.VirtualArray):
             return 1 + self._check_jaggedness(ak.Array(data.layout.array))
