@@ -79,7 +79,7 @@ def join(*argv):
         if len(argv) == 4:
             return fastjet._swig.join(argv[0], argv[1], argv[2], argv[3])
         if len(argv) > 4:
-            raise ValueError("Length exceeded")
+            raise ValueError("Length exceeded") from None
 
 
 def dot_product(a, b):
