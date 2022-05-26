@@ -68,7 +68,7 @@ jobs:
       with:
         submodules: recursive
 
-    - uses: pypa/cibuildwheel@v2.1.1
+    - uses: pypa/cibuildwheel@2.6.0
       env:
         CIBW_ARCHS: auto64
         CIBW_BUILD: cp39-*
