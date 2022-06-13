@@ -217,7 +217,7 @@ class ClusterSequence:  # The super class
             self.__class__ = fastjet._swig.ClusterSequence
             fastjet._swig.ClusterSequence.__init__(self, data, jetdef)
 
-    def jet_def(self):
+    def jet_def(self) -> JetDefinition:
         """Returns the Jet Definition Object associated with the instance
 
         Args:
@@ -228,7 +228,7 @@ class ClusterSequence:  # The super class
         """
         raise AssertionError()
 
-    def inclusive_jets(self, min_pt=0):
+    def inclusive_jets(self, min_pt=0) -> ak.Array:
         """Returns the inclusive jets after clustering in the same format as the input awkward array
 
         Args:
@@ -239,7 +239,7 @@ class ClusterSequence:  # The super class
         """
         raise AssertionError()
 
-    def unclustered_particles(self):
+    def unclustered_particles(self) -> ak.Array:
         """Returns the unclustered particles after clustering in the same format as the input awkward array
 
         Args:
@@ -250,7 +250,7 @@ class ClusterSequence:  # The super class
         """
         raise AssertionError()
 
-    def exclusive_jets(self, n_jets=-1, dcut=-1):
+    def exclusive_jets(self, n_jets=-1, dcut=-1) -> ak.Array:
         """Returns the exclusive jets after clustering in the same format as the input awkward array. Either takes njets or dcut as argument.
 
         Args:
@@ -262,7 +262,7 @@ class ClusterSequence:  # The super class
         """
         raise AssertionError()
 
-    def exclusive_jets_ycut(self, ycut=-1):
+    def exclusive_jets_ycut(self, ycut=-1) -> ak.Array:
         """Returns the exclusive jets after clustering in the same format as the input awkward array.
 
         Args:
@@ -273,7 +273,7 @@ class ClusterSequence:  # The super class
         """
         raise AssertionError()
 
-    def constituent_index(self, min_pt=0):
+    def constituent_index(self, min_pt=0) -> ak.Array:
         """Returns the index of the constituent of each Jet.
 
         Args:
@@ -284,7 +284,7 @@ class ClusterSequence:  # The super class
         """
         raise AssertionError()
 
-    def constituents(self, min_pt=0):
+    def constituents(self, min_pt=0) -> ak.Array:
         """Returns the particles that make up each Jet.
 
         Args:
@@ -295,7 +295,7 @@ class ClusterSequence:  # The super class
         """
         raise AssertionError()
 
-    def exclusive_dmerge(self, njets=10):
+    def exclusive_dmerge(self, njets=10) -> ak.Array:
         """Returns the dmin corresponding to the recombination that went from n+1 to n jets.
 
         Args:
@@ -306,7 +306,7 @@ class ClusterSequence:  # The super class
         """
         raise AssertionError()
 
-    def exclusive_dmerge_max(self, njets=10):
+    def exclusive_dmerge_max(self, njets=10) -> ak.Array:
         """Returns the maximum of the dmin encountered during all recombinations up to the one that led to an n-jet final state.
 
         Args:
@@ -317,7 +317,7 @@ class ClusterSequence:  # The super class
         """
         raise AssertionError()
 
-    def exclusive_ymerge_max(self, njets=10):
+    def exclusive_ymerge_max(self, njets=10) -> ak.Array:
         """Same as exclusive_dmerge_max, but normalised to squared total energy.
 
         Args:
@@ -328,7 +328,7 @@ class ClusterSequence:  # The super class
         """
         raise AssertionError()
 
-    def exclusive_ymerge(self, njets=10):
+    def exclusive_ymerge(self, njets=10) -> ak.Array:
         """Returns the ymin corresponding to the recombination that went from n+1 to n jets.
 
         Args:
@@ -339,7 +339,7 @@ class ClusterSequence:  # The super class
         """
         raise AssertionError()
 
-    def Q(self):
+    def Q(self) -> ak.Array:
         """Returns the sum of all energies in the event (relevant mainly for e+e-)
 
         Args:
@@ -350,7 +350,7 @@ class ClusterSequence:  # The super class
         """
         raise AssertionError()
 
-    def Q2(self):
+    def Q2(self) -> ak.Array:
         """Return Q()^2
 
         Args:
@@ -361,7 +361,7 @@ class ClusterSequence:  # The super class
         """
         raise AssertionError()
 
-    def exclusive_subjets(self, data, dcut=-1, nsub=-1):
+    def exclusive_subjets(self, data, dcut=-1, nsub=-1) -> ak.Array:
         """Returns an Awkward Array of all subjets of the current jet (in the sense of the exclusive algorithm) that would be obtained when running the algorithm with the given dcut.
 
         Args:
@@ -374,7 +374,7 @@ class ClusterSequence:  # The super class
         """
         raise AssertionError()
 
-    def exclusive_subjets_up_to(self, data, nsub=0):
+    def exclusive_subjets_up_to(self, data, nsub=0) -> ak.Array:
         """Returns the list of subjets obtained by unclustering the supplied jet down to nsub subjets (or all constituents if there are fewer than nsub).
 
         Args:
@@ -386,7 +386,7 @@ class ClusterSequence:  # The super class
         """
         raise AssertionError()
 
-    def exclusive_subdmerge(self, data, nsub=0):
+    def exclusive_subdmerge(self, data, nsub=0) -> ak.Array:
         """Returns the dij that was present in the merging nsub+1 -> nsub subjets inside this jet.
 
         Args:
@@ -398,7 +398,7 @@ class ClusterSequence:  # The super class
         """
         raise AssertionError()
 
-    def exclusive_subdmerge_max(self, data, nsub=0):
+    def exclusive_subdmerge_max(self, data, nsub=0) -> ak.Array:
         """Returns the maximum dij that occurred in the whole event at the stage that the nsub+1 -> nsub merge of subjets occurred inside this jet.
 
         Args:
@@ -410,7 +410,7 @@ class ClusterSequence:  # The super class
         """
         raise AssertionError()
 
-    def n_exclusive_subjets(self, data, dcut=0):
+    def n_exclusive_subjets(self, data, dcut=0) -> ak.Array:
         """Returns the size of exclusive_subjets(...); still n ln n with same coefficient, but marginally more efficient than manually taking len(exclusive_subjets)
 
         Args:
@@ -422,7 +422,7 @@ class ClusterSequence:  # The super class
         """
         raise AssertionError()
 
-    def has_parents(self, data):
+    def has_parents(self, data) -> ak.Array:
         """if the jet has parents in the clustering, it returns true.
 
         Args:
@@ -433,7 +433,7 @@ class ClusterSequence:  # The super class
         """
         raise AssertionError()
 
-    def has_child(self, data):
+    def has_child(self, data) -> ak.Array:
         """If the jet has children in the clustering, it returns true.
 
         Args:
@@ -444,7 +444,7 @@ class ClusterSequence:  # The super class
         """
         raise AssertionError()
 
-    def jet_scale_for_algorithm(self, data):
+    def jet_scale_for_algorithm(self, data) -> ak.Array:
         """Returns the scale associated with a jet as required for this clustering algorithm (kt^2 for the kt-algorithm, 1 for the Cambridge algorithm).
 
         Args:
@@ -455,7 +455,7 @@ class ClusterSequence:  # The super class
         """
         raise AssertionError()
 
-    def unique_history_order(self):
+    def unique_history_order(self) -> ak.Array:
         """Routine that returns an order in which to read the history such that clusterings that lead to identical jet compositions but different histories (because of degeneracies in the clustering order) will have matching constituents for each matching entry in the unique_history_order.
 
         Args:
@@ -466,7 +466,7 @@ class ClusterSequence:  # The super class
         """
         raise AssertionError()
 
-    def n_particles(self):
+    def n_particles(self) -> ak.Array:
         """Returns the number of particles that were provided to the clustering algorithm.
 
         Args:
@@ -477,7 +477,7 @@ class ClusterSequence:  # The super class
         """
         raise AssertionError()
 
-    def n_exclusive_jets(self, dcut=0):
+    def n_exclusive_jets(self, dcut=0) -> ak.Array:
         """Returns the number of jets (in the sense of the exclusive algorithm) that would be obtained when running the algorithm with the given dcut.
 
         Args:
@@ -488,7 +488,7 @@ class ClusterSequence:  # The super class
         """
         raise AssertionError()
 
-    def childless_pseudojets(self):
+    def childless_pseudojets(self) -> ak.Array:
         """Return the list of pseudojets in the ClusterSequence that do not have children (and are not among the inclusive jets).
 
         Args:
@@ -499,7 +499,7 @@ class ClusterSequence:  # The super class
         """
         raise AssertionError()
 
-    def jets(self):
+    def jets(self) -> ak.Array:
         """Allows the user to access the internally stored _jets() array, which contains both the initial particles and the various intermediate and final stages of recombination.
 
         Args:
@@ -510,7 +510,7 @@ class ClusterSequence:  # The super class
         """
         raise AssertionError()
 
-    def get_parents(self, data):
+    def get_parents(self, data) -> ak.Array:
         """If the jet has parents in the clustering, it returns them.
 
         Args:
@@ -520,7 +520,7 @@ class ClusterSequence:  # The super class
             awkward.highlevel.Array: Returns an Awkward Array of the same type as the input."""
         raise AssertionError()
 
-    def get_child(self, data):
+    def get_child(self, data) -> ak.Array:
         """If the jet has parents in the clustering, it returns them.
 
         Args:
