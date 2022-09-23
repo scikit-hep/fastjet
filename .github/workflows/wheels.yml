@@ -28,7 +28,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-build-version: ["cp36-*", "cp37-*", "cp38-*", "cp39-*"]
+        python-build-version: ["cp*"]
         os: [ubuntu-latest]   # , macos-latest
 
     steps:
