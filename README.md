@@ -74,5 +74,5 @@ sudo apt-get update && sudo apt-get install -y libboost-dev swig autoconf libtoo
 
 Then you can build it using the following command:
 ``` bash
-python -m pip install .[test]
+python -m pip install '.[test]'
 ```
