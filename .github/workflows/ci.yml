@@ -29,7 +29,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.6, 3.9]
+        python-version: ['3.6', '3.10']
         runs-on: [ubuntu-latest]   # , macos-latest
 
         # include:
@@ -71,7 +71,7 @@ jobs:
     - uses: pypa/cibuildwheel@v2.11.1
       env:
         CIBW_ARCHS: auto64
-        CIBW_BUILD: cp39-*
+        CIBW_BUILD: cp310-*
         CIBW_BUILD_VERBOSITY: 2
 
     - name: Upload wheels
