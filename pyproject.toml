@@ -18,3 +18,4 @@ before-all = [
     "yum update -y",
     "yum install -y mpfr-devel boost-devel",
 ]
+repair-wheel-command = "LD_LIBRARY_PATH={project}/build/lib.{platform}-3.10/fastjet/_fastjet_core/lib auditwheel repair -w {dest_dir} {wheel}"
