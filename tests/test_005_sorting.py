@@ -86,7 +86,7 @@ def test_ptsorting():
                 {"px": 32.45, "py": 63.21, "pz": 543.14, "E": 24.56, "ex": 0.0},
             ],
         ],
-        behavior=vector._backends.awkward_.behavior,
+        behavior=vector.backends.awkward.behavior,
         with_name="Momentum4D",
     )
     ans = [
@@ -119,7 +119,7 @@ def test_rapsorting():
                 {"px": 32.45, "py": 63.21, "pz": 543.14, "E": 24.56, "ex": 0.0},
             ],
         ],
-        behavior=vector._backends.awkward_.behavior,
+        behavior=vector.backends.awkward.behavior,
         with_name="Momentum4D",
     )
     ans = [
