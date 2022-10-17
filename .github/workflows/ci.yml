@@ -75,7 +75,7 @@ jobs:
     - uses: pypa/cibuildwheel@v2.1.1
       env:
         CIBW_ARCHS: auto64
-        CIBW_BUILD: cp39-*
+        CIBW_BUILD: cp310-*
         CIBW_BUILD_VERBOSITY: 2
 
     - name: Upload wheels
