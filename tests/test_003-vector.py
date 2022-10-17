@@ -15,7 +15,7 @@ def test_vector_single():
             {"phi": 32.45, "eta": 63.21, "rho": 543.14, "E": 24.56, "ex": 0.0},
         ],
         with_name="Momentum4D",
-        behavior=vector._backends.awkward_.behavior,
+        behavior=vector.backends.awkward.behavior,
     )
     jetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.6)
     cluster = fastjet._pyjet.AwkwardClusterSequence(array, jetdef)
@@ -114,7 +114,7 @@ def test_vector_multi():
             ],
         ],
         with_name="Momentum4D",
-        behavior=vector._backends.awkward_.behavior,
+        behavior=vector.backends.awkward.behavior,
     )
     jetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.6)
     cluster = fastjet._pyjet.AwkwardClusterSequence(array, jetdef)
