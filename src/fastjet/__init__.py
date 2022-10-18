@@ -1,7 +1,8 @@
 # BSD 3-Clause License; see https://github.com/scikit-hep/fastjet/blob/main/LICENSE
 
-import awkward as ak
 from typing import Union
+
+import awkward as ak
 
 import fastjet._ext  # noqa: F401, E402
 import fastjet._pyjet  # noqa: F401, E402
@@ -362,7 +363,9 @@ class ClusterSequence:  # The super class
         """
         raise AssertionError()
 
-    def exclusive_subjets(self, data: ak.Array, dcut: float = -1, nsub:int = -1) -> ak.Array:
+    def exclusive_subjets(
+        self, data: ak.Array, dcut: float = -1, nsub: int = -1
+    ) -> ak.Array:
         """Returns an Awkward Array of all subjets of the current jet (in the sense of the exclusive algorithm) that would be obtained when running the algorithm with the given dcut.
 
         Args:
@@ -387,7 +390,9 @@ class ClusterSequence:  # The super class
         """
         raise AssertionError()
 
-    def exclusive_subdmerge(self, data: ak.Array, nsub: int = 0) -> Union[ak.Array, float]:
+    def exclusive_subdmerge(
+        self, data: ak.Array, nsub: int = 0
+    ) -> Union[ak.Array, float]:
         """Returns the dij that was present in the merging nsub+1 -> nsub subjets inside this jet.
 
         Args:
@@ -399,7 +404,9 @@ class ClusterSequence:  # The super class
         """
         raise AssertionError()
 
-    def exclusive_subdmerge_max(self, data: ak.Array, nsub: int = 0) -> Union[ak.Array, float]:
+    def exclusive_subdmerge_max(
+        self, data: ak.Array, nsub: int = 0
+    ) -> Union[ak.Array, float]:
         """Returns the maximum dij that occurred in the whole event at the stage that the nsub+1 -> nsub merge of subjets occurred inside this jet.
 
         Args:
@@ -411,7 +418,9 @@ class ClusterSequence:  # The super class
         """
         raise AssertionError()
 
-    def n_exclusive_subjets(self, data: ak.Array, dcut: float = 0) -> Union[ak.Array, int]:
+    def n_exclusive_subjets(
+        self, data: ak.Array, dcut: float = 0
+    ) -> Union[ak.Array, int]:
         """Returns the size of exclusive_subjets(...); still n ln n with same coefficient, but marginally more efficient than manually taking len(exclusive_subjets)
 
         Args:
