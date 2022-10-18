@@ -217,7 +217,7 @@ class _classmultievent:
             pz = data.pz
             E = data.E
         except AttributeError:
-            raise AttributeError("Lorentz vector not found")
+            raise AttributeError("Lorentz vector not found") from None
         of = 0
         np_results = 0
         if nsub == 0:
@@ -233,7 +233,7 @@ class _classmultievent:
             )
             of = np.insert(np_results[-1], len(np_results[-1]), len(np_results[0]))
         if np_results == 0 and of == 0:
-            raise ValueError("Either NJets or Dcut sould be entered")
+            raise ValueError("Either NJets or Dcut sould be entered") from None
 
         return ak.Array(
             ak.layout.ListOffsetArray64(
@@ -259,7 +259,7 @@ class _classmultievent:
             pz = data.pz
             E = data.E
         except AttributeError:
-            raise AttributeError("Lorentz vector not found")
+            raise AttributeError("Lorentz vector not found") from None
         np_results = self._results.to_numpy_exclusive_subjets_up_to(px, py, pz, E, nsub)
         of = np.insert(np_results[-1], len(np_results[-1]), len(np_results[0]))
         return ak.Array(
@@ -286,7 +286,7 @@ class _classmultievent:
             pz = data.pz
             E = data.E
         except AttributeError:
-            raise AttributeError("Lorentz vector not found")
+            raise AttributeError("Lorentz vector not found") from None
         np_results = self._results.to_numpy_exclusive_subdmerge(px, py, pz, E, nsub)
         out = ak.Array(ak.layout.NumpyArray(np_results[0]))
         return out
@@ -298,7 +298,7 @@ class _classmultievent:
             pz = data.pz
             E = data.E
         except AttributeError:
-            raise AttributeError("Lorentz vector not found")
+            raise AttributeError("Lorentz vector not found") from None
         np_results = self._results.to_numpy_exclusive_subdmerge_max(px, py, pz, E, nsub)
         out = ak.Array(ak.layout.NumpyArray(np_results[0]))
         return out
@@ -310,7 +310,7 @@ class _classmultievent:
             pz = data.pz
             E = data.E
         except AttributeError:
-            raise AttributeError("Lorentz vector not found")
+            raise AttributeError("Lorentz vector not found") from None
         np_results = self._results.to_numpy_n_exclusive_subjets(px, py, pz, E, dcut)
         out = ak.Array(ak.layout.NumpyArray(np_results[0]))
         return out
@@ -322,7 +322,7 @@ class _classmultievent:
             pz = data.pz
             E = data.E
         except AttributeError:
-            raise AttributeError("Lorentz vector not found")
+            raise AttributeError("Lorentz vector not found") from None
         np_results = self._results.to_numpy_has_parents(px, py, pz, E)
         out = ak.Array(ak.layout.NumpyArray(np_results[0]))
         return out
@@ -334,7 +334,7 @@ class _classmultievent:
             pz = data.pz
             E = data.E
         except AttributeError:
-            raise AttributeError("Lorentz vector not found")
+            raise AttributeError("Lorentz vector not found") from None
         np_results = self._results.to_numpy_has_child(px, py, pz, E)
         out = ak.Array(ak.layout.NumpyArray(np_results[0]))
         return out
@@ -346,7 +346,7 @@ class _classmultievent:
             pz = data.pz
             E = data.E
         except AttributeError:
-            raise AttributeError("Lorentz vector not found")
+            raise AttributeError("Lorentz vector not found") from None
         np_results = self._results.to_numpy_jet_scale_for_algorithm(px, py, pz, E)
         out = ak.Array(ak.layout.NumpyArray(np_results[0]))
         return out
@@ -408,7 +408,7 @@ class _classmultievent:
             pz = data.pz
             E = data.E
         except AttributeError:
-            raise AttributeError("Lorentz vector not found")
+            raise AttributeError("Lorentz vector not found") from None
         np_results = self._results.to_numpy_get_parents(px, py, pz, E)
         return ak.Array(
             ak.layout.ListOffsetArray64(
@@ -434,7 +434,7 @@ class _classmultievent:
             pz = data.pz
             E = data.E
         except AttributeError:
-            raise AttributeError("Lorentz vector not found")
+            raise AttributeError("Lorentz vector not found") from None
         np_results = self._results.to_numpy_get_child(px, py, pz, E)
         return ak.Array(
             ak.layout.ListOffsetArray64(

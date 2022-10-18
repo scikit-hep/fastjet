@@ -11,14 +11,14 @@ jobs:
     name: Make SDist
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         submodules: recursive
 
     - name: Build SDist
       run: pipx run build --sdist
 
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v3
       with:
         path: dist/*.tar.gz
 
@@ -28,11 +28,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-build-version: ["cp36-*", "cp37-*", "cp38-*", "cp39-*"]
+        python-build-version: ["cp36-*", "cp37-*", "cp38-*", "cp39-*", "cp310-*"]
         os: [ubuntu-latest]   # , macos-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         submodules: recursive
 
@@ -47,7 +47,7 @@ jobs:
         CIBW_BUILD_VERBOSITY: 2
 
     - name: Upload wheels
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         path: wheelhouse/*.whl
 
@@ -55,7 +55,7 @@ jobs:
     needs: [make_sdist]
     runs-on: ubuntu-latest
     steps:
-    - uses : actions/download-artifact@v2
+    - uses : actions/download-artifact@v3
       with:
         name: artifact
         path: dist/
@@ -73,12 +73,12 @@ jobs:
     if: github.event_name == 'release' && github.event.action == 'published'
 
     steps:
-    - uses: actions/download-artifact@v2
+    - uses: actions/download-artifact@v3
       with:
         name: artifact
         path: dist
 
-    - uses: pypa/gh-action-pypi-publish@v1.4.2
+    - uses: pypa/gh-action-pypi-publish@v1.5.1
       with:
         user: __token__
         # Remember to generate this and set it in "GitHub Secrets"

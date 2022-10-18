@@ -26,7 +26,7 @@ Fastjet is a library for performing Jet-Finding *within* the Scikit-HEP ecosyste
 The library includes the classic interface, and a new interface built to perform clustering on multi-event Awkward Array objects.
 
 .. note::
-   This project is under active development.
+   Any questions about the C++ library, the jet finding algorithms, etc. should be directed to `fastjet.fr <http://fastjet.fr>`__. This page is meant to document the Python interfaces.
 
 Documentation
 ---------------

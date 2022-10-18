@@ -34,7 +34,8 @@ The JetDefinition class takes `JetAlgorithms <http://fastjet.fr/repo/doxygen-3.4
 * ``cambridge_for_passive_algorithm`` : A version of cambridge with a special distance measure for particles whose pt is < extra_param(); This is not usually intended for end users, but is instead automatically selected when requesting a passive Cambridge area.
 * ``cambridge_algorithm`` : The longitudinally invariant variant of the cambridge algorithm (aka Aachen algoithm).
 * ``antikt_algorithm`` : Like the k_t but with distance measures dij = min(1/kti^2,1/ktj^2) Delta R_{ij}^2 / R^2 diB = 1/kti^2
-* There are other algorithms mentioned do not work.
+* There are other algorithms mentioned in the link that do not work.
+
 The Data
 --------
 

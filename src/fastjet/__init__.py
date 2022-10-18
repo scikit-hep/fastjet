@@ -207,7 +207,7 @@ class ClusterSequence:  # The super class
 
     def __init__(self, data, jetdef):
         if not isinstance(jetdef, fastjet._swig.JetDefinition):
-            raise AttributeError("JetDefinition is not correct")
+            raise AttributeError("JetDefinition is not correct") from None
         if isinstance(data, ak.Array):
             self.__class__ = fastjet._pyjet.AwkwardClusterSequence
             fastjet._pyjet.AwkwardClusterSequence.__init__(
