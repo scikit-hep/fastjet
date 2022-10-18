@@ -9,6 +9,10 @@ on:
     - main
     - develop
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   pre-commit:
     name: Format
@@ -29,11 +33,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.6, 3.9]
+        python-version: ['3.6', '3.10']
         runs-on: [ubuntu-latest]   # , macos-latest
 
         # include:
-        # - python-version: pypy-3.6
+        # - python-version: pypy-3.8
         #   runs-on: ubuntu-latest
 
     steps:
@@ -71,10 +75,17 @@ jobs:
     - uses: pypa/cibuildwheel@v2.1.1
       env:
         CIBW_ARCHS: auto64
-        CIBW_BUILD: cp39-*
+        CIBW_BUILD: cp310-*
         CIBW_BUILD_VERBOSITY: 2
 
     - name: Upload wheels
       uses: actions/upload-artifact@v3
       with:
         path: wheelhouse/*.whl
+
+
+  pass:
+    needs: [pre-commit, checks, test_wheels]
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "All jobs passed"
