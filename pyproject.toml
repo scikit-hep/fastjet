@@ -16,5 +16,5 @@ manylinux-i686-image = "manylinux2014"
 [tool.cibuildwheel.linux]
 before-all = [
     "yum update -y",
-    "yum install -y boost-devel gmp-devel swig autoconf libtool",
+    "yum install -y boost-devel gmp-devel swig3 autoconf libtool",
 ]
