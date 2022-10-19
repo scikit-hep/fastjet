@@ -21,7 +21,9 @@ import zipfile
 import setuptools.command.build_ext
 import setuptools.command.install
 
-CGAL_ZIP = "https://github.com/CGAL/cgal/releases/download/v5.5.1/CGAL-5.5.1-library.zip"
+CGAL_ZIP = (
+    "https://github.com/CGAL/cgal/releases/download/v5.5.1/CGAL-5.5.1-library.zip"
+)
 
 DIR = pathlib.Path(__file__).parent.resolve()
 FASTJET = DIR / "fastjet-core"
