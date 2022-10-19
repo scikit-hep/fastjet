@@ -22,7 +22,7 @@ import setuptools.command.build_ext
 import setuptools.command.install
 
 CGAL_ZIP = (
-    "https://github.com/CGAL/cgal/releases/download/v5.5.1/CGAL-5.5.1-library.zip"
+    "https://github.com/CGAL/cgal/releases/download/releases%2FCGAL-4.14.2/CGAL-4.14.2.zip"
 )
 
 DIR = pathlib.Path(__file__).parent.resolve()
