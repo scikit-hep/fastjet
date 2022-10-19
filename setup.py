@@ -21,7 +21,7 @@ import zipfile
 import setuptools.command.build_ext
 import setuptools.command.install
 
-CGAL_ZIP = "https://github.com/CGAL/cgal/releases/download/releases%2FCGAL-4.14.3/CGAL-4.14.3.zip"
+CGAL_ZIP = "https://github.com/CGAL/cgal/releases/download/v5.5.1/CGAL-5.5.1.zip"
 
 DIR = pathlib.Path(__file__).parent.resolve()
 FASTJET = DIR / "fastjet-core"
@@ -68,6 +68,7 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
                 f"--prefix={OUTPUT}",
                 "--enable-allcxxplugins",
                 "--enable-cgal",
+                "--enable-cgal-header-only",
                 f"--with-cgaldir={cgal_dir}",
                 "--enable-swig",
                 "--enable-pyext",
