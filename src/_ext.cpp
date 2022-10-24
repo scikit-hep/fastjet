@@ -1680,7 +1680,7 @@ PYBIND11_MODULE(_ext, m) {
         auto bufE = E.request();
         double *ptrE = (double *)bufE.ptr;
 
-        auto off = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len}, {sizeof(int)}));
+        auto off = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len+1}, {sizeof(int)}));
         auto bufoff = off.request();
         int *ptroff = (int *)realloc(bufoff.ptr, len*sizeof(int)+1);;
         size_t idxe = 0;
@@ -1789,7 +1789,7 @@ PYBIND11_MODULE(_ext, m) {
         auto bufE = E.request();
         double *ptrE = (double *)bufE.ptr;
 
-        auto off = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len}, {sizeof(int)}));
+        auto off = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len+1}, {sizeof(int)}));
         auto bufoff = off.request();
         int *ptroff = (int *)realloc(bufoff.ptr, len*sizeof(int)+1);;
         size_t idxe = 0;
