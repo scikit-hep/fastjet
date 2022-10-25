@@ -89,7 +89,8 @@ class FastJetInstall(setuptools.command.install.install):
     def run(self):
         version = ".".join(map(str, sys.version_info[:2]))
         plat = sysconfig.get_platform()
-        fastjetdir = pathlib.Path(f"build/lib.{plat}-{version}/fastjet")
+        fastjetdir_bp = pathlib.Path(f"build/lib.{plat}-{version}/fastjet")
+        fastjetdir = pathlib.Path(f"build/lib.{get_platform()}-{sys.version_info[0]}.{sys.version_info[1]}")
 
         shutil.copytree(OUTPUT, fastjetdir / "_fastjet_core", symlinks=True)
 
