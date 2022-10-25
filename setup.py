@@ -41,7 +41,8 @@ def get_version() -> str:
 
 
 class FastJetBuild(setuptools.command.build_ext.build_ext):
-    def build_extensions(self):
+    def build_extensions(self, ext):
+        extdir = os.path.abspath(os.path.dirname(self.get_ext_fullpath(ext.name)))
         if not OUTPUT.exists():
             zip_filename = DIR / pathlib.Path(CGAL_ZIP).parts[-1]
 
