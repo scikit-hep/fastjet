@@ -65,8 +65,7 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
                     f"'s/{oldCode}/{newCode}/g'", 
                     "pyinterface/fastjet.i"
                 ], 
-                cwd=FASTJET, 
-                check=True
+                cwd=FASTJET
             )
 
             env = os.environ.copy()
