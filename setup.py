@@ -87,8 +87,8 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
 
 class FastJetInstall(setuptools.command.install.install):
     def run(self):
-        version = ".".join(map(str, sys.version_info[:2]))
-        plat = sysconfig.get_platform()
+        #version = ".".join(map(str, sys.version_info[:2]))
+        #plat = sysconfig.get_platform()
         #fastjetdir = pathlib.Path(f"build/lib.{plat}-{version}/fastjet")
         fastjetdir = pathlib.Path(f"build/lib.{sysconfig.get_platform()}-{sys.version_info[0]}.{sys.version_info[1]}/fastjet")
 
@@ -136,7 +136,6 @@ ext_modules = [
 
 
 setup(
-    version=get_version(),
     ext_modules=ext_modules,
     cmdclass={"build_ext": FastJetBuild, "install": FastJetInstall},
 )
