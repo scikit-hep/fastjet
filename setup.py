@@ -55,17 +55,9 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
 
             # Patch for FastJet core version 3.4.0
             # To be removed when it is applied upstream
-            oldCode = "from _fastjet import FastJetError"
-            newCode = 'if __package__ or "." in __name__:\n    from ._fastjet import FastJetError\n  else:\n    from _fastjet import FastJetError'
             subprocess.run(
-                [
-                    "sed", 
-                    "-i", 
-                    "-E", 
-                    f"'s/{oldCode}/{newCode}/g'", 
-                    "pyinterface/fastjet.i"
-                ], 
-                cwd=FASTJET
+                ["sed", "-i", "-E", "-f", DIR / "patch.sed", "pyinterface/fastjet.i"],
+                cwd=FASTJET,
             )
 
             env = os.environ.copy()
