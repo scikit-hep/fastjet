@@ -1,66 +1,74 @@
-// BSD 3-Clause License; see https://github.com/scikit-hep/fastjet/blob/main/LICENSE
+// BSD 3-Clause License; see
+// https://github.com/scikit-hep/fastjet/blob/main/LICENSE
 
-#include <iostream>
-#include <cstdlib>
-#include <vector>
 #include <algorithm>
+#include <cstdlib>
+#include <iostream>
 #include <unordered_map>
+#include <vector>
 
+#include <fastjet/AreaDefinition.hh>
 #include <fastjet/ClusterSequence.hh>
 #include <fastjet/ClusterSequenceArea.hh>
+#include <fastjet/GhostedAreaSpec.hh>
 #include <fastjet/JetDefinition.hh>
 #include <fastjet/PseudoJet.hh>
-#include <fastjet/AreaDefinition.hh>
-#include <fastjet/GhostedAreaSpec.hh>
 
-#include <pybind11/pybind11.h>
-#include <pybind11/operators.h>
 #include <pybind11/numpy.h>
+#include <pybind11/operators.h>
+#include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
 namespace fj = fastjet;
 namespace py = pybind11;
 using namespace pybind11::literals;
 
-typedef struct{
-  PyObject_HEAD
-  void *ptr;
+typedef struct {
+  PyObject_HEAD void *ptr;
   void *ty;
   int own;
   PyObject *next;
 } SwigPyObject;
 
 template <typename T>
-T swigtocpp(py::object obj) {  // unwraps python object to get the cpp pointer from the swig bindings
+T swigtocpp(py::object obj) { // unwraps python object to get the cpp pointer
+                              // from the swig bindings
   auto upointer = obj.attr("this").ptr();
-  auto swigpointer = reinterpret_cast<SwigPyObject*>(upointer);
+  auto swigpointer = reinterpret_cast<SwigPyObject *>(upointer);
   auto objpointervoid = swigpointer->ptr;
   auto objpointer = reinterpret_cast<T>(objpointervoid);
   return objpointer;
 }
-class output_wrapper{
-  public:
+class output_wrapper {
+public:
   std::vector<std::shared_ptr<fj::ClusterSequence>> cse;
   std::vector<std::shared_ptr<std::vector<fj::PseudoJet>>> parts;
 
-  std::shared_ptr<fj::ClusterSequence> getCluster(){
+  std::shared_ptr<fj::ClusterSequence> getCluster() {
     auto a = cse[0];
     return a;
   }
-  void setCluster(){}
+  void setCluster() {}
 };
 
-output_wrapper interfacemulti(py::array_t<double, py::array::c_style | py::array::forcecast> pxi, py::array_t<double, py::array::c_style | py::array::forcecast> pyi, py::array_t<double, py::array::c_style | py::array::forcecast> pzi, py::array_t<double, py::array::c_style | py::array::forcecast> Ei,py::array_t<int, py::array::c_style | py::array::forcecast> offsets, py::object jetdef)
-{
+output_wrapper interfacemulti(
+    py::array_t<double, py::array::c_style | py::array::forcecast> pxi,
+    py::array_t<double, py::array::c_style | py::array::forcecast> pyi,
+    py::array_t<double, py::array::c_style | py::array::forcecast> pzi,
+    py::array_t<double, py::array::c_style | py::array::forcecast> Ei,
+    py::array_t<int, py::array::c_style | py::array::forcecast> offsets,
+    py::object jetdef) {
   py::buffer_info infooff = offsets.request();
   py::buffer_info infopx = pxi.request();
-  py::buffer_info infopy = pyi.request();  // requesting buffer information of the input
+  py::buffer_info infopy =
+      pyi.request(); // requesting buffer information of the input
   py::buffer_info infopz = pzi.request();
   py::buffer_info infoE = Ei.request();
 
   auto offptr = static_cast<int *>(infooff.ptr);
   auto pxptr = static_cast<double *>(infopx.ptr);
-  auto pyptr = static_cast<double *>(infopy.ptr);  // pointer to the initial value
+  auto pyptr =
+      static_cast<double *>(infopy.ptr); // pointer to the initial value
   auto pzptr = static_cast<double *>(infopz.ptr);
   auto Eptr = static_cast<double *>(infoE.ptr);
 
@@ -71,31 +79,34 @@ output_wrapper interfacemulti(py::array_t<double, py::array::c_style | py::array
   std::vector<double> constphi;
   std::vector<double> idx;
   std::vector<double> idxo;
-  for (int i = 0; i < dimoff-1; i++) {
+  for (int i = 0; i < dimoff - 1; i++) {
     std::vector<fj::PseudoJet> particles;
-    for(int j = *offptr; j < *(offptr+1); j++ ){
-    particles.push_back(fj::PseudoJet(*pxptr, *pyptr, *pzptr, *Eptr));
-    pxptr++;
-    pyptr++;
-    pzptr++;
-    Eptr++;
+    for (int j = *offptr; j < *(offptr + 1); j++) {
+      particles.push_back(fj::PseudoJet(*pxptr, *pyptr, *pzptr, *Eptr));
+      pxptr++;
+      pyptr++;
+      pzptr++;
+      Eptr++;
     }
 
-  std::vector<fj::PseudoJet> jets;
-  auto jet_def = swigtocpp<fj::JetDefinition*>(jetdef);
-  std::shared_ptr<std::vector<fj::PseudoJet>> pj = std::make_shared<std::vector<fj::PseudoJet>>(particles);
-  std::shared_ptr<fastjet::ClusterSequence> cs = std::make_shared<fastjet::ClusterSequence>(*pj, *jet_def);
-  auto j = cs->inclusive_jets();
-  offptr++;
-  ow.cse.push_back(cs);
-  ow.parts.push_back(pj);
+    std::vector<fj::PseudoJet> jets;
+    auto jet_def = swigtocpp<fj::JetDefinition *>(jetdef);
+    std::shared_ptr<std::vector<fj::PseudoJet>> pj =
+        std::make_shared<std::vector<fj::PseudoJet>>(particles);
+    std::shared_ptr<fastjet::ClusterSequence> cs =
+        std::make_shared<fastjet::ClusterSequence>(*pj, *jet_def);
+    auto j = cs->inclusive_jets();
+    offptr++;
+    ow.cse.push_back(cs);
+    ow.parts.push_back(pj);
   }
   return ow;
 }
 
 PYBIND11_MODULE(_ext, m) {
   using namespace fastjet;
-  m.def("interfacemulti", &interfacemulti, py::return_value_policy::take_ownership);
+  m.def("interfacemulti", &interfacemulti,
+        py::return_value_policy::take_ownership);
   /// Jet algorithm definitions
 
   py::class_<output_wrapper>(m, "output_wrapper")
@@ -1827,6 +1838,11 @@ PYBIND11_MODULE(_ext, m) {
           pt, eta, phi, m of inclusive jets.
       )pbdoc");
   py::class_<ClusterSequence>(m, "ClusterSequence")
-    .def(py::init<const std::vector<PseudoJet> &, const JetDefinition &, const bool &>(), "pseudojets"_a, "jet_definition"_a, "write_out_combinations"_a = false, "Create a ClusterSequence, starting from the supplied set of PseudoJets and clustering them with jet definition specified by jet_definition (which also specifies the clustering strategy)");
-
+      .def(py::init<const std::vector<PseudoJet> &, const JetDefinition &,
+                    const bool &>(),
+           "pseudojets"_a, "jet_definition"_a,
+           "write_out_combinations"_a = false,
+           "Create a ClusterSequence, starting from the supplied set of "
+           "PseudoJets and clustering them with jet definition specified by "
+           "jet_definition (which also specifies the clustering strategy)");
 }
