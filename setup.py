@@ -54,9 +54,9 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
                 zip_obj.extractall(DIR)
 
             # Patch for FastJet core version 3.4.0
-            # To be removed when it is applied upstream
+            # To be removed when https://gitlab.com/fastjet/fastjet/-/merge_requests/1 is merged upstream
             subprocess.run(
-                ["sed", "-i", "-E", "-f", DIR / "patch.sed", "pyinterface/fastjet.i"],
+                ["patch", "pyinterface/fastjet.i", DIR / "patch.txt"],
                 cwd=FASTJET,
             )
 
