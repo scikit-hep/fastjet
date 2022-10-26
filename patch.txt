@@ -1,0 +1,14 @@
+--- fastjet-core/pyinterface/fastjet.i	2022-10-25 23:22:36.000000000 +0200
++++ fastjet-core/pyinterface/fastjet_p.i	2022-10-26 16:25:20.000000000 +0200
+@@ -138,7 +138,10 @@
+
+ // include FastJetError in python module
+ %pythoncode {
+-  from _fastjet import FastJetError
++  if __package__ or "." in __name__:
++    from ._fastjet import FastJetError
++  else:
++    from _fastjet import FastJetError
+ }
+
+ FASTJET_ERRORS_AS_PYTHON_EXCEPTIONS(fastjet)

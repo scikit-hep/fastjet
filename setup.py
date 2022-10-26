@@ -53,6 +53,13 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
                 cgal_dir = DIR / zip_obj.namelist()[0]
                 zip_obj.extractall(DIR)
 
+            # Patch for FastJet core version 3.4.0
+            # To be removed when https://gitlab.com/fastjet/fastjet/-/merge_requests/1 is merged upstream
+            subprocess.run(
+                ["patch", "pyinterface/fastjet.i", DIR / "patch.txt"],
+                cwd=FASTJET,
+            )
+
             env = os.environ.copy()
             env["PYTHON"] = sys.executable
             env["PYTHON_INCLUDE"] = f'-I{sysconfig.get_path("include")}'
