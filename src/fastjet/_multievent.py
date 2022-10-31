@@ -63,7 +63,7 @@ class _classmultievent:
 
     def inclusive_jets(self, min_pt):
         np_results = self._results.to_numpy(min_pt)
-        of = np.insert(np_results[-1], len(np_results[-1]), len(np_results[0]))
+        of = np_results[-1]
         return ak.Array(
             ak.layout.ListOffsetArray64(
                 ak.layout.Index64(of),
@@ -83,7 +83,7 @@ class _classmultievent:
 
     def unclustered_particles(self):
         np_results = self._results.to_numpy_unclustered_particles()
-        of = np.insert(np_results[-1], len(np_results[-1]), len(np_results[0]))
+        of = np_results[-1]
         return ak.Array(
             ak.layout.ListOffsetArray64(
                 ak.layout.Index64(of),
@@ -108,10 +108,10 @@ class _classmultievent:
             raise ValueError("Njets cannot be 0")
         if dcut == -1 and n_jets != -1:
             np_results = self._results.to_numpy_exclusive_njet(n_jets)
-            of = np.insert(np_results[-1], len(np_results[-1]), len(np_results[0]))
+            of = np_results[-1]
         if n_jets == -1 and dcut != -1:
             np_results = self._results.to_numpy_exclusive_dcut(dcut)
-            of = np.insert(np_results[-1], len(np_results[-1]), len(np_results[0]))
+            of = np_results[-1]
         if np_results == 0 and of == 0:
             raise ValueError("Either NJets or Dcut sould be entered")
         return ak.Array(
@@ -133,7 +133,7 @@ class _classmultievent:
 
     def exclusive_jets_ycut(self, ycut):
         np_results = self._results.to_numpy_exclusive_ycut(ycut)
-        of = np.insert(np_results[-1], len(np_results[-1]), len(np_results[0]))
+        of = np_results[-1]
         return ak.Array(
             ak.layout.ListOffsetArray64(
                 ak.layout.Index64(of),
@@ -226,12 +226,12 @@ class _classmultievent:
             np_results = self._results.to_numpy_exclusive_subjets_nsub(
                 px, py, pz, E, nsub
             )
-            of = np.insert(np_results[-1], len(np_results[-1]), len(np_results[0]))
+            of = np_results[-1]
         if nsub == -1 and dcut != -1:
             np_results = self._results.to_numpy_exclusive_subjets_dcut(
                 px, py, pz, E, dcut
             )
-            of = np.insert(np_results[-1], len(np_results[-1]), len(np_results[0]))
+            of = np_results[-1]
         if np_results == 0 and of == 0:
             raise ValueError("Either NJets or Dcut sould be entered") from None
 
@@ -261,7 +261,7 @@ class _classmultievent:
         except AttributeError:
             raise AttributeError("Lorentz vector not found") from None
         np_results = self._results.to_numpy_exclusive_subjets_up_to(px, py, pz, E, nsub)
-        of = np.insert(np_results[-1], len(np_results[-1]), len(np_results[0]))
+        of = np_results[-1]
         return ak.Array(
             ak.layout.ListOffsetArray64(
                 ak.layout.Index64(of),
@@ -363,7 +363,7 @@ class _classmultievent:
 
     def childless_pseudojets(self):
         np_results = self._results.to_numpy_childless_pseudojets()
-        of = np.insert(np_results[-1], len(np_results[-1]), len(np_results[0]))
+        of = np_results[-1]
         return ak.Array(
             ak.layout.ListOffsetArray64(
                 ak.layout.Index64(of),
@@ -383,7 +383,7 @@ class _classmultievent:
 
     def jets(self):
         np_results = self._results.to_numpy_jets()
-        of = np.insert(np_results[-1], len(np_results[-1]), len(np_results[0]))
+        of = np_results[-1]
         return ak.Array(
             ak.layout.ListOffsetArray64(
                 ak.layout.Index64(of),
