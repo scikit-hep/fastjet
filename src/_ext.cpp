@@ -136,9 +136,9 @@ PYBIND11_MODULE(_ext, m) {
         auto bufE = E.request();
         double *ptrE = (double *)bufE.ptr;
 
-        auto off = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len}, {sizeof(int)}));
+        auto off = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len+1}, {sizeof(int)}));
         auto bufoff = off.request();
-        int *ptroff = (int *)realloc(bufoff.ptr, len*sizeof(int)+1);;
+        int *ptroff = (int *)bufoff.ptr;
         size_t idxe = 0;
         *ptroff = 0;
         ptroff++;
@@ -265,9 +265,9 @@ PYBIND11_MODULE(_ext, m) {
         auto bufE = E.request();
         double *ptrE = (double *)bufE.ptr;
 
-        auto off = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len}, {sizeof(int)}));
+        auto off = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len+1}, {sizeof(int)}));
         auto bufoff = off.request();
-        int *ptroff = (int *)realloc(bufoff.ptr, len*sizeof(int)+1);;
+        int *ptroff = (int *)bufoff.ptr;
         size_t idxe = 0;
         *ptroff = 0;
         ptroff++;
@@ -324,9 +324,9 @@ PYBIND11_MODULE(_ext, m) {
         auto bufE = E.request();
         double *ptrE = (double *)bufE.ptr;
 
-        auto off = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len}, {sizeof(int)}));
+        auto off = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len+1}, {sizeof(int)}));
         auto bufoff = off.request();
-        int *ptroff = (int *)realloc(bufoff.ptr, len*sizeof(int)+1);;
+        int *ptroff = (int *)bufoff.ptr;
         size_t idxe = 0;
         *ptroff = 0;
         ptroff++;
@@ -382,9 +382,9 @@ PYBIND11_MODULE(_ext, m) {
         auto bufE = E.request();
         double *ptrE = (double *)bufE.ptr;
 
-        auto off = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len}, {sizeof(int)}));
+        auto off = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len+1}, {sizeof(int)}));
         auto bufoff = off.request();
-        int *ptroff = (int *)realloc(bufoff.ptr, len*sizeof(int)+1);;
+        int *ptroff = (int *)bufoff.ptr;
         size_t idxe = 0;
         *ptroff = 0;
         ptroff++;
@@ -619,8 +619,14 @@ PYBIND11_MODULE(_ext, m) {
           pt, eta, phi, m of inclusive jets.
       )pbdoc")
       .def("to_numpy_exclusive_subjets_dcut",
-      [](const output_wrapper ow, py::array_t<double, py::array::c_style | py::array::forcecast> pxi, py::array_t<double, py::array::c_style | py::array::forcecast> pyi, py::array_t<double, py::array::c_style | py::array::forcecast> pzi, py::array_t<double, py::array::c_style | py::array::forcecast> Ei, double dcut = 0) {
-
+      [](
+          const output_wrapper ow,
+          py::array_t<double, py::array::c_style | py::array::forcecast> pxi,
+          py::array_t<double, py::array::c_style | py::array::forcecast> pyi,
+          py::array_t<double, py::array::c_style | py::array::forcecast> pzi,
+          py::array_t<double, py::array::c_style | py::array::forcecast> Ei,
+          double dcut = 0
+        ) {
         py::buffer_info infopx = pxi.request();
         py::buffer_info infopy = pyi.request();  // requesting buffer information of the input
         py::buffer_info infopz = pzi.request();
@@ -680,9 +686,9 @@ PYBIND11_MODULE(_ext, m) {
         auto bufE = E.request();
         double *ptrE = (double *)bufE.ptr;
 
-        auto off = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len}, {sizeof(int)}));
+        auto off = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len+1}, {sizeof(int)}));
         auto bufoff = off.request();
-        int *ptroff = (int *)realloc(bufoff.ptr, len*sizeof(int)+1);;
+        int *ptroff = (int *)bufoff.ptr;
 
         size_t idxe = 0;
         *ptroff = 0;
@@ -716,8 +722,14 @@ PYBIND11_MODULE(_ext, m) {
           pt, eta, phi, m of inclusive jets.
       )pbdoc")
       .def("to_numpy_exclusive_subjets_nsub",
-      [](const output_wrapper ow, py::array_t<double, py::array::c_style | py::array::forcecast> pxi, py::array_t<double, py::array::c_style | py::array::forcecast> pyi, py::array_t<double, py::array::c_style | py::array::forcecast> pzi, py::array_t<double, py::array::c_style | py::array::forcecast> Ei, int nsub = 0) {
-
+      [](
+          const output_wrapper ow,
+          py::array_t<double, py::array::c_style | py::array::forcecast> pxi,
+          py::array_t<double, py::array::c_style | py::array::forcecast> pyi,
+          py::array_t<double, py::array::c_style | py::array::forcecast> pzi,
+          py::array_t<double, py::array::c_style | py::array::forcecast> Ei,
+          int nsub = 0
+        ) {
         py::buffer_info infopx = pxi.request();
         py::buffer_info infopy = pyi.request();  // requesting buffer information of the input
         py::buffer_info infopz = pzi.request();
@@ -777,9 +789,9 @@ PYBIND11_MODULE(_ext, m) {
         auto bufE = E.request();
         double *ptrE = (double *)bufE.ptr;
 
-        auto off = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len}, {sizeof(int)}));
+        auto off = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len+1}, {sizeof(int)}));
         auto bufoff = off.request();
-        int *ptroff = (int *)realloc(bufoff.ptr, len*sizeof(int)+1);;
+        int *ptroff = (int *)bufoff.ptr;
 
         size_t idxe = 0;
         *ptroff = 0;
@@ -813,8 +825,14 @@ PYBIND11_MODULE(_ext, m) {
           pt, eta, phi, m of inclusive jets.
       )pbdoc")
       .def("to_numpy_exclusive_subjets_up_to",
-      [](const output_wrapper ow, py::array_t<double, py::array::c_style | py::array::forcecast> pxi, py::array_t<double, py::array::c_style | py::array::forcecast> pyi, py::array_t<double, py::array::c_style | py::array::forcecast> pzi, py::array_t<double, py::array::c_style | py::array::forcecast> Ei, int nsub = 0) {
-
+      [](
+          const output_wrapper ow,
+          py::array_t<double, py::array::c_style | py::array::forcecast> pxi,
+          py::array_t<double, py::array::c_style | py::array::forcecast> pyi,
+          py::array_t<double, py::array::c_style | py::array::forcecast> pzi,
+          py::array_t<double, py::array::c_style | py::array::forcecast> Ei,
+          int nsub = 0
+        ) {
         py::buffer_info infopx = pxi.request();
         py::buffer_info infopy = pyi.request();  // requesting buffer information of the input
         py::buffer_info infopz = pzi.request();
@@ -874,9 +892,9 @@ PYBIND11_MODULE(_ext, m) {
         auto bufE = E.request();
         double *ptrE = (double *)bufE.ptr;
 
-        auto off = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len}, {sizeof(int)}));
+        auto off = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len+1}, {sizeof(int)}));
         auto bufoff = off.request();
-        int *ptroff = (int *)realloc(bufoff.ptr, len*sizeof(int)+1);;
+        int *ptroff = (int *)bufoff.ptr;
 
         size_t idxe = 0;
         *ptroff = 0;
@@ -910,8 +928,14 @@ PYBIND11_MODULE(_ext, m) {
           pt, eta, phi, m of inclusive jets.
       )pbdoc")
       .def("to_numpy_exclusive_subdmerge",
-      [](const output_wrapper ow, py::array_t<double, py::array::c_style | py::array::forcecast> pxi, py::array_t<double, py::array::c_style | py::array::forcecast> pyi, py::array_t<double, py::array::c_style | py::array::forcecast> pzi, py::array_t<double, py::array::c_style | py::array::forcecast> Ei, int nsub = 0) {
-
+      [](
+          const output_wrapper ow,
+          py::array_t<double, py::array::c_style | py::array::forcecast> pxi,
+          py::array_t<double, py::array::c_style | py::array::forcecast> pyi,
+          py::array_t<double, py::array::c_style | py::array::forcecast> pzi,
+          py::array_t<double, py::array::c_style | py::array::forcecast> Ei,
+          int nsub = 0
+        ) {
         py::buffer_info infopx = pxi.request();
         py::buffer_info infopy = pyi.request();  // requesting buffer information of the input
         py::buffer_info infopz = pzi.request();
@@ -955,9 +979,9 @@ PYBIND11_MODULE(_ext, m) {
         auto bufpx = out_value.request();
         double *ptrpx = (double *)bufpx.ptr;
 
-        auto off = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len}, {sizeof(int)}));
+        auto off = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len+1}, {sizeof(int)}));
         auto bufoff = off.request();
-        int *ptroff = (int *)realloc(bufoff.ptr, len*sizeof(int)+1);;
+        int *ptroff = (int *)bufoff.ptr;
 
         size_t idxe = 0;
         *ptroff = 0;
@@ -982,8 +1006,14 @@ PYBIND11_MODULE(_ext, m) {
           pt, eta, phi, m of inclusive jets.
       )pbdoc")
       .def("to_numpy_exclusive_subdmerge_max",
-      [](const output_wrapper ow, py::array_t<double, py::array::c_style | py::array::forcecast> pxi, py::array_t<double, py::array::c_style | py::array::forcecast> pyi, py::array_t<double, py::array::c_style | py::array::forcecast> pzi, py::array_t<double, py::array::c_style | py::array::forcecast> Ei, int nsub = 0) {
-
+      [](
+          const output_wrapper ow,
+          py::array_t<double, py::array::c_style | py::array::forcecast> pxi,
+          py::array_t<double, py::array::c_style | py::array::forcecast> pyi,
+          py::array_t<double, py::array::c_style | py::array::forcecast> pzi,
+          py::array_t<double, py::array::c_style | py::array::forcecast> Ei,
+          int nsub = 0
+        ) {
         py::buffer_info infopx = pxi.request();
         py::buffer_info infopy = pyi.request();  // requesting buffer information of the input
         py::buffer_info infopz = pzi.request();
@@ -1027,9 +1057,9 @@ PYBIND11_MODULE(_ext, m) {
         auto bufpx = out_value.request();
         double *ptrpx = (double *)bufpx.ptr;
 
-        auto off = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len}, {sizeof(int)}));
+        auto off = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len+1}, {sizeof(int)}));
         auto bufoff = off.request();
-        int *ptroff = (int *)realloc(bufoff.ptr, len*sizeof(int)+1);;
+        int *ptroff = (int *)bufoff.ptr;
 
         size_t idxe = 0;
         *ptroff = 0;
@@ -1054,8 +1084,14 @@ PYBIND11_MODULE(_ext, m) {
           pt, eta, phi, m of inclusive jets.
       )pbdoc")
       .def("to_numpy_n_exclusive_subjets",
-      [](const output_wrapper ow, py::array_t<double, py::array::c_style | py::array::forcecast> pxi, py::array_t<double, py::array::c_style | py::array::forcecast> pyi, py::array_t<double, py::array::c_style | py::array::forcecast> pzi, py::array_t<double, py::array::c_style | py::array::forcecast> Ei, double dcut = 0) {
-
+      [](
+          const output_wrapper ow,
+          py::array_t<double, py::array::c_style | py::array::forcecast> pxi,
+          py::array_t<double, py::array::c_style | py::array::forcecast> pyi,
+          py::array_t<double, py::array::c_style | py::array::forcecast> pzi,
+          py::array_t<double, py::array::c_style | py::array::forcecast> Ei,
+          double dcut = 0
+        ) {
         py::buffer_info infopx = pxi.request();
         py::buffer_info infopy = pyi.request();  // requesting buffer information of the input
         py::buffer_info infopz = pzi.request();
@@ -1099,9 +1135,9 @@ PYBIND11_MODULE(_ext, m) {
         auto bufpx = out_value.request();
         int *ptrpx = (int *)bufpx.ptr;
 
-        auto off = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len}, {sizeof(int)}));
+        auto off = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len+1}, {sizeof(int)}));
         auto bufoff = off.request();
-        int *ptroff = (int *)realloc(bufoff.ptr, len*sizeof(int)+1);;
+        int *ptroff = (int *)bufoff.ptr;
 
         size_t idxe = 0;
         *ptroff = 0;
@@ -1126,8 +1162,13 @@ PYBIND11_MODULE(_ext, m) {
           pt, eta, phi, m of inclusive jets.
       )pbdoc")
       .def("to_numpy_has_parents",
-      [](const output_wrapper ow, py::array_t<double, py::array::c_style | py::array::forcecast> pxi, py::array_t<double, py::array::c_style | py::array::forcecast> pyi, py::array_t<double, py::array::c_style | py::array::forcecast> pzi, py::array_t<double, py::array::c_style | py::array::forcecast> Ei) {
-
+      [](
+          const output_wrapper ow,
+          py::array_t<double, py::array::c_style | py::array::forcecast> pxi,
+          py::array_t<double, py::array::c_style | py::array::forcecast> pyi,
+          py::array_t<double, py::array::c_style | py::array::forcecast> pzi,
+          py::array_t<double, py::array::c_style | py::array::forcecast> Ei
+        ) {
         py::buffer_info infopx = pxi.request();
         py::buffer_info infopy = pyi.request();  // requesting buffer information of the input
         py::buffer_info infopz = pzi.request();
@@ -1171,9 +1212,9 @@ PYBIND11_MODULE(_ext, m) {
         auto bufpx = out_value.request();
         bool *ptrpx = (bool *)bufpx.ptr;
 
-        auto off = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len}, {sizeof(int)}));
+        auto off = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len+1}, {sizeof(int)}));
         auto bufoff = off.request();
-        int *ptroff = (int *)realloc(bufoff.ptr, len*sizeof(int)+1);;
+        int *ptroff = (int *)bufoff.ptr;
 
         size_t idxe = 0;
         *ptroff = 0;
@@ -1200,8 +1241,13 @@ PYBIND11_MODULE(_ext, m) {
           pt, eta, phi, m of inclusive jets.
       )pbdoc")
       .def("to_numpy_has_child",
-      [](const output_wrapper ow, py::array_t<double, py::array::c_style | py::array::forcecast> pxi, py::array_t<double, py::array::c_style | py::array::forcecast> pyi, py::array_t<double, py::array::c_style | py::array::forcecast> pzi, py::array_t<double, py::array::c_style | py::array::forcecast> Ei) {
-
+      [](
+          const output_wrapper ow,
+          py::array_t<double, py::array::c_style | py::array::forcecast> pxi,
+          py::array_t<double, py::array::c_style | py::array::forcecast> pyi,
+          py::array_t<double, py::array::c_style | py::array::forcecast> pzi,
+          py::array_t<double, py::array::c_style | py::array::forcecast> Ei
+        ) {
         py::buffer_info infopx = pxi.request();
         py::buffer_info infopy = pyi.request();  // requesting buffer information of the input
         py::buffer_info infopz = pzi.request();
@@ -1245,9 +1291,9 @@ PYBIND11_MODULE(_ext, m) {
         auto bufpx = out_value.request();
         bool *ptrpx = (bool *)bufpx.ptr;
 
-        auto off = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len}, {sizeof(int)}));
+        auto off = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len+1}, {sizeof(int)}));
         auto bufoff = off.request();
-        int *ptroff = (int *)realloc(bufoff.ptr, len*sizeof(int)+1);;
+        int *ptroff = (int *)bufoff.ptr;
 
         size_t idxe = 0;
         *ptroff = 0;
@@ -1273,8 +1319,14 @@ PYBIND11_MODULE(_ext, m) {
           pt, eta, phi, m of inclusive jets.
       )pbdoc")
     .def("to_numpy_jet_scale_for_algorithm",
-      [](const output_wrapper ow, py::array_t<double, py::array::c_style | py::array::forcecast> pxi, py::array_t<double, py::array::c_style | py::array::forcecast> pyi, py::array_t<double, py::array::c_style | py::array::forcecast> pzi, py::array_t<double, py::array::c_style | py::array::forcecast> Ei) {
-
+      [](
+          const output_wrapper ow,
+          py::array_t<double,
+          py::array::c_style | py::array::forcecast> pxi,
+          py::array_t<double, py::array::c_style | py::array::forcecast> pyi,
+          py::array_t<double, py::array::c_style | py::array::forcecast> pzi,
+          py::array_t<double, py::array::c_style | py::array::forcecast> Ei
+        ) {
         py::buffer_info infopx = pxi.request();
         py::buffer_info infopy = pyi.request();  // requesting buffer information of the input
         py::buffer_info infopz = pzi.request();
@@ -1318,9 +1370,9 @@ PYBIND11_MODULE(_ext, m) {
         auto bufpx = out_value.request();
         double *ptrpx = (double *)bufpx.ptr;
 
-        auto off = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len}, {sizeof(int)}));
+        auto off = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len+1}, {sizeof(int)}));
         auto bufoff = off.request();
-        int *ptroff = (int *)realloc(bufoff.ptr, len*sizeof(int)+1);;
+        int *ptroff = (int *)bufoff.ptr;
 
         size_t idxe = 0;
         *ptroff = 0;
@@ -1475,9 +1527,9 @@ PYBIND11_MODULE(_ext, m) {
         auto bufE = E.request();
         double *ptrE = (double *)bufE.ptr;
 
-        auto off = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len}, {sizeof(int)}));
+        auto off = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len+1}, {sizeof(int)}));
         auto bufoff = off.request();
-        int *ptroff = (int *)realloc(bufoff.ptr, len*sizeof(int)+1);;
+        int *ptroff = (int *)bufoff.ptr;
         size_t idxe = 0;
         *ptroff = 0;
         ptroff++;
@@ -1533,9 +1585,9 @@ PYBIND11_MODULE(_ext, m) {
         auto bufE = E.request();
         double *ptrE = (double *)bufE.ptr;
 
-        auto off = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len}, {sizeof(int)}));
+        auto off = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len+1}, {sizeof(int)}));
         auto bufoff = off.request();
-        int *ptroff = (int *)realloc(bufoff.ptr, len*sizeof(int)+1);;
+        int *ptroff = (int *)bufoff.ptr;
         size_t idxe = 0;
         *ptroff = 0;
         ptroff++;
@@ -1591,9 +1643,9 @@ PYBIND11_MODULE(_ext, m) {
         auto bufE = E.request();
         double *ptrE = (double *)bufE.ptr;
 
-        auto off = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len}, {sizeof(int)}));
+        auto off = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len+1}, {sizeof(int)}));
         auto bufoff = off.request();
-        int *ptroff = (int *)realloc(bufoff.ptr, len*sizeof(int)+1);;
+        int *ptroff = (int *)bufoff.ptr;
         size_t idxe = 0;
         *ptroff = 0;
         ptroff++;
@@ -1625,7 +1677,13 @@ PYBIND11_MODULE(_ext, m) {
           pt, eta, phi, m of inclusive jets.
       )pbdoc")
       .def("to_numpy_get_parents",
-      [](const output_wrapper ow, py::array_t<double, py::array::c_style | py::array::forcecast> pxi, py::array_t<double, py::array::c_style | py::array::forcecast> pyi, py::array_t<double, py::array::c_style | py::array::forcecast> pzi, py::array_t<double, py::array::c_style | py::array::forcecast> Ei) {
+      [](
+          const output_wrapper ow,
+          py::array_t<double, py::array::c_style | py::array::forcecast> pxi,
+          py::array_t<double, py::array::c_style | py::array::forcecast> pyi,
+          py::array_t<double, py::array::c_style | py::array::forcecast> pzi,
+          py::array_t<double, py::array::c_style | py::array::forcecast> Ei
+        ) {
         py::buffer_info infopx = pxi.request();
         py::buffer_info infopy = pyi.request();  // requesting buffer information of the input
         py::buffer_info infopz = pzi.request();
@@ -1735,7 +1793,13 @@ PYBIND11_MODULE(_ext, m) {
           pt, eta, phi, m of inclusive jets.
       )pbdoc")
     .def("to_numpy_get_child",
-      [](const output_wrapper ow, py::array_t<double, py::array::c_style | py::array::forcecast> pxi, py::array_t<double, py::array::c_style | py::array::forcecast> pyi, py::array_t<double, py::array::c_style | py::array::forcecast> pzi, py::array_t<double, py::array::c_style | py::array::forcecast> Ei) {
+      [](
+          const output_wrapper ow,
+          py::array_t<double, py::array::c_style | py::array::forcecast> pxi,
+          py::array_t<double, py::array::c_style | py::array::forcecast> pyi,
+          py::array_t<double, py::array::c_style | py::array::forcecast> pzi,
+          py::array_t<double, py::array::c_style | py::array::forcecast> Ei
+        ) {
         py::buffer_info infopx = pxi.request();
         py::buffer_info infopy = pyi.request();  // requesting buffer information of the input
         py::buffer_info infopz = pzi.request();
