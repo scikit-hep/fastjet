@@ -18,3 +18,5 @@ before-all = [
     "yum update -y",
     "yum install -y mpfr-devel boost-devel",
 ]
+# Skip musllinux builds for the moment
+skip = "*-musllinux_*"

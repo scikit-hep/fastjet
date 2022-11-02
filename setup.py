@@ -56,7 +56,13 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
             # Patch for FastJet core version 3.4.0
             # To be removed when https://gitlab.com/fastjet/fastjet/-/merge_requests/1 is merged upstream
             subprocess.run(
-                ["patch", "pyinterface/fastjet.i", DIR / "patch.txt"],
+                ["patch", "pyinterface/fastjet.i", DIR / "patch1.txt"],
+                cwd=FASTJET,
+            )
+
+            # Patch for segfault of LimitedWarning
+            subprocess.run(
+                ["patch", "src/ClusterSequence.cc", DIR / "patch2.txt"],
                 cwd=FASTJET,
             )
 
