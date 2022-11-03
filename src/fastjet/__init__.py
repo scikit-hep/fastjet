@@ -548,6 +548,7 @@ class multi_inheritor(
     def __init__(self):
         pass
 
+
 def formatwarning(message, category, filename, lineno, line=None):
     """Make warnings resemble the ones from fastjet-core"""
     return f"{category.__name__}: {message}\n"
