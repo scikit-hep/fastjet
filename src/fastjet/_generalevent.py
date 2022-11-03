@@ -1,3 +1,5 @@
+import warnings
+
 import awkward as ak
 import numpy as np
 
@@ -555,6 +557,25 @@ class _classgeneralevent:
         else:
             raise AssertionError(layout)
 
+    def _warn_for_exclusive(self):
+        if (
+            self.jetdef
+            not in [
+                fastjet.kt_algorithm,
+                fastjet.cambridge_algorithm,
+                fastjet.ee_kt_algorithm,
+                fastjet.plugin_algorithm,
+            ]
+        ) and (
+            (self.jetdef not in [fastjet.kt_algorithm, fastjet.cambridge_algorithm])
+            or self.jetdef.extra_param() < 0
+        ):
+            warnings.formatwarning = fastjet.formatwarning
+            warnings.warn(
+                "dcut and exclusive jets for jet-finders other than kt, C/A or genkt with p>=0 should be interpreted with care."
+            )
+        return
+
     def inclusive_jets(self, min_pt):
         self._out = []
         self._input_flag = 0
@@ -727,6 +748,7 @@ class _classgeneralevent:
         return res
 
     def exclusive_jets(self, n_jets, dcut):
+        self._warn_for_exclusive()
         self._out = []
         self._input_flag = 0
         for i in range(len(self._clusterable_level)):
@@ -764,6 +786,7 @@ class _classgeneralevent:
         return res
 
     def exclusive_jets_ycut(self, ycut):
+        self._warn_for_exclusive()
         self._out = []
         self._input_flag = 0
         for i in range(len(self._clusterable_level)):

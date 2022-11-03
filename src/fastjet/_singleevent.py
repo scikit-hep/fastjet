@@ -1,3 +1,5 @@
+import warnings
+
 import awkward as ak
 import numpy as np
 
@@ -66,6 +68,25 @@ class _classsingleevent:
         )
         return single
 
+    def _warn_for_exclusive(self):
+        if (
+            self.jetdef
+            not in [
+                fastjet.kt_algorithm,
+                fastjet.cambridge_algorithm,
+                fastjet.ee_kt_algorithm,
+                fastjet.plugin_algorithm,
+            ]
+        ) and (
+            (self.jetdef not in [fastjet.kt_algorithm, fastjet.cambridge_algorithm])
+            or self.jetdef.extra_param() < 0
+        ):
+            warnings.formatwarning = fastjet.formatwarning
+            warnings.warn(
+                "dcut and exclusive jets for jet-finders other than kt, C/A or genkt with p>=0 should be interpreted with care."
+            )
+        return
+
     def inclusive_jets(self, min_pt):
         np_results = self._results.to_numpy(min_pt)
         return ak.Array(
@@ -99,6 +120,7 @@ class _classsingleevent:
         )
 
     def exclusive_jets(self, n_jets, dcut):
+        self._warn_for_exclusive()
         np_results = 0
         if n_jets == 0:
             raise ValueError("Njets cannot be 0") from None
@@ -123,6 +145,7 @@ class _classsingleevent:
         )
 
     def exclusive_jets_ycut(self, ycut):
+        self._warn_for_exclusive()
         np_results = self._results.to_numpy_exclusive_ycut(ycut)
         return ak.Array(
             ak.layout.RecordArray(
