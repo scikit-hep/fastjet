@@ -22,7 +22,7 @@ import setuptools.command.build_ext
 import setuptools.command.install
 
 CGAL_ZIP = (
-    "https://github.com/CGAL/cgal/releases/download/v5.2.1/CGAL-5.2.1-library.zip"
+    "https://github.com/CGAL/cgal/releases/download/v5.5.1/CGAL-5.5.1-library.zip"
 )
 
 DIR = pathlib.Path(__file__).parent.resolve()
@@ -56,7 +56,14 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
             # Patch for FastJet core version 3.4.0
             # To be removed when https://gitlab.com/fastjet/fastjet/-/merge_requests/1 is merged upstream
             subprocess.run(
-                ["patch", "pyinterface/fastjet.i", DIR / "patch.txt"],
+                ["patch", "pyinterface/fastjet.i", DIR / "patch_fastjet_i.txt"],
+                cwd=FASTJET,
+            )
+
+            # Patch for segfault of LimitedWarning
+            # For more info see https://github.com/scikit-hep/fastjet/pull/131
+            subprocess.run(
+                ["patch", "src/ClusterSequence.cc", DIR / "patch_clustersequence.txt"],
                 cwd=FASTJET,
             )
 
@@ -70,6 +77,7 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
                 f"--prefix={OUTPUT}",
                 "--enable-allcxxplugins",
                 "--enable-cgal-header-only",
+                "--enable-cgal",
                 f"--with-cgaldir={cgal_dir}",
                 "--enable-swig",
                 "--enable-pyext",

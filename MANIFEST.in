@@ -3,4 +3,4 @@ graft tests
 graft fastjet-core
 graft pybind11
 global-exclude .git .gitmodules
-include LICENSE README.md pyproject.toml setup.py setup.cfg patch.txt .clang-format
+include LICENSE README.md pyproject.toml setup.py setup.cfg patch_fastjet_i.txt patch_clustersequence.txt

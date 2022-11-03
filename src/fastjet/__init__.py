@@ -547,3 +547,8 @@ class multi_inheritor(
 ):  # class that inherits both the custom ClusterSequence and swig ClusterSequence and acts as a trampoline
     def __init__(self):
         pass
+
+
+def formatwarning(message, category, filename, lineno, line=None):
+    """Make warnings resemble the ones from fastjet-core"""
+    return f"{category.__name__}: {message}\n"
