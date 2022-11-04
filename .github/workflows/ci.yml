@@ -51,14 +51,19 @@ jobs:
 
     - name: Install compiler tools on macOS
       if: runner.os == 'macOS'
-      run: brew install make gcc automake swig gmp mpfr boost
+      run: |
+        brew install make gcc automake swig gmp mpfr boost
+        export PATH="/usr/local/opt/make/libexec/gnubin:$PATH"
 
     - name: Install extra deps on Linux
       if: runner.os == 'Linux'
       run: sudo apt-get update && sudo apt-get install -y libboost-dev libmpfr-dev swig autoconf libtool
 
     - name: Install package
-      run: python -m pip install '.[test]' -v
+      run: |
+        echo $PATH
+        python -m pip install '.[test]' -v
+        
 
     - name: Test package
       run: python -m pytest -vv -rs -Wd
