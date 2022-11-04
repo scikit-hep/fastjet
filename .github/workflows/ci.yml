@@ -63,7 +63,7 @@ jobs:
       run: |
         echo $PATH
         python -m pip install '.[test]' -v
-        
+
 
     - name: Test package
       run: python -m pytest -vv -rs -Wd
