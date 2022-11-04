@@ -51,7 +51,7 @@ jobs:
 
     - name: Install compiler tools on macOS
       if: runner.os == 'macOS'
-      run: brew install gcc automake swig gmp mpfr boost
+      run: brew install make gcc automake swig gmp mpfr boost
 
     - name: Install extra deps on Linux
       if: runner.os == 'Linux'
