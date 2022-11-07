@@ -64,48 +64,7 @@ def test_exclusive_multi():
     assert multi_exclusive_dcut == cluster.exclusive_jets(dcut=0.0001).to_list()
 
 
-def test_exclusive_constituents_multi():
-    array = ak.Array(
-        [
-            [
-                {"px": 1.2, "py": 3.2, "pz": 5.4, "E": 2.5, "ex": 0.78},
-                {"px": 32.2, "py": 64.21, "pz": 543.34, "E": 24.12, "ex": 0.35},
-                {"px": 32.45, "py": 63.21, "pz": 543.14, "E": 24.56, "ex": 0.0},
-            ],
-            [
-                {"px": 1.2, "py": 3.2, "pz": 5.4, "E": 2.5, "ex": 0.78},
-                {"px": 32.2, "py": 64.21, "pz": 543.34, "E": 24.12, "ex": 0.35},
-                {"px": 32.45, "py": 63.21, "pz": 543.14, "E": 24.56, "ex": 0.0},
-            ],
-        ]
-    )
-    jetdef = fastjet.JetDefinition(fastjet.ca_algorithm, 0.6)
-    cluster = fastjet._pyjet.AwkwardClusterSequence(array, jetdef)
-
-    constituents_output = [
-        [
-            [
-                {"px": 32.2, "py": 64.21, "pz": 543.34, "E": 24.12, "ex": 0.35},
-                {"px": 32.45, "py": 63.21, "pz": 543.14, "E": 24.56, "ex": 0.0},
-            ],
-            [{"px": 1.2, "py": 3.2, "pz": 5.4, "E": 2.5, "ex": 0.78}],
-        ],
-        [
-            [
-                {"px": 32.2, "py": 64.21, "pz": 543.34, "E": 24.12, "ex": 0.35},
-                {"px": 32.45, "py": 63.21, "pz": 543.14, "E": 24.56, "ex": 0.0},
-            ],
-            [{"px": 1.2, "py": 3.2, "pz": 5.4, "E": 2.5, "ex": 0.78}],
-        ],
-    ]
-    assert cluster.exclusive_jets_constituents(2).to_list() == constituents_output
-    constituent_index_out = [[[1, 2], [0]], [[1, 2], [0]]]
-    assert (
-        constituent_index_out == cluster.exclusive_jets_cconstituent_index(2).to_list()
-    )
-
-
-def test_single():
+def test_exclusive_constituents_single():
     array = ak.Array(
         [
             {"px": 1.2, "py": 3.2, "pz": 5.4, "E": 2.5, "ex": 0.78},
@@ -128,6 +87,47 @@ def test_single():
     assert (
         constituent_index_output
         == cluster.exclusive_jets_constituent_index(2).to_list()
+    )
+
+
+def test_exclusive_constituents_multi():
+    array = ak.Array(
+        [
+            [
+                {"px": 1.2, "py": 3.2, "pz": 5.4, "E": 2.5, "ex": 0.78},
+                {"px": 32.2, "py": 64.21, "pz": 543.34, "E": 24.12, "ex": 0.35},
+                {"px": 32.45, "py": 63.21, "pz": 543.14, "E": 24.56, "ex": 0.0},
+            ],
+            [
+                {"px": 1.2, "py": 3.2, "pz": 5.4, "E": 2.5, "ex": 0.78},
+                {"px": 32.2, "py": 64.21, "pz": 543.34, "E": 24.12, "ex": 0.35},
+                {"px": 32.45, "py": 63.21, "pz": 543.14, "E": 24.56, "ex": 0.0},
+            ],
+        ]
+    )
+    jetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.6)
+    cluster = fastjet._pyjet.AwkwardClusterSequence(array, jetdef)
+
+    constituents_output = [
+        [
+            [
+                {"px": 32.2, "py": 64.21, "pz": 543.34, "E": 24.12, "ex": 0.35},
+                {"px": 32.45, "py": 63.21, "pz": 543.14, "E": 24.56, "ex": 0.0},
+            ],
+            [{"px": 1.2, "py": 3.2, "pz": 5.4, "E": 2.5, "ex": 0.78}],
+        ],
+        [
+            [
+                {"px": 32.2, "py": 64.21, "pz": 543.34, "E": 24.12, "ex": 0.35},
+                {"px": 32.45, "py": 63.21, "pz": 543.14, "E": 24.56, "ex": 0.0},
+            ],
+            [{"px": 1.2, "py": 3.2, "pz": 5.4, "E": 2.5, "ex": 0.78}],
+        ],
+    ]
+    assert cluster.exclusive_jets_constituents(2).to_list() == constituents_output
+    constituent_index_out = [[[1, 2], [0]], [[1, 2], [0]]]
+    assert (
+        constituent_index_out == cluster.exclusive_jets_cconstituent_index(2).to_list()
     )
 
 
