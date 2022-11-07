@@ -309,7 +309,7 @@ PYBIND11_MODULE(_ext, m) {
           jk += css[i]->exclusive_jets(n_jets).size();
           sizepar += css[i]->n_particles();
         }
-        jk++
+        jk++;
 
         auto parid = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {sizepar}, {sizeof(int)}));
         auto bufparid = parid.request();
@@ -332,7 +332,7 @@ PYBIND11_MODULE(_ext, m) {
 
 
         for (unsigned int i = 0; i < css.size(); i++){  // iterate through events
-            auto jets = css[i]->exclusive_jets(n_jets)
+            auto jets = css[i]->exclusive_jets(n_jets);
             int size = css[i]->exclusive_jets(n_jets).size();
             auto idx = css[i]->particle_jet_indices(jets);
             int64_t sizz = css[i]->n_particles();
