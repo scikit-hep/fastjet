@@ -99,7 +99,7 @@ def test_exclusive_constituents_multi():
         ],
     ]
     assert cluster.exclusive_jets_constituents(2).to_list() == constituents_output
-    constituent_index_out = [[[0], [1, 2]], [[0], [1, 2]]]
+    constituent_index_out = [[[1, 2], [0]], [[1, 2], [0]]]
     assert (
         constituent_index_out == cluster.exclusive_jets_cconstituent_index(2).to_list()
     )
@@ -124,7 +124,7 @@ def test_single():
         [{"px": 1.2, "py": 3.2, "pz": 5.4, "E": 2.5}],
     ]
     assert constituent_output == cluster.exclusive_jets_constituents(2).to_list()
-    constituent_index_output = [[0], [1, 2]]
+    constituent_index_output = [[1, 2], [0]]
     assert (
         constituent_index_output
         == cluster.exclusive_jets_constituent_index(2).to_list()
