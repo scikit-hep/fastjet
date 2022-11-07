@@ -344,7 +344,7 @@ PYBIND11_MODULE(_ext, m) {
               jetidx++;
             }
             for(int k = 0; k < size; k++){  // iterate through jets in event
-              for(int j = 0; j <sizz; j++){  // iterate through particles in event 
+              for(int j = 0; j <sizz; j++){  // iterate through particles in event
                 if(idx[j] == k){  // if particle jet index matches jet index assign it to jet j
                   ptrid[idxh] = j;
                   idxh++;

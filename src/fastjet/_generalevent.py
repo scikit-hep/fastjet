@@ -630,11 +630,13 @@ class _classgeneralevent:
     def exclusive_jets_constituents(self, njets):
         if njets <= 0:
             raise ValueError("Njets cannot be <= 0")
-        
+
         self._out = []
         self._input_flag = 0
         for i in range(len(self._clusterable_level)):
-            np_results = self._results[i].to_numpy_exclusive_njet_with_constituents(njets)
+            np_results = self._results[i].to_numpy_exclusive_njet_with_constituents(
+                njets
+            )
             off = np.insert(np_results[-1], 0, 0)
             out = ak.Array(
                 ak.layout.ListOffsetArray64(
@@ -678,11 +680,13 @@ class _classgeneralevent:
     def exclusive_jets_constituent_index(self, njets):
         if njets <= 0:
             raise ValueError("Njets cannot be <= 0")
-        
+
         self._out = []
         self._input_flag = 0
         for i in range(len(self._clusterable_level)):
-            np_results = self._results[i].to_numpy_exclusive_njet_with_constituents(njets)
+            np_results = self._results[i].to_numpy_exclusive_njet_with_constituents(
+                njets
+            )
             off = np.insert(np_results[-1], 0, 0)
             out = ak.Array(
                 ak.layout.ListOffsetArray64(

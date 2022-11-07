@@ -211,7 +211,7 @@ class _classsingleevent:
     def exclusive_jets_constituents(self, njets):
         if njets <= 0:
             raise ValueError("Njets cannot be <= 0")
-            
+
         np_results = self._results.to_numpy_exclusive_njet_with_constituents(njets)
 
         off = np.insert(np_results[-1], 0, 0)

@@ -249,7 +249,7 @@ class _classmultievent:
     def exclusive_jets_constituents(self, njets):
         if njets <= 0:
             raise ValueError("Njets cannot be <= 0")
-            
+
         outputs_to_inputs = self.exclusive_jets_constituent_index(njets)
         shape = ak.num(outputs_to_inputs)
         total = np.sum(shape)
