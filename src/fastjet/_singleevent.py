@@ -184,7 +184,7 @@ class _classsingleevent:
             )
         )
         out = ak.Array(ak.layout.ListOffsetArray64(ak.layout.Index64(off), out.layout))
-        return out
+        return out[0]
 
     def unique_history_order(self):
         np_results = self._results.to_numpy_unique_history_order()
