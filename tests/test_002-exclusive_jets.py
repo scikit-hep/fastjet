@@ -84,18 +84,18 @@ def test_exclusive_constituents_multi():
 
     constituents_output = [
         [
-            [{"px": 1.2, "py": 3.2, "pz": 5.4, "E": 2.5, "ex": 0.78}],
             [
                 {"px": 32.2, "py": 64.21, "pz": 543.34, "E": 24.12, "ex": 0.35},
                 {"px": 32.45, "py": 63.21, "pz": 543.14, "E": 24.56, "ex": 0.0},
             ],
+            [{"px": 1.2, "py": 3.2, "pz": 5.4, "E": 2.5, "ex": 0.78}],
         ],
         [
-            [{"px": 1.2, "py": 3.2, "pz": 5.4, "E": 2.5, "ex": 0.78}],
             [
                 {"px": 32.2, "py": 64.21, "pz": 543.34, "E": 24.12, "ex": 0.35},
                 {"px": 32.45, "py": 63.21, "pz": 543.14, "E": 24.56, "ex": 0.0},
             ],
+            [{"px": 1.2, "py": 3.2, "pz": 5.4, "E": 2.5, "ex": 0.78}],
         ],
     ]
     assert cluster.exclusive_jets_constituents(2).to_list() == constituents_output
@@ -117,11 +117,11 @@ def test_single():
     cluster = fastjet._pyjet.AwkwardClusterSequence(array, jetdef)
 
     constituent_output = [
-        [{"px": 1.2, "py": 3.2, "pz": 5.4, "E": 2.5}],
         [
             {"px": 32.2, "py": 64.21, "pz": 543.34, "E": 24.12},
             {"px": 32.45, "py": 63.21, "pz": 543.14, "E": 24.56},
         ],
+        [{"px": 1.2, "py": 3.2, "pz": 5.4, "E": 2.5}],
     ]
     assert constituent_output == cluster.exclusive_jets_constituents(2).to_list()
     constituent_index_output = [[0], [1, 2]]
