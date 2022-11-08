@@ -190,7 +190,7 @@ class _classsingleevent:
         if njets <= 0:
             raise ValueError("Njets cannot be <= 0")
 
-        np_results = self._results.to_numpy_exclusive_njet_with_constituents(njets)
+        np_results = self._results.to_numpy_exclusive_njet_lund_declusterings(njets)
         off = np.insert(np_results[-1], 0, 0)
         out = ak.Array(
             ak.layout.ListOffsetArray64(
