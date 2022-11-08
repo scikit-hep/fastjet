@@ -67,7 +67,7 @@ To install the build-time dependencies run the following installation commands f
 ### Debian/Ubuntu
 
 ``` bash
-sudo apt-get update && sudo apt-get install -y libboost-dev swig autoconf libtool
+sudo apt-get update && sudo apt-get install -y libboost-dev libmpfr-dev libgmp-dev swig autoconf libtool
 ```
 
 ## Build and install
