@@ -1615,7 +1615,7 @@ PYBIND11_MODULE(_ext, m) {
               if (j1.pt2() < j2.pt2()) std::swap(j1,j2);
               double Delta = j1.delta_R(j2);
               Delta_vec.push_back(Delta);
-              kt.push_back(j2.pt() * Delta);
+              kt_vec.push_back(j2.pt() * Delta);
               pair = j1;
               splittings++;
             }
