@@ -1593,10 +1593,13 @@ PYBIND11_MODULE(_ext, m) {
         std::vector<double> Delta_vec;
         std::vector<double> kt_vec;
 
-        auto eventoffsets = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len}, {sizeof(int)}));
+        auto eventoffsets = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len+1}, {sizeof(int)}));
         auto bufeventoffsets = eventoffsets.request();
         int *ptreventoffsets = (int *)bufeventoffsets.ptr;
         size_t eventidx = 0;
+
+        ptreventoffsets[eventidx] = 0;
+        eventidx++;
 
         auto jetoffsets = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {jk}, {sizeof(int)}));
         auto bufjetoffsets = jetoffsets.request();
