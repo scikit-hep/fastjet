@@ -1579,6 +1579,83 @@ PYBIND11_MODULE(_ext, m) {
         Returns:
           pt, eta, phi, m of inclusive jets.
       )pbdoc")
+      .def("to_numpy_exclusive_njet_lund_declusterings",
+      [](const output_wrapper ow, const int n_jets = 0) {
+        auto css = ow.cse;
+        int64_t len = css.size();
+        auto jk = 0;
+
+        for(int i = 0; i < len; i++){
+          jk += css[i]->exclusive_jets(n_jets).size();
+        }
+        jk++;
+
+        std::vector<double> Delta_vec;
+        std::vector<double> kt_vec;
+
+        auto eventoffsets = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len+1}, {sizeof(int)}));
+        auto bufeventoffsets = eventoffsets.request();
+        int *ptreventoffsets = (int *)bufeventoffsets.ptr;
+        size_t eventidx = 0;
+
+        ptreventoffsets[eventidx] = 0;
+        eventidx++;
+
+        auto jetoffsets = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {jk}, {sizeof(int)}));
+        auto bufjetoffsets = jetoffsets.request();
+        int *ptrjetoffsets = (int *)bufjetoffsets.ptr;
+        size_t jetidx = 0;
+
+        size_t idxh = 0;
+        ptrjetoffsets[jetidx] = 0;
+        jetidx++;
+        auto eventprev = 0;
+
+        for (unsigned int i = 0; i < css.size(); i++){  // iterate through events
+          auto jets = css[i]->exclusive_jets(n_jets);
+          int size = css[i]->exclusive_jets(n_jets).size();
+          auto prev = ptrjetoffsets[jetidx-1];
+
+          for (unsigned int j = 0; j < jets.size(); j++){
+            // adapted from https://github.com/fdreyer/LundPlane/blob/master/LundGenerator.cc
+            PseudoJet pair, j1, j2;
+            pair = jets[j];
+            int splittings = 0;
+            while (pair.has_parents(j1, j2)) {
+              if (j1.pt2() < j2.pt2()) std::swap(j1,j2);
+              double Delta = j1.delta_R(j2);
+              Delta_vec.push_back(Delta);
+              kt_vec.push_back(j2.pt() * Delta);
+              pair = j1;
+              splittings++;
+            }
+
+            ptrjetoffsets[jetidx] = splittings + prev;
+            prev = ptrjetoffsets[jetidx];
+            jetidx++;
+          }
+
+          ptreventoffsets[eventidx] = jets.size() + eventprev;
+          eventprev = ptreventoffsets[eventidx];
+          eventidx++;
+        }
+
+        auto Deltas = py::array(Delta_vec.size(), Delta_vec.data());
+        auto kts = py::array(kt_vec.size(), kt_vec.data());
+
+        return std::make_tuple(
+            jetoffsets,
+            Deltas,
+            kts,
+            eventoffsets
+          );
+      }, "n_jets"_a = 0, R"pbdoc(
+        Calculates the Lund declustering Delta and k_T parameters from exclusive n_jets and converts them to numpy arrays.
+        Args:
+          n_jets: Number of exclusive subjets. Default: 0.
+        Returns:
+          jet offsets, splitting Deltas, kts, and event offsets.
+      )pbdoc")
       .def("to_numpy_unclustered_particles",
       [](const output_wrapper ow) {
         auto css = ow.cse;

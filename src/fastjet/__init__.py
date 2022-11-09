@@ -321,6 +321,18 @@ class ClusterSequence:  # The super class
 
         raise AssertionError()
 
+    def exclusive_jets_lund_declusterings(self, njets: int = 10) -> ak.Array:
+        """Returns the Lund declustering Delta and k_T parameters from exclusive n_jets.
+
+        Args:
+            njets (int): The number of jets it was clustered to.
+
+        Returns:
+            awkward.highlevel.Array: Returns an Awkward Array of the same type as the input.
+        """
+
+        raise AssertionError()
+
     def exclusive_dmerge(self, njets: int = 10) -> Union[ak.Array, float]:
         """Returns the dmin corresponding to the recombination that went from n+1 to n jets.
 
