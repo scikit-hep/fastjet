@@ -608,7 +608,7 @@ class _classgeneralevent:
         self._input_flag = 0
         for i in range(len(self._clusterable_level)):
             np_results = self._results[i].to_numpy_with_constituents(min_pt)
-            off = np.insert(np_results[-1], 0, 0)
+            off = np_results[-1]
             out = ak.Array(
                 ak.layout.ListOffsetArray64(
                     ak.layout.Index64(np_results[0]),
@@ -637,7 +637,7 @@ class _classgeneralevent:
             np_results = self._results[i].to_numpy_exclusive_njet_with_constituents(
                 njets
             )
-            off = np.insert(np_results[-1], 0, 0)
+            off = np_results[-1]
             out = ak.Array(
                 ak.layout.ListOffsetArray64(
                     ak.layout.Index64(np_results[0]),
@@ -661,7 +661,7 @@ class _classgeneralevent:
         self._input_flag = 0
         for i in range(len(self._clusterable_level)):
             np_results = self._results[i].to_numpy_with_constituents(min_pt)
-            off = np.insert(np_results[-1], 0, 0)
+            off = np_results[-1]
             out = ak.Array(
                 ak.layout.ListOffsetArray64(
                     ak.layout.Index64(np_results[0]),
@@ -687,7 +687,7 @@ class _classgeneralevent:
             np_results = self._results[i].to_numpy_exclusive_njet_with_constituents(
                 njets
             )
-            off = np.insert(np_results[-1], 0, 0)
+            off = np_results[-1]
             out = ak.Array(
                 ak.layout.ListOffsetArray64(
                     ak.layout.Index64(np_results[0]),
@@ -903,7 +903,7 @@ class _classgeneralevent:
         self._input_flag = 0
         for i in range(len(self._clusterable_level)):
             np_results = self._results[i].to_numpy_unique_history_order()
-            off = np.insert(np_results[-1], 0, 0)
+            off = np_results[-1]
             self._out.append(
                 ak.Array(
                     ak.layout.ListOffsetArray64(
