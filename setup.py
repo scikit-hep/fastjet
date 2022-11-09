@@ -27,6 +27,7 @@ CGAL_ZIP = (
 
 DIR = pathlib.Path(__file__).parent.resolve()
 FASTJET = DIR / "fastjet-core"
+FASTJET_CONTRIB = DIR / "fastjet-contrib"
 PYTHON = DIR / "src/fastjet"
 OUTPUT = PYTHON / "_fastjet_core"
 
@@ -96,6 +97,17 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
             env["ORIGIN"] = "$ORIGIN"  # if evaluated, it will still be '$ORIGIN'
             subprocess.run(["make", "-j"], cwd=FASTJET, env=env, check=True)
             subprocess.run(["make", "install"], cwd=FASTJET, env=env, check=True)
+
+            subprocess.run(
+                ["./configure", f"--fastjet-config={FASTJET}/fastjet-config"],
+                cwd=FASTJET_CONTRIB,
+                env=env,
+                check=True,
+            )
+            subprocess.run(["make", "-j"], cwd=FASTJET_CONTRIB, env=env, check=True)
+            subprocess.run(
+                ["make", "install"], cwd=FASTJET_CONTRIB, env=env, check=True
+            )
 
         setuptools.command.build_ext.build_ext.build_extensions(self)
 
