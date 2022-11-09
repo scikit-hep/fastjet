@@ -186,10 +186,13 @@ PYBIND11_MODULE(_ext, m) {
         auto bufparid = parid.request();
         int *ptrid = (int *)bufparid.ptr;
 
-        auto eventoffsets = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len}, {sizeof(int)}));
+        auto eventoffsets = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len+1}, {sizeof(int)}));
         auto bufeventoffsets = eventoffsets.request();
         int *ptreventoffsets = (int *)bufeventoffsets.ptr;
         size_t eventidx = 0;
+
+        ptreventoffsets[eventidx] = 0;
+        eventidx++;
 
         auto jetoffsets = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {jk}, {sizeof(int)}));
         auto bufjetoffsets = jetoffsets.request();
@@ -297,6 +300,78 @@ PYBIND11_MODULE(_ext, m) {
           min_pt: Minimum jet pt to include. Default: 0.
         Returns:
           pt, eta, phi, m of inclusive jets.
+      )pbdoc")
+      .def("to_numpy_exclusive_njet_with_constituents",
+      [](const output_wrapper ow, const int n_jets = 0) {
+        auto css = ow.cse;
+        int64_t len = css.size();
+        auto jk = 0;
+        auto sizepar = 0;
+
+        for(int i = 0; i < len; i++){
+          jk += css[i]->exclusive_jets(n_jets).size();
+          sizepar += css[i]->n_particles();
+        }
+        jk++;
+
+        auto parid = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {sizepar}, {sizeof(int)}));
+        auto bufparid = parid.request();
+        int *ptrid = (int *)bufparid.ptr;
+
+        auto eventoffsets = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len+1}, {sizeof(int)}));
+        auto bufeventoffsets = eventoffsets.request();
+        int *ptreventoffsets = (int *)bufeventoffsets.ptr;
+        size_t eventidx = 0;
+
+        ptreventoffsets[eventidx] = 0;
+        eventidx++;
+
+        auto jetoffsets = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {jk}, {sizeof(int)}));
+        auto bufjetoffsets = jetoffsets.request();
+        int *ptrjetoffsets = (int *)bufjetoffsets.ptr;
+        size_t jetidx = 0;
+
+        size_t idxh = 0;
+        ptrjetoffsets[jetidx] = 0;
+        jetidx++;
+        auto eventprev = 0;
+
+
+        for (unsigned int i = 0; i < css.size(); i++){  // iterate through events
+            auto jets = css[i]->exclusive_jets(n_jets);
+            int size = css[i]->exclusive_jets(n_jets).size();
+            auto idx = css[i]->particle_jet_indices(jets);
+            int64_t sizz = css[i]->n_particles();
+            auto prev = ptrjetoffsets[jetidx-1];
+
+            for (unsigned int j = 0; j < jets.size(); j++){
+              ptrjetoffsets[jetidx] = jets[j].constituents().size() + prev;
+              prev = ptrjetoffsets[jetidx];
+              jetidx++;
+            }
+            for(int k = 0; k < size; k++){  // iterate through jets in event
+              for(int j = 0; j <sizz; j++){  // iterate through particles in event
+                if(idx[j] == k){  // if particle jet index matches jet index assign it to jet j
+                  ptrid[idxh] = j;
+                  idxh++;
+                }
+              }
+            }
+            ptreventoffsets[eventidx] = jets.size()+eventprev;
+            eventprev = ptreventoffsets[eventidx];
+            eventidx++;
+          }
+        return std::make_tuple(
+            jetoffsets,
+            parid,
+            eventoffsets
+          );
+      }, "n_jets"_a = 0, R"pbdoc(
+        Retrieves the constituents of exclusive jets upto n jets from multievent clustering and converts them to numpy arrays.
+        Args:
+          n_jets: Number of exclusive subjets. Default: 0.
+        Returns:
+          jet offsets, particle indices, and event offsets
       )pbdoc")
       .def("to_numpy_exclusive_dcut",
       [](const output_wrapper ow, const double dcut = 100) {
@@ -1408,10 +1483,12 @@ PYBIND11_MODULE(_ext, m) {
         auto parid = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {jk}, {sizeof(int)}));
         auto bufparid = parid.request();
         int *ptrid = (int *)bufparid.ptr;
-        auto eventoffsets = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len}, {sizeof(int)}));
+        auto eventoffsets = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len+1}, {sizeof(int)}));
         auto bufeventoffsets = eventoffsets.request();
         int *ptreventoffsets = (int *)bufeventoffsets.ptr;
         size_t eventidx = 0;
+        ptreventoffsets[eventidx] = 0;
+        eventidx++;
         size_t idxh = 0;
         auto eventprev = 0;
         for (unsigned int i = 0; i < css.size(); i++){

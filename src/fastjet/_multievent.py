@@ -175,7 +175,21 @@ class _classmultievent:
 
     def constituent_index(self, min_pt):
         np_results = self._results.to_numpy_with_constituents(min_pt)
-        off = np.insert(np_results[-1], 0, 0)
+        off = np_results[-1]
+        out = ak.Array(
+            ak.layout.ListOffsetArray64(
+                ak.layout.Index64(np_results[0]), ak.layout.NumpyArray(np_results[1])
+            )
+        )
+        out = ak.Array(ak.layout.ListOffsetArray64(ak.layout.Index64(off), out.layout))
+        return out
+
+    def exclusive_jets_constituent_index(self, njets):
+        if njets <= 0:
+            raise ValueError("Njets cannot be <= 0")
+
+        np_results = self._results.to_numpy_exclusive_njet_with_constituents(njets)
+        off = np_results[-1]
         out = ak.Array(
             ak.layout.ListOffsetArray64(
                 ak.layout.Index64(np_results[0]), ak.layout.NumpyArray(np_results[1])
@@ -186,7 +200,7 @@ class _classmultievent:
 
     def unique_history_order(self):
         np_results = self._results.to_numpy_unique_history_order()
-        off = np.insert(np_results[-1], 0, 0)
+        off = np_results[-1]
         out = ak.Array(
             ak.layout.ListOffsetArray64(
                 ak.layout.Index64(off), ak.layout.NumpyArray(np_results[0])
@@ -226,6 +240,17 @@ class _classmultievent:
 
     def constituents(self, min_pt):
         outputs_to_inputs = self.constituent_index(min_pt)
+        shape = ak.num(outputs_to_inputs)
+        total = np.sum(shape)
+        duplicate = ak.unflatten(np.zeros(total, np.int64), shape)
+        prepared = self.data[:, np.newaxis][duplicate]
+        return prepared[outputs_to_inputs]
+
+    def exclusive_jets_constituents(self, njets):
+        if njets <= 0:
+            raise ValueError("Njets cannot be <= 0")
+
+        outputs_to_inputs = self.exclusive_jets_constituent_index(njets)
         shape = ak.num(outputs_to_inputs)
         total = np.sum(shape)
         duplicate = ak.unflatten(np.zeros(total, np.int64), shape)
