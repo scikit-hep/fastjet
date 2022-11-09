@@ -710,18 +710,20 @@ class _classgeneralevent:
         self._out = []
         self._input_flag = 0
         for i in range(len(self._clusterable_level)):
-            np_results = self._results[i].to_numpy_exclusive_njet_with_constituents(njets)
+            np_results = self._results[i].to_numpy_exclusive_njet_with_constituents(
+                njets
+            )
             off = np.insert(np_results[-1], 0, 0)
             out = ak.Array(
                 ak.layout.ListOffsetArray64(
                     ak.layout.Index64(np_results[0]),
                     ak.layout.RecordArray(
-                    (
-                        ak.layout.NumpyArray(np_results[1]),
-                        ak.layout.NumpyArray(np_results[2]),
+                        (
+                            ak.layout.NumpyArray(np_results[1]),
+                            ak.layout.NumpyArray(np_results[2]),
+                        ),
+                        ("Delta", "kt"),
                     ),
-                    ("Delta", "kt"),
-                ),
                 ),
                 behavior=self.data.behavior,
             )

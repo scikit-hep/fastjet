@@ -51,7 +51,6 @@ public:
   void setCluster() {}
 };
 
-
 output_wrapper interfacemulti(
     py::array_t<double, py::array::c_style | py::array::forcecast> pxi,
     py::array_t<double, py::array::c_style | py::array::forcecast> pyi,

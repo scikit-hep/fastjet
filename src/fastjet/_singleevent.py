@@ -194,7 +194,7 @@ class _classsingleevent:
         off = np.insert(np_results[-1], 0, 0)
         out = ak.Array(
             ak.layout.ListOffsetArray64(
-                ak.layout.Index64(np_results[0]), 
+                ak.layout.Index64(np_results[0]),
                 ak.layout.RecordArray(
                     (
                         ak.layout.NumpyArray(np_results[1]),
