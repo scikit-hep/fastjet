@@ -1591,6 +1591,7 @@ PYBIND11_MODULE(_ext, m) {
         }
         jk++;
 
+        auto lund_generator = fastjet::contrib::LundGenerator();
         std::vector<double> Delta_vec;
         std::vector<double> kt_vec;
 
@@ -1618,7 +1619,6 @@ PYBIND11_MODULE(_ext, m) {
           auto prev = ptrjetoffsets[jetidx-1];
 
           for (unsigned int j = 0; j < jets.size(); j++){
-            auto lund_generator = fastjet::contrib::LundGenerator();
             auto lund_result = lund_generator.result(jets[j]);
             auto splittings = lund_result.size();
             for (unsigned int k = 0; k < splittings; k++){
