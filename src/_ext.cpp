@@ -13,6 +13,7 @@
 #include <fastjet/GhostedAreaSpec.hh>
 #include <fastjet/JetDefinition.hh>
 #include <fastjet/PseudoJet.hh>
+#include <fastjet/contrib/LundGenerator.hh>
 
 #include <pybind11/numpy.h>
 #include <pybind11/operators.h>
@@ -1590,6 +1591,7 @@ PYBIND11_MODULE(_ext, m) {
         }
         jk++;
 
+        auto lund_generator = fastjet::contrib::LundGenerator();
         std::vector<double> Delta_vec;
         std::vector<double> kt_vec;
 
@@ -1617,17 +1619,11 @@ PYBIND11_MODULE(_ext, m) {
           auto prev = ptrjetoffsets[jetidx-1];
 
           for (unsigned int j = 0; j < jets.size(); j++){
-            // adapted from https://github.com/fdreyer/LundPlane/blob/master/LundGenerator.cc
-            PseudoJet pair, j1, j2;
-            pair = jets[j];
-            int splittings = 0;
-            while (pair.has_parents(j1, j2)) {
-              if (j1.pt2() < j2.pt2()) std::swap(j1,j2);
-              double Delta = j1.delta_R(j2);
-              Delta_vec.push_back(Delta);
-              kt_vec.push_back(j2.pt() * Delta);
-              pair = j1;
-              splittings++;
+            auto lund_result = lund_generator.result(jets[j]);
+            auto splittings = lund_result.size();
+            for (unsigned int k = 0; k < splittings; k++){
+              Delta_vec.push_back(lund_result[k].Delta());
+              kt_vec.push_back(lund_result[k].kt());
             }
 
             ptrjetoffsets[jetidx] = splittings + prev;
