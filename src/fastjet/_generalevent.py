@@ -710,7 +710,7 @@ class _classgeneralevent:
         self._out = []
         self._input_flag = 0
         for i in range(len(self._clusterable_level)):
-            np_results = self._results[i].to_numpy_exclusive_njet_with_constituents(
+            np_results = self._results[i].to_numpy_exclusive_njet_lund_declusterings(
                 njets
             )
             off = np_results[-1]
