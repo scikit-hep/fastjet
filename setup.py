@@ -78,7 +78,7 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
             env = os.environ.copy()
             env["PYTHON"] = sys.executable
             env["PYTHON_INCLUDE"] = f'-I{sysconfig.get_path("include")}'
-            env["CXXFLAGS"] = "-O3 -Bstatic -lgmp -Bdynamic"
+            env["CXXFLAGS"] = "-O3 -Bstatic -lgmp -Bdynamic -std=c++17"
             env["ORIGIN"] = "$ORIGIN"  # if evaluated, it will still be '$ORIGIN'
 
             args = [
@@ -109,7 +109,11 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
             subprocess.run(["make", "install"], cwd=FASTJET, env=env, check=True)
 
             subprocess.run(
-                ["./configure", f"--fastjet-config={FASTJET}/fastjet-config"],
+                [
+                    "./configure", 
+                    f"--fastjet-config={FASTJET}/fastjet-config",
+                    "CXXFLAGS='-O3 -Bstatic -Bdynamic -std=c++17'",
+                ],
                 cwd=FASTJET_CONTRIB,
                 env=env,
                 check=True,
@@ -137,24 +141,28 @@ class FastJetInstall(setuptools.command.install.install):
 
         shutil.copytree(OUTPUT, fastjetdir / "_fastjet_core", symlinks=True)
 
+        make = "make"
+        if sys.platform == "darwin":
+            make = "gmake"
+
         pythondir = pathlib.Path(
             subprocess.check_output(
-                """make -f pyinterface/Makefile --eval='print-pythondir:
+                f"""{make} -f Makefile --eval='print-pythondir:
 \t@echo $(pythondir)
 ' print-pythondir""",
                 shell=True,
-                cwd=FASTJET,
+                cwd=FASTJET / "pyinterface",
                 universal_newlines=True,
             ).strip()
         )
 
         pyexecdir = pathlib.Path(
             subprocess.check_output(
-                """make -f pyinterface/Makefile --eval='print-pyexecdir:
+                f"""{make} -f Makefile --eval='print-pyexecdir:
 \t@echo $(pyexecdir)
 ' print-pyexecdir""",
                 shell=True,
-                cwd=FASTJET,
+                cwd=FASTJET / "pyinterface",
                 universal_newlines=True,
             ).strip()
         )
