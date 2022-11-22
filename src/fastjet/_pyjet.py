@@ -206,6 +206,15 @@ class AwkwardClusterSequence(ClusterSequence):
     def constituents(self, min_pt=0):
         return self._internalrep.constituents(min_pt)
 
+    def exclusive_jets_constituent_index(self, njets=10):
+        return self._internalrep.exclusive_jets_constituent_index(njets)
+
+    def exclusive_jets_constituents(self, njets=10):
+        return self._internalrep.exclusive_jets_constituents(njets)
+
+    def exclusive_jets_lund_declusterings(self, njets=10):
+        return self._internalrep.exclusive_jets_lund_declusterings(njets)
+
     def exclusive_dmerge(self, njets=10):
         return self._internalrep.exclusive_dmerge(njets)
 

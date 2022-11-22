@@ -163,10 +163,45 @@ class _classsingleevent:
 
     def constituent_index(self, min_pt):
         np_results = self._results.to_numpy_with_constituents(min_pt)
-        off = np.insert(np_results[-1], 0, 0)
+        off = np_results[-1]
         out = ak.Array(
             ak.layout.ListOffsetArray64(
                 ak.layout.Index64(np_results[0]), ak.layout.NumpyArray(np_results[1])
+            )
+        )
+        out = ak.Array(ak.layout.ListOffsetArray64(ak.layout.Index64(off), out.layout))
+        return out[0]
+
+    def exclusive_jets_constituent_index(self, njets):
+        if njets <= 0:
+            raise ValueError("Njets cannot be <= 0")
+
+        np_results = self._results.to_numpy_exclusive_njet_with_constituents(njets)
+        off = np_results[-1]
+        out = ak.Array(
+            ak.layout.ListOffsetArray64(
+                ak.layout.Index64(np_results[0]), ak.layout.NumpyArray(np_results[1])
+            )
+        )
+        out = ak.Array(ak.layout.ListOffsetArray64(ak.layout.Index64(off), out.layout))
+        return out[0]
+
+    def exclusive_jets_lund_declusterings(self, njets):
+        if njets <= 0:
+            raise ValueError("Njets cannot be <= 0")
+
+        np_results = self._results.to_numpy_exclusive_njet_lund_declusterings(njets)
+        off = np_results[-1]
+        out = ak.Array(
+            ak.layout.ListOffsetArray64(
+                ak.layout.Index64(np_results[0]),
+                ak.layout.RecordArray(
+                    (
+                        ak.layout.NumpyArray(np_results[1]),
+                        ak.layout.NumpyArray(np_results[2]),
+                    ),
+                    ("Delta", "kt"),
+                ),
             )
         )
         out = ak.Array(ak.layout.ListOffsetArray64(ak.layout.Index64(off), out.layout))
@@ -179,7 +214,28 @@ class _classsingleevent:
 
     def constituents(self, min_pt):
         np_results = self._results.to_numpy_with_constituents(min_pt)
-        off = np.insert(np_results[-1], 0, 0)
+        off = np_results[-1]
+        out = ak.Array(
+            ak.layout.ListOffsetArray64(
+                ak.layout.Index64(np_results[0]), ak.layout.NumpyArray(np_results[1])
+            )
+        )
+        outputs_to_inputs = ak.Array(
+            ak.layout.ListOffsetArray64(ak.layout.Index64(off), out.layout)
+        )
+        shape = ak.num(outputs_to_inputs)
+        total = np.sum(shape)
+        duplicate = ak.unflatten(np.zeros(total, np.int64), shape)
+        prepared = self.data[:, np.newaxis][duplicate]
+        return prepared[outputs_to_inputs][0]
+
+    def exclusive_jets_constituents(self, njets):
+        if njets <= 0:
+            raise ValueError("Njets cannot be <= 0")
+
+        np_results = self._results.to_numpy_exclusive_njet_with_constituents(njets)
+
+        off = np_results[-1]
         out = ak.Array(
             ak.layout.ListOffsetArray64(
                 ak.layout.Index64(np_results[0]), ak.layout.NumpyArray(np_results[1])
