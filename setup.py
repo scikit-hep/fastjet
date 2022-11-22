@@ -110,7 +110,7 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
 
             subprocess.run(
                 [
-                    "./configure", 
+                    "./configure",
                     f"--fastjet-config={FASTJET}/fastjet-config",
                     "CXXFLAGS='-O3 -Bstatic -Bdynamic -std=c++17'",
                 ],
