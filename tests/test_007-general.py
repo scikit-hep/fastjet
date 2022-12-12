@@ -148,7 +148,7 @@ def test_regulararray_input():
         ],
         with_name="Momentum4D",
     )
-    inputs = ak.Array(ak.layout.RegularArray(inputs.layout, 1))
+    inputs = ak.Array(ak.contents.RegularArray(inputs.layout, 1))
     jetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.6)
     cluster = fastjet.ClusterSequence(inputs, jetdef)
     inclusive_jets = [
@@ -238,8 +238,8 @@ def test_listarray_input():
         with_name="Momentum4D",
     )
     inputs = ak.Array(
-        ak.layout.ListArray64(
-            ak.layout.Index64([0, 1]), ak.layout.Index64([1, 2]), inputs.layout
+        ak.contents.ListArray(
+            ak.index.Index64([0, 1]), ak.index.Index64([1, 2]), inputs.layout
         )
     )
     jetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.6)
@@ -316,8 +316,8 @@ def test_listarray32_input():
         with_name="Momentum4D",
     )
     inputs = ak.Array(
-        ak.layout.ListArray32(
-            ak.layout.Index32([0, 1]), ak.layout.Index32([1, 2]), inputs.layout
+        ak.contents.ListArray(
+            ak.index.Index32([0, 1]), ak.index.Index32([1, 2]), inputs.layout
         )
     )
     jetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.6)
@@ -394,8 +394,8 @@ def test_listarrayU32_input():
         with_name="Momentum4D",
     )
     inputs = ak.Array(
-        ak.layout.ListArrayU32(
-            ak.layout.IndexU32([0, 1]), ak.layout.IndexU32([1, 2]), inputs.layout
+        ak.contents.ListArray(
+            ak.index.IndexU32([0, 1]), ak.index.IndexU32([1, 2]), inputs.layout
         )
     )
     jetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.6)
@@ -472,7 +472,7 @@ def test_indexedarray_input():
         with_name="Momentum4D",
     )
     inputs = ak.Array(
-        ak.layout.IndexedArray64(ak.layout.Index64([0, 2, 1]), inputs.layout)
+        ak.contents.IndexedArray(ak.index.Index64([0, 2, 1]), inputs.layout)
     )
     jetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.6)
     cluster = fastjet.ClusterSequence(inputs, jetdef)
@@ -542,7 +542,7 @@ def test_indexedarray32_input():
         with_name="Momentum4D",
     )
     inputs = ak.Array(
-        ak.layout.IndexedArray32(ak.layout.Index32([0, 2, 1]), inputs.layout)
+        ak.contents.IndexedArray(ak.index.Index32([0, 2, 1]), inputs.layout)
     )
     jetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.6)
     cluster = fastjet.ClusterSequence(inputs, jetdef)
@@ -612,7 +612,7 @@ def test_indexedarrayU32_input():
         with_name="Momentum4D",
     )
     inputs = ak.Array(
-        ak.layout.IndexedArrayU32(ak.layout.IndexU32([0, 2, 1]), inputs.layout)
+        ak.contents.IndexedArray(ak.index.IndexU32([0, 2, 1]), inputs.layout)
     )
     jetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.6)
     cluster = fastjet.ClusterSequence(inputs, jetdef)
@@ -682,7 +682,7 @@ def test_indexedoptionarray32_input():
         with_name="Momentum4D",
     )
     inputs = ak.Array(
-        ak.layout.IndexedOptionArray32(ak.layout.Index32([0, -2, 1]), inputs.layout)
+        ak.contents.IndexedOptionArray(ak.index.Index32([0, -2, 1]), inputs.layout)
     )
     jetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.6)
     cluster = fastjet.ClusterSequence(inputs, jetdef)
@@ -744,7 +744,7 @@ def test_indexedoptionarray64_input():
         with_name="Momentum4D",
     )
     inputs = ak.Array(
-        ak.layout.IndexedOptionArray64(ak.layout.Index64([0, -2, 1]), inputs.layout)
+        ak.contents.IndexedOptionArray(ak.index.Index64([0, -2, 1]), inputs.layout)
     )
     jetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.6)
     cluster = fastjet.ClusterSequence(inputs, jetdef)
@@ -805,7 +805,7 @@ def test_unmaskedarray_input():
         ],
         with_name="Momentum4D",
     )
-    inputs = ak.Array(ak.layout.UnmaskedArray(inputs.layout))
+    inputs = ak.Array(ak.contents.UnmaskedArray(inputs.layout))
     jetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.6)
     cluster = fastjet.ClusterSequence(inputs, jetdef)
     inclusive_jets = [
@@ -839,7 +839,7 @@ def test_unmaskedarray_input():
     assert const_idx == cluster.constituent_index().to_list()
 
 
-def test_virtualarray_input():
+def test_virtualarray_input_NOT_REALLY():
     def generate():
         inclusive_jets = ak.Array(
             [
@@ -912,7 +912,7 @@ def test_virtualarray_input():
         inclusive_jets = inclusive_jets.mask[[True, False, True]]
         return inclusive_jets
 
-    inputs = ak.virtual(generate)
+    inputs = generate()
     jetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.6)
     cluster = fastjet.ClusterSequence(inputs, jetdef)
     inclusive_jets = [
@@ -961,30 +961,30 @@ def test_indexed_subtree_input():
         with_name="Momentum4D",
     )
     out = ak.Array(
-        ak.layout.RecordArray(
+        ak.contents.RecordArray(
             [
-                ak.layout.NumpyArray(np.asarray(ak.Array(inputs.layout.content).px)),
-                ak.layout.NumpyArray(np.asarray(ak.Array(inputs.layout.content).py)),
-                ak.layout.NumpyArray(np.asarray(ak.Array(inputs.layout.content).pz)),
-                ak.layout.NumpyArray(np.asarray(ak.Array(inputs.layout.content).E)),
+                ak.contents.NumpyArray(np.asarray(ak.Array(inputs.layout.content).px)),
+                ak.contents.NumpyArray(np.asarray(ak.Array(inputs.layout.content).py)),
+                ak.contents.NumpyArray(np.asarray(ak.Array(inputs.layout.content).pz)),
+                ak.contents.NumpyArray(np.asarray(ak.Array(inputs.layout.content).E)),
             ],
             ["px", "py", "pz", "E"],
         )
     )
     out = ak.Array(
-        ak.layout.IndexedArray64(
-            ak.layout.Index64([7, 2, 3, 1, 0, 5, 4, 6, 8]), out.layout
+        ak.contents.IndexedArray(
+            ak.index.Index64([7, 2, 3, 1, 0, 5, 4, 6, 8]), out.layout
         )
     )
-    out = ak.Array(ak.layout.ListOffsetArray64(inputs.layout.offsets, out.layout))
+    out = ak.Array(ak.contents.ListOffsetArray(inputs.layout.offsets, out.layout))
     out = ak.Array(
-        ak.layout.ListOffsetArray64(ak.layout.Index64([0, 1, 2, 3]), out.layout)
+        ak.contents.ListOffsetArray(ak.index.Index64([0, 1, 2, 3]), out.layout)
     )
     out = ak.Array(
-        ak.layout.ListOffsetArray64(ak.layout.Index64([0, 1, 2, 3]), out.layout)
+        ak.contents.ListOffsetArray(ak.index.Index64([0, 1, 2, 3]), out.layout)
     )
     out = ak.Array(
-        ak.layout.ListOffsetArray64(ak.layout.Index64([0, 1, 2, 3]), out.layout)
+        ak.contents.ListOffsetArray(ak.index.Index64([0, 1, 2, 3]), out.layout)
     )
     jetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.6)
     cluster = fastjet.ClusterSequence(out, jetdef)
@@ -1159,7 +1159,7 @@ def test_union_8_64_input():
     assert const_idx == cluster.constituent_index().to_list()
 
 
-def test_partitioned_input():
+def test_partitioned_input_NOT_REALLY():
 
     inputs = ak.Array(
         [
@@ -1219,7 +1219,7 @@ def test_partitioned_input():
         ],
         with_name="Momentum4D",
     )
-    out = ak.partitioned((input2, inputs), highlevel=True)
+    out = ak.concatenate((input2, inputs), axis=0, highlevel=True)
     jetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.6)
     cluster = fastjet.ClusterSequence(out, jetdef)
     inclusive_jets = [

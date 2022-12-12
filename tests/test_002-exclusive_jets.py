@@ -273,22 +273,22 @@ def test_listoffset_indexed_input():
         with_name="Momentum4D",
     )
     out = ak.Array(
-        ak.layout.RecordArray(
+        ak.contents.RecordArray(
             [
-                ak.layout.NumpyArray(np.asarray(ak.Array(inputs.layout.content).px)),
-                ak.layout.NumpyArray(np.asarray(ak.Array(inputs.layout.content).py)),
-                ak.layout.NumpyArray(np.asarray(ak.Array(inputs.layout.content).pz)),
-                ak.layout.NumpyArray(np.asarray(ak.Array(inputs.layout.content).E)),
+                ak.contents.NumpyArray(np.asarray(ak.Array(inputs.layout.content).px)),
+                ak.contents.NumpyArray(np.asarray(ak.Array(inputs.layout.content).py)),
+                ak.contents.NumpyArray(np.asarray(ak.Array(inputs.layout.content).pz)),
+                ak.contents.NumpyArray(np.asarray(ak.Array(inputs.layout.content).E)),
             ],
             ["px", "py", "pz", "E"],
         )
     )
     out = ak.Array(
-        ak.layout.IndexedArray64(
-            ak.layout.Index64([7, 2, 3, 1, 0, 5, 4, 6, 8]), out.layout
+        ak.contents.IndexedArray(
+            ak.index.Index64([7, 2, 3, 1, 0, 5, 4, 6, 8]), out.layout
         )
     )
-    out = ak.Array(ak.layout.ListOffsetArray64(inputs.layout.offsets, out.layout))
+    out = ak.Array(ak.contents.ListOffsetArray(inputs.layout.offsets, out.layout))
     jetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.6)
     cluster = fastjet._pyjet.AwkwardClusterSequence(out, jetdef)
     inclusive_jets = [

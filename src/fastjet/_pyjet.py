@@ -24,16 +24,11 @@ class AwkwardClusterSequence(ClusterSequence):
         ):
             self._flag = 0
             self._internalrep = fastjet._multievent._classmultievent(data, self._jetdef)
-        elif self._jagedness == 1 and isinstance(data.layout, ak.layout.RecordArray):
+        elif self._jagedness == 1 and data.layout.is_record:
             self._internalrep = fastjet._singleevent._classsingleevent(
                 data, self._jetdef
             )
-        elif (
-            self._jagedness >= 3
-            or self._check_general(data)
-            or isinstance(data.layout, ak.partition.IrregularlyPartitionedArray)
-            and self._flag == 1
-        ):
+        elif self._jagedness >= 3 or self._check_general(data):
             self._internalrep = fastjet._generalevent._classgeneralevent(data, jetdef)
 
     # else:
@@ -44,35 +39,15 @@ class AwkwardClusterSequence(ClusterSequence):
     def _check_jaggedness(self, data):
         if self._check_general_jaggedness(data) or self._check_listoffset(data):
             return 1 + self._check_jaggedness(ak.Array(data.layout.content))
-        if isinstance(
-            data.layout,
-            (
-                ak.layout.UnionArray8_32,
-                ak.layout.UnionArray8_U32,
-                ak.layout.UnionArray8_64,
-            ),
-        ):
+        if data.layout.is_union:
             return 1 + max(
                 self._check_jaggedness(ak.Array(x)) for x in data.layout.contents
             )
-        if isinstance(
-            data.layout,
-            (ak.layout.RecordArray,),
-        ):
+        if data.layout.is_record:
             return 1 + max(
                 self._check_jaggedness(ak.Array(x)) for x in data.layout.contents
             )
-        if isinstance(
-            data.layout,
-            (ak.partition.IrregularlyPartitionedArray),
-        ):
-            return 1 + max(
-                self._check_jaggedness(ak.Array(x)) for x in data.layout.partitions
-            )
-        if isinstance(data.layout, ak.layout.VirtualArray):
-            return 1 + self._check_jaggedness(ak.Array(data.layout.array))
-        else:
-            return 0
+        return 0
 
     def _check_listoffset_index(self, data):
         if self._check_listoffset_subtree(ak.Array(data.layout)):
@@ -93,62 +68,25 @@ class AwkwardClusterSequence(ClusterSequence):
             return False
 
     def _check_record(self, data):
-        out = isinstance(
-            data.layout,
-            (
-                ak.layout.RecordArray,
-                ak.layout.NumpyArray,
-            ),
-        )
-
-        return out
+        return data.layout.is_record or data.layout.is_numpy
 
     def _check_indexed(self, data):
-        out = isinstance(
-            data.layout,
-            (
-                ak.layout.IndexedArray64,
-                ak.layout.IndexedArray32,
-                ak.layout.IndexedArray32,
-                ak.layout.IndexedOptionArray64,
-                ak.layout.IndexedOptionArray32,
-            ),
-        )
-
-        return out
+        return data.layout.is_indexed
 
     def _check_listoffset_subtree(self, data):
-        out = isinstance(
-            data.layout,
-            (
-                ak.layout.ListOffsetArray64,
-                ak.layout.ListOffsetArray32,
-                ak.layout.ListOffsetArrayU32,
-                ak.layout.ListArray64,
-                ak.layout.ListArray32,
-                ak.layout.ListArrayU32,
-                ak.layout.RegularArray,
-            ),
-        )
-        return out
+        return data.layout.is_list
 
     def _check_general(self, data):
         out = isinstance(
             data.layout,
             (
-                ak.layout.IndexedArray64,
-                ak.layout.IndexedArray32,
-                ak.layout.IndexedArrayU32,
-                ak.layout.ByteMaskedArray,
-                ak.layout.BitMaskedArray,
-                ak.layout.UnmaskedArray,
-                ak.layout.IndexedOptionArray64,
-                ak.layout.IndexedOptionArray32,
-                ak.layout.VirtualArray,
-                ak.layout.UnionArray8_32,
-                ak.layout.UnionArray8_U32,
-                ak.layout.UnionArray8_64,
-                ak.layout.Record,
+                ak.contents.BitMaskedArray,
+                ak.contents.ByteMaskedArray,
+                ak.contents.IndexedArray,
+                ak.contents.IndexedOptionArray,
+                ak.contents.UnionArray,
+                ak.contents.UnmaskedArray,
+                ak.record.Record,
             ),
         )
         return out
@@ -157,15 +95,12 @@ class AwkwardClusterSequence(ClusterSequence):
         out = isinstance(
             data.layout,
             (
-                ak.layout.IndexedArray64,
-                ak.layout.IndexedArray32,
-                ak.layout.IndexedArrayU32,
-                ak.layout.ByteMaskedArray,
-                ak.layout.BitMaskedArray,
-                ak.layout.UnmaskedArray,
-                ak.layout.IndexedOptionArray64,
-                ak.layout.IndexedOptionArray32,
-                ak.layout.Record,
+                ak.contents.BitMaskedArray,
+                ak.contents.ByteMaskedArray,
+                ak.contents.IndexedArray,
+                ak.contents.IndexedOptionArray,
+                ak.contents.UnmaskedArray,
+                ak.record.Record,
             ),
         )
         return out
@@ -174,13 +109,9 @@ class AwkwardClusterSequence(ClusterSequence):
         out = isinstance(
             data.layout,
             (
-                ak.layout.ListOffsetArray64,
-                ak.layout.ListOffsetArray32,
-                ak.layout.ListOffsetArrayU32,
-                ak.layout.ListArray64,
-                ak.layout.ListArray32,
-                ak.layout.ListArrayU32,
-                ak.layout.RegularArray,
+                ak.contents.ListArray,
+                ak.contents.ListOffsetArray,
+                ak.contents.RegularArray,
             ),
         )
         return out
