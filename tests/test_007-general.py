@@ -1407,11 +1407,11 @@ def test_record_input():
         },
     ]
 
-    ### BEGIN debug
+    # BEGIN debug
     tmp = cluster.inclusive_jets()
     print(tmp.to_list())
     print(tmp.layout)
-    ### END debug
+    # END debug
 
     assert inclusive_jets == cluster.inclusive_jets().to_list()
     const_idx = [
@@ -1543,10 +1543,10 @@ def test_func_call__input():
         }
     ]
 
-    ### BEGIN debug
+    # BEGIN debug
     tmp = cluster.get_parents(inn)
     print(tmp.to_list())
     print(tmp.layout)
-    ### END debug
+    # END debug
 
     assert get_parents == cluster.get_parents(inn).to_list()
