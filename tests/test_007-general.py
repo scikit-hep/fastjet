@@ -1407,12 +1407,6 @@ def test_record_input():
         },
     ]
 
-    # BEGIN debug
-    tmp = cluster.inclusive_jets()
-    print(tmp.to_list())
-    print(tmp.layout)
-    # END debug
-
     assert inclusive_jets == cluster.inclusive_jets().to_list()
     const_idx = [
         {"a": [[[0], [1, 2]]], "b": [[[[0], [1, 2]]]]},
@@ -1542,11 +1536,4 @@ def test_func_call__input():
             ],
         }
     ]
-
-    # BEGIN debug
-    tmp = cluster.get_parents(inn)
-    print(tmp.to_list())
-    print(tmp.layout)
-    # END debug
-
     assert get_parents == cluster.get_parents(inn).to_list()
