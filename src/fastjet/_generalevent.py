@@ -262,14 +262,14 @@ class _classgeneralevent:
                 if elem == self._bread_list[cluster][level]:
                     nextcontents.append(
                         self.replace(
-                            layout.field(self._bread_list[cluster][level]),
+                            layout.content(self._bread_list[cluster][level]),
                             cluster,
                             level + 1,
                         )
                     )
                 else:
                     nextcontents.append(
-                        layout.field(elem),
+                        layout.content(elem),
                     )
             return layout.copy(contents=nextcontents)
         elif isinstance(layout, ak.record.Record):
