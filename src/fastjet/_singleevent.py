@@ -26,7 +26,7 @@ class _classsingleevent:
         return data
 
     def check_jaggedness(self, data):
-        if isinstance(data.layout, ak.layout.ListOffsetArray64):
+        if isinstance(data.layout, ak.contents.ListOffsetArray):
             return 1 + self.check_jaggedness(ak.Array(data.layout.content))
         else:
             return 0
@@ -41,25 +41,18 @@ class _classsingleevent:
         return px, py, pz, E, off
 
     def _check_record(self, data):
-        out = isinstance(
-            data.layout,
-            (
-                ak.layout.RecordArray,
-                ak.layout.NumpyArray,
-            ),
-        )
-        return out
+        return data.layout.is_record or data.layout.is_numpy
 
     def single_to_jagged(self, array):
         single = ak.Array(
-            ak.layout.ListOffsetArray64(
-                ak.layout.Index64(np.array([0, len(array)])),
-                ak.layout.RecordArray(
+            ak.contents.ListOffsetArray(
+                ak.index.Index64(np.array([0, len(array)])),
+                ak.contents.RecordArray(
                     [
-                        ak.layout.NumpyArray(array.px),
-                        ak.layout.NumpyArray(array.py),
-                        ak.layout.NumpyArray(array.pz),
-                        ak.layout.NumpyArray(array.E),
+                        ak.contents.NumpyArray(array.px),
+                        ak.contents.NumpyArray(array.py),
+                        ak.contents.NumpyArray(array.pz),
+                        ak.contents.NumpyArray(array.E),
                     ],
                     ["px", "py", "pz", "E"],
                     parameters={"__record__": "Momentum4D"},
@@ -90,12 +83,12 @@ class _classsingleevent:
     def inclusive_jets(self, min_pt):
         np_results = self._results.to_numpy(min_pt)
         return ak.Array(
-            ak.layout.RecordArray(
+            ak.contents.RecordArray(
                 (
-                    ak.layout.NumpyArray(np_results[0]),
-                    ak.layout.NumpyArray(np_results[1]),
-                    ak.layout.NumpyArray(np_results[2]),
-                    ak.layout.NumpyArray(np_results[3]),
+                    ak.contents.NumpyArray(np_results[0]),
+                    ak.contents.NumpyArray(np_results[1]),
+                    ak.contents.NumpyArray(np_results[2]),
+                    ak.contents.NumpyArray(np_results[3]),
                 ),
                 ("px", "py", "pz", "E"),
                 parameters={"__record__": "Momentum4D"},
@@ -106,12 +99,12 @@ class _classsingleevent:
     def unclustered_particles(self):
         np_results = self._results.to_numpy_unclustered_particles()
         return ak.Array(
-            ak.layout.RecordArray(
+            ak.contents.RecordArray(
                 (
-                    ak.layout.NumpyArray(np_results[0]),
-                    ak.layout.NumpyArray(np_results[1]),
-                    ak.layout.NumpyArray(np_results[2]),
-                    ak.layout.NumpyArray(np_results[3]),
+                    ak.contents.NumpyArray(np_results[0]),
+                    ak.contents.NumpyArray(np_results[1]),
+                    ak.contents.NumpyArray(np_results[2]),
+                    ak.contents.NumpyArray(np_results[3]),
                 ),
                 ("px", "py", "pz", "E"),
                 parameters={"__record__": "Momentum4D"},
@@ -131,12 +124,12 @@ class _classsingleevent:
         if np_results == 0:
             raise ValueError("Either Dcut or Njets should be entered") from None
         return ak.Array(
-            ak.layout.RecordArray(
+            ak.contents.RecordArray(
                 (
-                    ak.layout.NumpyArray(np_results[0]),
-                    ak.layout.NumpyArray(np_results[1]),
-                    ak.layout.NumpyArray(np_results[2]),
-                    ak.layout.NumpyArray(np_results[3]),
+                    ak.contents.NumpyArray(np_results[0]),
+                    ak.contents.NumpyArray(np_results[1]),
+                    ak.contents.NumpyArray(np_results[2]),
+                    ak.contents.NumpyArray(np_results[3]),
                 ),
                 ("px", "py", "pz", "E"),
                 parameters={"__record__": "Momentum4D"},
@@ -148,12 +141,12 @@ class _classsingleevent:
         self._warn_for_exclusive()
         np_results = self._results.to_numpy_exclusive_ycut(ycut)
         return ak.Array(
-            ak.layout.RecordArray(
+            ak.contents.RecordArray(
                 (
-                    ak.layout.NumpyArray(np_results[0]),
-                    ak.layout.NumpyArray(np_results[1]),
-                    ak.layout.NumpyArray(np_results[2]),
-                    ak.layout.NumpyArray(np_results[3]),
+                    ak.contents.NumpyArray(np_results[0]),
+                    ak.contents.NumpyArray(np_results[1]),
+                    ak.contents.NumpyArray(np_results[2]),
+                    ak.contents.NumpyArray(np_results[3]),
                 ),
                 ("px", "py", "pz", "E"),
                 parameters={"__record__": "Momentum4D"},
@@ -165,11 +158,11 @@ class _classsingleevent:
         np_results = self._results.to_numpy_with_constituents(min_pt)
         off = np_results[-1]
         out = ak.Array(
-            ak.layout.ListOffsetArray64(
-                ak.layout.Index64(np_results[0]), ak.layout.NumpyArray(np_results[1])
+            ak.contents.ListOffsetArray(
+                ak.index.Index64(np_results[0]), ak.contents.NumpyArray(np_results[1])
             )
         )
-        out = ak.Array(ak.layout.ListOffsetArray64(ak.layout.Index64(off), out.layout))
+        out = ak.Array(ak.contents.ListOffsetArray(ak.index.Index64(off), out.layout))
         return out[0]
 
     def exclusive_jets_constituent_index(self, njets):
@@ -179,11 +172,11 @@ class _classsingleevent:
         np_results = self._results.to_numpy_exclusive_njet_with_constituents(njets)
         off = np_results[-1]
         out = ak.Array(
-            ak.layout.ListOffsetArray64(
-                ak.layout.Index64(np_results[0]), ak.layout.NumpyArray(np_results[1])
+            ak.contents.ListOffsetArray(
+                ak.index.Index64(np_results[0]), ak.contents.NumpyArray(np_results[1])
             )
         )
-        out = ak.Array(ak.layout.ListOffsetArray64(ak.layout.Index64(off), out.layout))
+        out = ak.Array(ak.contents.ListOffsetArray(ak.index.Index64(off), out.layout))
         return out[0]
 
     def exclusive_jets_lund_declusterings(self, njets):
@@ -193,35 +186,35 @@ class _classsingleevent:
         np_results = self._results.to_numpy_exclusive_njet_lund_declusterings(njets)
         off = np_results[-1]
         out = ak.Array(
-            ak.layout.ListOffsetArray64(
-                ak.layout.Index64(np_results[0]),
-                ak.layout.RecordArray(
+            ak.contents.ListOffsetArray(
+                ak.index.Index64(np_results[0]),
+                ak.contents.RecordArray(
                     (
-                        ak.layout.NumpyArray(np_results[1]),
-                        ak.layout.NumpyArray(np_results[2]),
+                        ak.contents.NumpyArray(np_results[1]),
+                        ak.contents.NumpyArray(np_results[2]),
                     ),
                     ("Delta", "kt"),
                 ),
             )
         )
-        out = ak.Array(ak.layout.ListOffsetArray64(ak.layout.Index64(off), out.layout))
+        out = ak.Array(ak.contents.ListOffsetArray(ak.index.Index64(off), out.layout))
         return out[0]
 
     def unique_history_order(self):
         np_results = self._results.to_numpy_unique_history_order()
-        out = ak.Array(ak.layout.NumpyArray(np_results[0]))
+        out = ak.Array(ak.contents.NumpyArray(np_results[0]))
         return out
 
     def constituents(self, min_pt):
         np_results = self._results.to_numpy_with_constituents(min_pt)
         off = np_results[-1]
         out = ak.Array(
-            ak.layout.ListOffsetArray64(
-                ak.layout.Index64(np_results[0]), ak.layout.NumpyArray(np_results[1])
+            ak.contents.ListOffsetArray(
+                ak.index.Index64(np_results[0]), ak.contents.NumpyArray(np_results[1])
             )
         )
         outputs_to_inputs = ak.Array(
-            ak.layout.ListOffsetArray64(ak.layout.Index64(off), out.layout)
+            ak.contents.ListOffsetArray(ak.index.Index64(off), out.layout)
         )
         shape = ak.num(outputs_to_inputs)
         total = np.sum(shape)
@@ -237,12 +230,12 @@ class _classsingleevent:
 
         off = np_results[-1]
         out = ak.Array(
-            ak.layout.ListOffsetArray64(
-                ak.layout.Index64(np_results[0]), ak.layout.NumpyArray(np_results[1])
+            ak.contents.ListOffsetArray(
+                ak.index.Index64(np_results[0]), ak.contents.NumpyArray(np_results[1])
             )
         )
         outputs_to_inputs = ak.Array(
-            ak.layout.ListOffsetArray64(ak.layout.Index64(off), out.layout)
+            ak.contents.ListOffsetArray(ak.index.Index64(off), out.layout)
         )
         shape = ak.num(outputs_to_inputs)
         total = np.sum(shape)
@@ -308,12 +301,12 @@ class _classsingleevent:
         if np_results == 0:
             raise ValueError("Either Dcut or Njets should be entered") from None
         return ak.Array(
-            ak.layout.RecordArray(
+            ak.contents.RecordArray(
                 [
-                    ak.layout.NumpyArray(np_results[0]),
-                    ak.layout.NumpyArray(np_results[1]),
-                    ak.layout.NumpyArray(np_results[2]),
-                    ak.layout.NumpyArray(np_results[3]),
+                    ak.contents.NumpyArray(np_results[0]),
+                    ak.contents.NumpyArray(np_results[1]),
+                    ak.contents.NumpyArray(np_results[2]),
+                    ak.contents.NumpyArray(np_results[3]),
                 ],
                 ["px", "py", "pz", "E"],
                 parameters={"__record__": "Momentum4D"},
@@ -331,12 +324,12 @@ class _classsingleevent:
             raise AttributeError("Lorentz vector not found") from None
         np_results = self._results.to_numpy_exclusive_subjets_up_to(px, py, pz, E, nsub)
         return ak.Array(
-            ak.layout.RecordArray(
+            ak.contents.RecordArray(
                 [
-                    ak.layout.NumpyArray(np_results[0]),
-                    ak.layout.NumpyArray(np_results[1]),
-                    ak.layout.NumpyArray(np_results[2]),
-                    ak.layout.NumpyArray(np_results[3]),
+                    ak.contents.NumpyArray(np_results[0]),
+                    ak.contents.NumpyArray(np_results[1]),
+                    ak.contents.NumpyArray(np_results[2]),
+                    ak.contents.NumpyArray(np_results[3]),
                 ],
                 ["px", "py", "pz", "E"],
                 parameters={"__record__": "Momentum4D"},
@@ -437,12 +430,12 @@ class _classsingleevent:
     def childless_pseudojets(self):
         np_results = self._results.to_numpy_childless_pseudojets()
         return ak.Array(
-            ak.layout.RecordArray(
+            ak.contents.RecordArray(
                 (
-                    ak.layout.NumpyArray(np_results[0]),
-                    ak.layout.NumpyArray(np_results[1]),
-                    ak.layout.NumpyArray(np_results[2]),
-                    ak.layout.NumpyArray(np_results[3]),
+                    ak.contents.NumpyArray(np_results[0]),
+                    ak.contents.NumpyArray(np_results[1]),
+                    ak.contents.NumpyArray(np_results[2]),
+                    ak.contents.NumpyArray(np_results[3]),
                 ),
                 ("px", "py", "pz", "E"),
                 parameters={"__record__": "Momentum4D"},
@@ -453,12 +446,12 @@ class _classsingleevent:
     def jets(self):
         np_results = self._results.to_numpy_jets()
         return ak.Array(
-            ak.layout.RecordArray(
+            ak.contents.RecordArray(
                 (
-                    ak.layout.NumpyArray(np_results[0]),
-                    ak.layout.NumpyArray(np_results[1]),
-                    ak.layout.NumpyArray(np_results[2]),
-                    ak.layout.NumpyArray(np_results[3]),
+                    ak.contents.NumpyArray(np_results[0]),
+                    ak.contents.NumpyArray(np_results[1]),
+                    ak.contents.NumpyArray(np_results[2]),
+                    ak.contents.NumpyArray(np_results[3]),
                 ),
                 ("px", "py", "pz", "E"),
                 parameters={"__record__": "Momentum4D"},
@@ -476,12 +469,12 @@ class _classsingleevent:
             raise AttributeError("Lorentz vector not found") from None
         np_results = self._results.to_numpy_get_parents(px, py, pz, E)
         return ak.Array(
-            ak.layout.RecordArray(
+            ak.contents.RecordArray(
                 (
-                    ak.layout.NumpyArray(np_results[0]),
-                    ak.layout.NumpyArray(np_results[1]),
-                    ak.layout.NumpyArray(np_results[2]),
-                    ak.layout.NumpyArray(np_results[3]),
+                    ak.contents.NumpyArray(np_results[0]),
+                    ak.contents.NumpyArray(np_results[1]),
+                    ak.contents.NumpyArray(np_results[2]),
+                    ak.contents.NumpyArray(np_results[3]),
                 ),
                 ("px", "py", "pz", "E"),
                 parameters={"__record__": "Momentum4D"},
@@ -499,12 +492,12 @@ class _classsingleevent:
             raise AttributeError("Lorentz vector not found") from None
         np_results = self._results.to_numpy_get_child(px, py, pz, E)
         return ak.Array(
-            ak.layout.RecordArray(
+            ak.contents.RecordArray(
                 (
-                    ak.layout.NumpyArray(np_results[0]),
-                    ak.layout.NumpyArray(np_results[1]),
-                    ak.layout.NumpyArray(np_results[2]),
-                    ak.layout.NumpyArray(np_results[3]),
+                    ak.contents.NumpyArray(np_results[0]),
+                    ak.contents.NumpyArray(np_results[1]),
+                    ak.contents.NumpyArray(np_results[2]),
+                    ak.contents.NumpyArray(np_results[3]),
                 ),
                 ("px", "py", "pz", "E"),
                 parameters={"__record__": "Momentum4D"},
