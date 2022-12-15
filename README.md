@@ -1,4 +1,4 @@
-<img src="docs/logo.svg">
+<img src="https://raw.githubusercontent.com/scikit-hep/fastjet/main/docs/logo.svg">
 
 [![Actions Status][actions-badge]][actions-link]
 [![PyPI version][pypi-version]][pypi-link]
