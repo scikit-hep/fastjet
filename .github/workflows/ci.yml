@@ -68,8 +68,12 @@ jobs:
         run: python -m pytest -vv -rs -Wd
 
   test_wheels:
-    name: Wheel on Linux
-    runs-on: ubuntu-latest
+    name: "Wheel on ${{ matrix.os }}"
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
 
     steps:
       - uses: actions/checkout@v3
