@@ -80,6 +80,12 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Install compiler tools on macOS
+        if: runner.os == 'macOS'
+        run: |
+          brew install make gcc automake swig gmp mpfr boost
+          export PATH="/usr/local/opt/make/libexec/gnubin:$PATH"
+
       - uses: pypa/cibuildwheel@v2.11.3
         env:
           CIBW_ARCHS: auto64
