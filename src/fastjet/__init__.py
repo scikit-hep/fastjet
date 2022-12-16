@@ -21,9 +21,6 @@ from fastjet._swig import Boost  # noqa: F401, E402
 from fastjet._swig import CASubJetTagger  # noqa: F401, E402
 from fastjet._swig import CASubJetTaggerStructure  # noqa: F401, E402
 from fastjet._swig import ClusterSequence1GhostPassiveArea  # noqa: F401, E402
-from fastjet._swig import ClusterSequence_fastjet_banner_stream  # noqa: F401, E402
-from fastjet._swig import ClusterSequence_print_banner  # noqa: F401, E402
-from fastjet._swig import ClusterSequence_set_fastjet_banner_stream  # noqa: F401, E402
 from fastjet._swig import ClusterSequenceActiveArea  # noqa: F401, E402
 from fastjet._swig import ClusterSequenceActiveAreaExplicitGhosts  # noqa: F401, E402
 from fastjet._swig import ClusterSequenceArea  # noqa: F401, E402
@@ -34,9 +31,6 @@ from fastjet._swig import ClusterSequenceVoronoiArea  # noqa: F401, E402
 from fastjet._swig import CompositeJetStructure  # noqa: F401, E402
 from fastjet._swig import E_scheme  # noqa: F401, E402
 from fastjet._swig import Error  # noqa: F401, E402
-from fastjet._swig import Error_set_default_stream  # noqa: F401, E402
-from fastjet._swig import Error_set_print_backtrace  # noqa: F401, E402
-from fastjet._swig import Error_set_print_errors  # noqa: F401, E402
 from fastjet._swig import Et2_scheme  # noqa: F401, E402
 from fastjet._swig import Et_scheme  # noqa: F401, E402
 from fastjet._swig import Filter  # noqa: F401, E402
@@ -51,15 +45,10 @@ from fastjet._swig import JetDefinition  # noqa: F401, E402
 from fastjet._swig import JetDefinition0Param  # noqa: F401, E402
 from fastjet._swig import JetDefinition1Param  # noqa: F401, E402
 from fastjet._swig import JetDefinition2Param  # noqa: F401, E402
-from fastjet._swig import JetDefinition_algorithm_description  # noqa: F401, E402
-from fastjet._swig import JetDefinition_n_parameters_for_algorithm  # noqa: F401, E402
 from fastjet._swig import JetMedianBackgroundEstimator  # noqa: F401, E402
 from fastjet._swig import JHTopTagger  # noqa: F401, E402
 from fastjet._swig import JHTopTaggerStructure  # noqa: F401, E402
 from fastjet._swig import LimitedWarning  # noqa: F401, E402
-from fastjet._swig import LimitedWarning_set_default_max_warn  # noqa: F401, E402
-from fastjet._swig import LimitedWarning_set_default_stream  # noqa: F401, E402
-from fastjet._swig import LimitedWarning_summary  # noqa: F401, E402
 from fastjet._swig import MassDropTagger  # noqa: F401, E402
 from fastjet._swig import MassDropTaggerStructure  # noqa: F401, E402
 from fastjet._swig import MaxRap  # noqa: F401, E402
