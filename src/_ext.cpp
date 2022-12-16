@@ -1901,7 +1901,7 @@ PYBIND11_MODULE(_ext, m) {
 
         auto off = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len+1}, {sizeof(int)}));
         auto bufoff = off.request();
-        int *ptroff = (int *)realloc(bufoff.ptr, (len+1)*sizeof(int)+1);;
+        int *ptroff = (int *)bufoff.ptr;
         size_t idxe = 0;
         *ptroff = 0;
         ptroff++;
@@ -2016,7 +2016,7 @@ PYBIND11_MODULE(_ext, m) {
 
         auto off = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len+1}, {sizeof(int)}));
         auto bufoff = off.request();
-        int *ptroff = (int *)realloc(bufoff.ptr, (len+1)*sizeof(int)+1);;
+        int *ptroff = (int *)bufoff.ptr;
         size_t idxe = 0;
         *ptroff = 0;
         ptroff++;
