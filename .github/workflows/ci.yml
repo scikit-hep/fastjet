@@ -86,7 +86,7 @@ jobs:
           brew install make gcc automake swig gmp mpfr boost
           export PATH="/usr/local/opt/make/libexec/gnubin:$PATH"
 
-      - uses: pypa/cibuildwheel@v2.11.3
+      - uses: pypa/cibuildwheel@v2.11.4
         env:
           CIBW_ARCHS: auto64
           CIBW_BUILD: cp311-*
