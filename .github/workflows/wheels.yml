@@ -70,6 +70,8 @@ jobs:
           submodules: recursive
 
       - uses: docker/setup-qemu-action@v2.1.0
+        with:
+          platforms: arm64
 
       - uses: pypa/cibuildwheel@v2.11.3
         env:
