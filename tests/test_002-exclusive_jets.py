@@ -107,15 +107,20 @@ def test_exclusive_lund_declustering_single():
 
     lds = cluster.exclusive_jets_lund_declusterings(2)
 
-    lund_declustering_output = [
+    # expected output from x86_64, aarch64 is slightly different
+    lund_declustering_output = ak.Array(
         [
-            {"Delta": 0.08755181299980186, "kt": 0.30179987478357223},
-            {"Delta": 0.019481226884377707, "kt": 0.06602095529127928},
-        ],
-        [{"Delta": 0.014750342295225208, "kt": 1.0480537658466145}],
-    ]
+            [
+                {"Delta": 0.08755181299980186, "kt": 0.30179987478357223},
+                {"Delta": 0.019481226884377707, "kt": 0.06602095529127928},
+            ],
+            [{"Delta": 0.014750342295225208, "kt": 1.0480537658466145}],
+        ]
+    )
 
-    assert lund_declustering_output == lds.to_list()
+    is_close = ak.ravel(ak.isclose(lund_declustering_output, lds, rtol=1e-12, atol=0))
+
+    assert ak.all(is_close)
 
 
 def test_exclusive_lund_declustering_multi():
@@ -144,24 +149,29 @@ def test_exclusive_lund_declustering_multi():
 
     lds = cluster.exclusive_jets_lund_declusterings(2)
 
-    lund_declustering_output = [
+    # expected output from x86_64, aarch64 is slightly different
+    lund_declustering_output = ak.Array(
         [
             [
-                {"Delta": 0.08755181299980186, "kt": 0.30179987478357223},
-                {"Delta": 0.019481226884377707, "kt": 0.06602095529127928},
+                [
+                    {"Delta": 0.08755181299980186, "kt": 0.30179987478357223},
+                    {"Delta": 0.019481226884377707, "kt": 0.06602095529127928},
+                ],
+                [{"Delta": 0.014750342295225208, "kt": 1.0480537658466145}],
             ],
-            [{"Delta": 0.014750342295225208, "kt": 1.0480537658466145}],
-        ],
-        [
             [
-                {"Delta": 0.08755181299980186, "kt": 0.30179987478357223},
-                {"Delta": 0.019481226884377707, "kt": 0.06602095529127928},
+                [
+                    {"Delta": 0.08755181299980186, "kt": 0.30179987478357223},
+                    {"Delta": 0.019481226884377707, "kt": 0.06602095529127928},
+                ],
+                [{"Delta": 0.014750342295225208, "kt": 1.0480537658466145}],
             ],
-            [{"Delta": 0.014750342295225208, "kt": 1.0480537658466145}],
-        ],
-    ]
+        ]
+    )
 
-    assert lund_declustering_output == lds.to_list()
+    is_close = ak.ravel(ak.isclose(lund_declustering_output, lds, rtol=1e-12, atol=0))
+
+    assert ak.all(is_close)
 
 
 def test_exclusive_constituents_multi():
