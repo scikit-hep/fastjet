@@ -31,8 +31,29 @@ jobs:
         python: [37, 38, 39, 310, 311]
         os: [ubuntu-latest, macos-latest]
         arch: [auto64]
+        include:
+          - python: 37
+            runs-on: ubuntu-latest
+            arch: aarch64
+          - python: 38
+            runs-on: ubuntu-latest
+            arch: aarch64
+          - python: 39
+            runs-on: ubuntu-latest
+            arch: aarch64
+          - python: 310
+            runs-on: ubuntu-latest
+            arch: aarch64
+          - python: 311
+            runs-on: ubuntu-latest
+            arch: aarch64
 
     steps:
+      - uses: docker/setup-qemu-action@v2.1.0
+        if: matrix.arch != 'auto64'
+        with:
+         platforms: arm64
+
       - uses: actions/checkout@v3
         with:
           submodules: recursive
@@ -44,36 +65,6 @@ jobs:
           export PATH="/usr/local/opt/make/libexec/gnubin:$PATH"
 
       - uses: pypa/cibuildwheel@v2.11.4
-        env:
-          CIBW_ARCHS: ${{ matrix.arch }}
-          CIBW_BUILD: cp${{ matrix.python }}-*
-          CIBW_BUILD_VERBOSITY: 2
-
-      - name: Upload wheels
-        uses: actions/upload-artifact@v3
-        with:
-          path: wheelhouse/*.whl
-
-  build_alt_wheels:
-    name: "Build wheel: ${{ matrix.python }}, ${{ matrix.arch }} on ${{ matrix.os }}"
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest]
-        python: [37, 38, 39, 310, 311]
-        arch: [aarch64]
-
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: recursive
-
-      - uses: docker/setup-qemu-action@v2.1.0
-        with:
-          platforms: arm64
-
-      - uses: pypa/cibuildwheel@v2.11.3
         env:
           CIBW_ARCHS: ${{ matrix.arch }}
           CIBW_BUILD: cp${{ matrix.python }}-*
@@ -101,7 +92,7 @@ jobs:
         run: python -m pip install dist/*.tar.gz
 
   upload_all:
-    needs: [build_wheels, build_alt_wheels, make_sdist]
+    needs: [build_wheels, make_sdist]
     runs-on: ubuntu-latest
     if: github.event_name == 'release' && github.event.action == 'published'
 
