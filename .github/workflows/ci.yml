@@ -36,19 +36,7 @@ jobs:
         python-version: ["3.7", "3.11"]
         runs-on: [ubuntu-latest, macos-latest]
         arch: [auto64]
-        include:
-          - python-version: "3.7"
-            runs-on: ubuntu-latest
-            arch: aarch64
-          - python-version: "3.11"
-            runs-on: ubuntu-latest
-            arch: aarch64
     steps:
-      - uses: docker/setup-qemu-action@v2.1.0
-        if: matrix.arch != 'auto64'
-        with:
-         platforms: arm64
-
       - uses: actions/checkout@v3
         with:
           submodules: recursive
@@ -74,6 +62,45 @@ jobs:
 
       - name: Test package
         run: python -m pytest -vv -rs -Wd
+
+  checks_alt:
+    name: Check Python ${{ matrix.python-version }}, ${{ matrix.arch }} on ${{ matrix.runs-on }}
+    runs-on: ${{ matrix.runs-on }}
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.7", "3.11"]
+        runs-on: [ubuntu-latest]
+        arch: [aarch64]
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - uses: uraimo/run-on-arch-action@v2
+        name: Build artifact
+        id: build
+        with:
+          arch: ${{ matrix.arch }}
+          distro: ${{ matrix.runs-on }}
+          # Not required, but speeds up builds
+          githubToken: ${{ github.token }}
+          dockerRunArgs: |
+            --volume "${PWD}:/fastjet"
+          shell: /bin/sh
+          install: |
+            uname -m
+            add-apt-repository ppa:deadsnakes/ppa
+            apt-get update
+            apt-get install -y libboost-dev libmpfr-dev swig autoconf libtool python${{ matrix.python-version}} python3-pip
+          run: |
+            uname -m
+            echo $PATH
+            echo $PWD
+            cd /fastjet
+            echo $PWD
+            python${{ matrix.python-version}} -m pip install '.[test]' -v
+            python${{ matrix.python-version}} -m pytest -vv -rs -Wd
 
   test_wheels:
     name: "Wheel: ${{ matrix.python }}, ${{ matrix.arch }} on ${{ matrix.os }}"
@@ -113,7 +140,7 @@ jobs:
           path: wheelhouse/*.whl
 
   pass:
-    needs: [pre-commit, checks, test_wheels]
+    needs: [pre-commit, checks, checks_alt, test_wheels]
     runs-on: ubuntu-latest
     steps:
       - run: echo "All jobs passed"
