@@ -89,7 +89,7 @@ jobs:
           install: |
             uname -m
             apt-get update
-            apt-get install -y ca-certificates gnupg2
+            apt-get install -y ca-certificates gnupg2 build-essential patch
             echo 'deb https://ppa.launchpadcontent.net/deadsnakes/ppa/ubuntu jammy main' >> /etc/apt/sources.list
             echo 'deb-src https://ppa.launchpadcontent.net/deadsnakes/ppa/ubuntu jammy main' >> /etc/apt/sources.list
             apt-key adv --keyserver keyserver.ubuntu.com --recv-keys BA6932366A755776
