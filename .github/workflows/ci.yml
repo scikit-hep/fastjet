@@ -78,16 +78,14 @@ jobs:
           submodules: recursive
 
       - uses: uraimo/run-on-arch-action@v2.5.0
-        name: Build artifact
-        id: build
+        name: Run test in image
         with:
           arch: ${{ matrix.arch }}
           distro: ubuntu_latest
           # Not required, but speeds up builds
           githubToken: ${{ github.token }}
           dockerRunArgs: |
-            --volume "${PWD}:/fastjet"
-          shell: /bin/sh
+            --volume "${PWD}:/fastjet"  --platform linux/arm64/v8
           install: |
             uname -m
             add-apt-repository ppa:deadsnakes/ppa
