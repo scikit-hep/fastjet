@@ -88,6 +88,8 @@ jobs:
             --volume "${PWD}:/fastjet"  --platform linux/arm64/v8
           install: |
             uname -m
+            apt-get update
+            apt-get install -y software-properties-common
             add-apt-repository ppa:deadsnakes/ppa
             apt-get update
             apt-get install -y libboost-dev libmpfr-dev swig autoconf libtool python${{ matrix.python-version}} python3-pip
