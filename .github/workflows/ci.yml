@@ -94,7 +94,8 @@ jobs:
             echo 'deb-src https://ppa.launchpadcontent.net/deadsnakes/ppa/ubuntu jammy main' >> /etc/apt/sources.list
             apt-key adv --keyserver keyserver.ubuntu.com --recv-keys BA6932366A755776
             apt-get update
-            apt-get install -y libboost-dev libmpfr-dev swig autoconf libtool python${{ matrix.python-version }} python${{ matrix.python-version }}-distutils python3-pip
+            apt-get install -y libboost-dev libmpfr-dev swig autoconf libtool python${{ matrix.python-version }} python${{ matrix.python-version }}-dev python${{ matrix.python-version }}-distutils
+            python${{ matrix.python-version }} -m ensurepip
           run: |
             uname -m
             echo $PATH
