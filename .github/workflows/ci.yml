@@ -78,14 +78,14 @@ jobs:
           submodules: recursive
 
       - uses: uraimo/run-on-arch-action@v2.5.0
-        name: Run test in image
+        name: Install and test in image
         with:
           arch: ${{ matrix.arch }}
           distro: ubuntu_latest
           # Not required, but speeds up builds
           githubToken: ${{ github.token }}
           dockerRunArgs: |
-            --volume "${PWD}:/fastjet"  --platform linux/arm64/v8
+            --volume "${PWD}:/fastjet" --platform linux/arm64
           install: |
             uname -m
             apt-get update
@@ -94,7 +94,7 @@ jobs:
             echo 'deb-src https://ppa.launchpadcontent.net/deadsnakes/ppa/ubuntu jammy main' >> /etc/apt/sources.list
             apt-key adv --keyserver keyserver.ubuntu.com --recv-keys BA6932366A755776
             apt-get update
-            apt-get install -y libboost-dev libmpfr-dev swig autoconf libtool python${{ matrix.python-version }} python${{ matrix.python-version }}-dev python${{ matrix.python-version }}-distutils
+            apt-get install -y libboost-dev libmpfr-dev swig autoconf libtool python${{ matrix.python-version }} python${{ matrix.python-version }}-dev python${{ matrix.python-version }}-distutils python${{ matrix.python-version }}-venv
             python${{ matrix.python-version }} -m ensurepip
           run: |
             uname -m
