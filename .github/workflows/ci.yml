@@ -35,11 +35,14 @@ jobs:
       matrix:
         python-version: ["3.7", "3.11"]
         runs-on: [ubuntu-latest, macos-latest]
-
-        # include:
-        # - python-version: pypy-3.8
-        #   runs-on: ubuntu-latest
-
+        arch: [x86_64]
+        include:
+          - python-version: "3.7"
+            runs-on: ubuntu-latest
+            arch: arm64
+          - python-version: "3.11"
+            runs-on: ubuntu-latest
+            arch: arm64
     steps:
       - uses: actions/checkout@v3
         with:
@@ -48,6 +51,11 @@ jobs:
       - uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
+
+      - uses: docker/setup-qemu-action@v2.1.0
+        if: matrix.arch != 'x86_64'
+        with:
+         platforms: ${{ matrix.arch }}
 
       - name: Install compiler tools on macOS
         if: runner.os == 'macOS'
@@ -99,38 +107,8 @@ jobs:
         with:
           path: wheelhouse/*.whl
 
-  test_alt_wheels:
-    name: "Wheel: ${{ matrix.python }}, ${{ matrix.arch }} on ${{ matrix.os }}"
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest]
-        python: [311]
-        arch: [aarch64]
-
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: recursive
-
-      - uses: docker/setup-qemu-action@v2.1.0
-        with:
-         platforms: arm64
-
-      - uses: pypa/cibuildwheel@v2.11.3
-        env:
-          CIBW_ARCHS: ${{ matrix.arch }}
-          CIBW_BUILD: cp${{ matrix.python }}-*
-          CIBW_BUILD_VERBOSITY: 2
-
-      - name: Upload wheels
-        uses: actions/upload-artifact@v3
-        with:
-          path: wheelhouse/*.whl
-
   pass:
-    needs: [pre-commit, checks, test_wheels, test_alt_wheels]
+    needs: [pre-commit, checks, test_wheels]
     runs-on: ubuntu-latest
     steps:
       - run: echo "All jobs passed"
