@@ -77,12 +77,12 @@ jobs:
         with:
           submodules: recursive
 
-      - uses: uraimo/run-on-arch-action@v2
+      - uses: uraimo/run-on-arch-action@v2.5.0
         name: Build artifact
         id: build
         with:
           arch: ${{ matrix.arch }}
-          distro: ${{ matrix.runs-on }}
+          distro: ubuntu_latest
           # Not required, but speeds up builds
           githubToken: ${{ github.token }}
           dockerRunArgs: |
