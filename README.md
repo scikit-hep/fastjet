@@ -1,6 +1,7 @@
 <img src="https://raw.githubusercontent.com/scikit-hep/fastjet/main/docs/logo.svg">
 
 [![Actions Status][actions-badge]][actions-link]
+[![cirrus-ci Status][cirrus-ci-badge]][cirrus-ci-link]
 [![PyPI version][pypi-version]][pypi-link]
 [![Conda-Forge][conda-badge]][conda-link]
 
@@ -13,6 +14,8 @@
 
 [actions-badge]:            https://github.com/scikit-hep/fastjet/workflows/CI/badge.svg
 [actions-link]:             https://github.com/scikit-hep/fastjet/actions
+[cirrus-ci-badge]:          https://api.cirrus-ci.com/github/scikit-hep/fastjet.svg?branch=main
+[cirrus-ci-link]:           https://cirrus-ci.com/github/scikit-hep/fastjet
 [conda-badge]:              https://img.shields.io/conda/vn/conda-forge/fastjet
 [conda-link]:               https://github.com/conda-forge/fastjet-feedstock
 [github-discussions-badge]: https://img.shields.io/static/v1?label=Discussions&message=Ask&color=blue&logo=github
