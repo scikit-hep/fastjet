@@ -92,25 +92,21 @@ jobs:
           install: |
             uname -m
             apt-get update
-            apt-get install -y ca-certificates gnupg2 build-essential patch
+            apt-get -y install --no-install-recommends ca-certificates gnupg2 build-essential libboost-dev libmpfr-dev swig patch automake autoconf libtool
             echo 'deb https://ppa.launchpadcontent.net/deadsnakes/ppa/ubuntu jammy main' >> /etc/apt/sources.list
             echo 'deb-src https://ppa.launchpadcontent.net/deadsnakes/ppa/ubuntu jammy main' >> /etc/apt/sources.list
             apt-key adv --keyserver keyserver.ubuntu.com --recv-keys BA6932366A755776
             apt-get update
-            apt-get install -y libboost-dev libmpfr-dev swig autoconf libtool python${{ matrix.python-version }} python${{ matrix.python-version }}-dev python${{ matrix.python-version }}-distutils python${{ matrix.python-version }}-venv
-            python${{ matrix.python-version }} -m ensurepip --upgrade
-            echo $PATH
-            echo $PWD
-            echo $LD_LIBRARY_PATH
-            ls /usr/local/include/python${{ matrix.python-version }}
+            apt-get -y install --no-install-recommends python${{ matrix.python-version }} python${{ matrix.python-version }}-dev python${{ matrix.python-version }}-distutils python${{ matrix.python-version }}-venv
+            python${{ matrix.python-version }} -m venv /venv
           run: |
             uname -m
-            echo $PATH
-            echo $PWD
-            echo $LD_LIBRARY_PATH
-            ls /usr/local/include/python${{ matrix.python-version }}
-            python${{ matrix.python-version }} -m pip install '.[test]' -v
-            python${{ matrix.python-version }} -m pytest -vv -rs -Wd
+            echo "PATH: ${PATH}"
+            echo "PWD: ${PWD}"
+            . /venv/bin/activate
+            python -m pip install --upgrade pip setuptools wheel
+            python -m pip install '.[test]' -v
+            pytest -vv -rs -Wd
 
   test_wheels:
     name: "Wheel: ${{ matrix.python }}, ${{ matrix.arch }} on ${{ matrix.os }}"
