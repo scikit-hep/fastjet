@@ -80,12 +80,15 @@ jobs:
       - uses: uraimo/run-on-arch-action@v2.5.0
         name: Install and test in image
         with:
+          # workaround for https://github.com/uraimo/run-on-arch-action/issues/55
+          env: |
+            GITHUB_WORKFLOW: ${{ github.workflow }}-python${{ matrix.python-version }}
           arch: ${{ matrix.arch }}
           distro: ubuntu_latest
           # Not required, but speeds up builds
           githubToken: ${{ github.token }}
           dockerRunArgs: |
-            --volume "${PWD}:/fastjet" --platform linux/arm64
+            --volume "${PWD}:/fastjet" --platform linux/arm64 --workdir /fastjet
           install: |
             uname -m
             apt-get update
@@ -96,11 +99,11 @@ jobs:
             apt-get update
             apt-get install -y libboost-dev libmpfr-dev swig autoconf libtool python${{ matrix.python-version }} python${{ matrix.python-version }}-dev python${{ matrix.python-version }}-distutils python${{ matrix.python-version }}-venv
             python${{ matrix.python-version }} -m ensurepip
+            echo $PATH
+            echo $PWD
           run: |
             uname -m
             echo $PATH
-            echo $PWD
-            cd /fastjet
             echo $PWD
             python${{ matrix.python-version }} -m pip install '.[test]' -v
             python${{ matrix.python-version }} -m pytest -vv -rs -Wd
