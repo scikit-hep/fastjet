@@ -33,19 +33,19 @@ jobs:
         arch: [auto64]
         include:
           - python: 37
-            runs-on: ubuntu-latest
+            os: ubuntu-latest
             arch: aarch64
           - python: 38
-            runs-on: ubuntu-latest
+            os: ubuntu-latest
             arch: aarch64
           - python: 39
-            runs-on: ubuntu-latest
+            os: ubuntu-latest
             arch: aarch64
           - python: 310
-            runs-on: ubuntu-latest
+            os: ubuntu-latest
             arch: aarch64
           - python: 311
-            runs-on: ubuntu-latest
+            os: ubuntu-latest
             arch: aarch64
 
     steps:
