@@ -63,51 +63,6 @@ jobs:
       - name: Test package
         run: python -m pytest -vv -rs -Wd
 
-  checks_alt:
-    name: Check Python ${{ matrix.python-version }}, ${{ matrix.arch }} on ${{ matrix.runs-on }}
-    runs-on: ${{ matrix.runs-on }}
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: ["3.7", "3.11"]
-        runs-on: [ubuntu-latest]
-        arch: [aarch64]
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: recursive
-
-      - uses: uraimo/run-on-arch-action@v2.5.0
-        name: Install and test in image
-        with:
-          # workaround for https://github.com/uraimo/run-on-arch-action/issues/55
-          env: |
-            GITHUB_WORKFLOW: ${{ github.workflow }}-python${{ matrix.python-version }}
-          arch: ${{ matrix.arch }}
-          distro: ubuntu_latest
-          # Not required, but speeds up builds
-          githubToken: ${{ github.token }}
-          dockerRunArgs: |
-            --volume "${PWD}:/fastjet" --platform linux/arm64 --workdir /fastjet
-          install: |
-            uname -m
-            apt-get update
-            apt-get -y install --no-install-recommends ca-certificates gnupg2 build-essential libboost-dev libmpfr-dev swig patch automake autoconf libtool
-            echo 'deb https://ppa.launchpadcontent.net/deadsnakes/ppa/ubuntu jammy main' >> /etc/apt/sources.list
-            echo 'deb-src https://ppa.launchpadcontent.net/deadsnakes/ppa/ubuntu jammy main' >> /etc/apt/sources.list
-            apt-key adv --keyserver keyserver.ubuntu.com --recv-keys BA6932366A755776
-            apt-get update
-            apt-get -y install --no-install-recommends python${{ matrix.python-version }} python${{ matrix.python-version }}-dev python${{ matrix.python-version }}-distutils python${{ matrix.python-version }}-venv
-            python${{ matrix.python-version }} -m venv /venv
-          run: |
-            uname -m
-            echo "PATH: ${PATH}"
-            echo "PWD: ${PWD}"
-            . /venv/bin/activate
-            python -m pip install --upgrade pip setuptools wheel
-            python -m pip install '.[test]' -v
-            pytest -vv -rs -Wd
-
   test_wheels:
     name: "Wheel: ${{ matrix.python }}, ${{ matrix.arch }} on ${{ matrix.os }}"
     runs-on: ${{ matrix.os }}
@@ -146,7 +101,7 @@ jobs:
           path: wheelhouse/*.whl
 
   pass:
-    needs: [pre-commit, checks, checks_alt, test_wheels]
+    needs: [pre-commit, checks, test_wheels]
     runs-on: ubuntu-latest
     steps:
       - run: echo "All jobs passed"
