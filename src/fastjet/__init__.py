@@ -41,7 +41,24 @@ from fastjet._swig import GhostedAreaSpec  # noqa: F401, E402
 from fastjet._swig import GridMedianBackgroundEstimator  # noqa: F401, E402
 from fastjet._swig import IndexedSortHelper  # noqa: F401, E402
 from fastjet._swig import InternalError  # noqa: F401, E402
-from fastjet._swig import JetDefinition  # noqa: F401, E402
+from fastjet._swig import JetDefinition as JetDefinitionNoCast # noqa: F401, E402
+class JetDefinition(JetDefinitionNoCast):
+    def __init__(self, *args):
+        r"""
+
+        `JetDefinition(JetAlgorithm jet_algorithm_in, double R_in, RecombinationScheme
+            recomb_scheme_in, Strategy strategy_in, int nparameters_in)`  
+
+        constructor to fully specify a jet-definition (together with information about
+        how algorithically to run it).  
+
+        """
+        if len(args) > 1:
+            args_list = list(args)
+            args_list[1] = float(args[1])
+            args = tuple(args_list)
+
+        _fastjet.JetDefinition_swiginit(self, _fastjet.new_JetDefinition(*args))
 from fastjet._swig import JetDefinition0Param  # noqa: F401, E402
 from fastjet._swig import JetDefinition1Param  # noqa: F401, E402
 from fastjet._swig import JetDefinition2Param  # noqa: F401, E402
