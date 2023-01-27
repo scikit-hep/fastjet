@@ -178,7 +178,7 @@ PYBIND11_MODULE(_ext, m) {
         auto sizepar = 0;
 
         for(int i = 0; i < len; i++){
-        jk += css[i]->inclusive_jets().size();
+        jk += css[i]->inclusive_jets(min_pt).size();
         sizepar += css[i]->n_particles();
         }
         jk++;
@@ -209,7 +209,7 @@ PYBIND11_MODULE(_ext, m) {
         for (unsigned int i = 0; i < css.size(); i++){
 
         auto jets = css[i]->inclusive_jets(min_pt);
-        int size = css[i]->inclusive_jets().size();
+        int size = css[i]->inclusive_jets(min_pt).size();
         auto idx = css[i]->particle_jet_indices(jets);
         int64_t sizz = css[i]->n_particles();
         auto prev = ptrjetoffsets[jetidx-1];
