@@ -7,7 +7,6 @@ import fastjet._pyjet  # noqa: F401
 
 
 def test_exclusive_subjets_multi():
-
     array = ak.Array(
         [
             [
@@ -44,7 +43,6 @@ def test_exclusive_subjets_multi():
 
 
 def test_exclusive_subjets_single():
-
     array = ak.Array(
         [
             {"px": 1.2, "py": 3.2, "pz": 5.4, "E": 2.5, "ex": 0.78},
@@ -70,7 +68,6 @@ def test_exclusive_subjets_single():
 
 
 def test_exclusive_subjets_up_to_single():
-
     array = ak.Array(
         [
             {"px": 1.2, "py": 3.2, "pz": 5.4, "E": 2.5, "ex": 0.78},
@@ -94,7 +91,6 @@ def test_exclusive_subjets_up_to_single():
 
 
 def test_exclusive_subjets_up_to_multi():
-
     array = ak.Array(
         [
             [
@@ -126,7 +122,6 @@ def test_exclusive_subjets_up_to_multi():
 
 
 def test_exclusive_subdmerge_single():
-
     array = ak.Array(
         [
             {"px": 1.2, "py": 3.2, "pz": 5.4, "E": 2.5, "ex": 0.78},
@@ -145,7 +140,6 @@ def test_exclusive_subdmerge_single():
 
 
 def test_exclusive_subdmerge_multi():
-
     array = ak.Array(
         [
             [
@@ -176,7 +170,6 @@ def test_exclusive_subdmerge_multi():
 
 
 def test_exclusive_subdmerge_max_multi():
-
     array = ak.Array(
         [
             [
@@ -207,7 +200,6 @@ def test_exclusive_subdmerge_max_multi():
 
 
 def test_exclusive_subdmerge_max_single():
-
     array = ak.Array(
         [
             {"px": 1.2, "py": 3.2, "pz": 5.4, "E": 2.5, "ex": 0.78},
@@ -228,7 +220,6 @@ def test_exclusive_subdmerge_max_single():
 
 
 def test_n_exclusive_subjets_multi():
-
     array = ak.Array(
         [
             [
@@ -257,7 +248,6 @@ def test_n_exclusive_subjets_multi():
 
 
 def test_n_exclusive_subjets_single():
-
     array = ak.Array(
         [
             {"px": 1.2, "py": 3.2, "pz": 5.4, "E": 2.5, "ex": 0.78},
@@ -278,7 +268,6 @@ def test_n_exclusive_subjets_single():
 
 
 def test_has_parents_multi():
-
     array = ak.Array(
         [
             [
@@ -307,7 +296,6 @@ def test_has_parents_multi():
 
 
 def test_has_parents_single():
-
     array = ak.Array(
         [
             {"px": 1.2, "py": 3.2, "pz": 5.4, "E": 2.5, "ex": 0.78},
@@ -328,7 +316,6 @@ def test_has_parents_single():
 
 
 def test_has_child_single():
-
     array = ak.Array(
         [
             {"px": 1.2, "py": 3.2, "pz": 5.4, "E": 2.5, "ex": 0.78},
@@ -349,7 +336,6 @@ def test_has_child_single():
 
 
 def test_has_child_multi():
-
     array = ak.Array(
         [
             [
@@ -378,7 +364,6 @@ def test_has_child_multi():
 
 
 def test_jet_scale_for_algorithm_multi():
-
     array = ak.Array(
         [
             [
@@ -409,7 +394,6 @@ def test_jet_scale_for_algorithm_multi():
 
 
 def test_jet_scale_for_algorithm_single():
-
     array = ak.Array(
         [
             {"px": 1.2, "py": 3.2, "pz": 5.4, "E": 2.5, "ex": 0.78},

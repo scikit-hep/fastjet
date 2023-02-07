@@ -552,7 +552,8 @@ class ClusterSequence:  # The super class
             data (awkward.highlevel.Array): An Array containing the Jets.
 
         Returns:
-            awkward.highlevel.Array: Returns an Awkward Array of the same type as the input."""
+            awkward.highlevel.Array: Returns an Awkward Array of the same type as the input.
+        """
         raise AssertionError()
 
     def get_child(self, data: ak.Array) -> ak.Array:
