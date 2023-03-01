@@ -1041,7 +1041,6 @@ def test_indexed_subtree_input():
 
 
 def test_union_8_64_input():
-
     inputs = ak.Array(
         [
             [
@@ -1160,7 +1159,6 @@ def test_union_8_64_input():
 
 
 def test_partitioned_input_NOT_REALLY():
-
     inputs = ak.Array(
         [
             [
@@ -1279,7 +1277,6 @@ def test_partitioned_input_NOT_REALLY():
 
 
 def test_record_input():
-
     inputs = ak.Array(
         [
             [
@@ -1418,7 +1415,6 @@ def test_record_input():
 
 
 def test_func_call__input():
-
     inputs = ak.Array(
         [
             [

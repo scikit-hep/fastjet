@@ -760,7 +760,6 @@ class _classgeneralevent:
         if len(self._cluster_inputs) == 0:
             raise TypeError("The Awkward Array is not valid")
         for i in range(len(self._cluster_inputs)):
-
             px = self._cluster_inputs[i].px
             py = self._cluster_inputs[i].py
             pz = self._cluster_inputs[i].pz
