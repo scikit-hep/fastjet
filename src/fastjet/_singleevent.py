@@ -76,7 +76,8 @@ class _classsingleevent:
         ):
             warnings.formatwarning = fastjet.formatwarning
             warnings.warn(
-                "dcut and exclusive jets for jet-finders other than kt, C/A or genkt with p>=0 should be interpreted with care."
+                "dcut and exclusive jets for jet-finders other than kt, C/A or genkt with p>=0 should be interpreted with care.",
+                stacklevel=2,
             )
         return
 
