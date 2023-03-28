@@ -5,7 +5,7 @@ index a4645fd..a7b82e2 100644
 @@ -8,11 +8,6 @@
  SUBDIRS=@CONTRIB_BUILD_LIST@
  SUBDIRS.all=$(SUBDIRS:=.all)
- 
+
 -# these will be overriden if the user specifies CXX or CXXFLAGS with configure
 -# they will also be overriden by definitions in subsiduary Makefiles
 -CXX=g++

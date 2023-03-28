@@ -116,7 +116,7 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
                 env=env,
                 check=True,
             )
-            
+
             subprocess.run(
                 [
                     "./configure",
