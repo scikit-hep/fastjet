@@ -83,6 +83,7 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
 
             args = [
                 f"--prefix={OUTPUT}",
+                "--enable-thread-safety",
                 "--disable-auto-ptr",
                 "--enable-allcxxplugins",
                 "--enable-cgal-header-only",
