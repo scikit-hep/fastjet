@@ -427,7 +427,7 @@ class DaskAwkwardClusterSequence(ClusterSequence):
 
         if not isinstance(data, dak.Array):
             raise TypeError("The input data is not a dask-awkward Array")
-        if not dak.lib.core.compatible_partitions(self.data, data):
+        if not dak.lib.core.compatible_partitions(self._data, data):
             raise ValueError(
                 "Input data must be partition-wise compatible with clustering data!"
             )
@@ -438,7 +438,7 @@ class DaskAwkwardClusterSequence(ClusterSequence):
 
         if not isinstance(data, dak.Array):
             raise TypeError("The input data is not a dask-awkward Array")
-        if not dak.lib.core.compatible_partitions(self.data, data):
+        if not dak.lib.core.compatible_partitions(self._data, data):
             raise ValueError(
                 "Input data must be partition-wise compatible with clustering data!"
             )
@@ -449,7 +449,7 @@ class DaskAwkwardClusterSequence(ClusterSequence):
 
         if not isinstance(data, dak.Array):
             raise TypeError("The input data is not a dask-awkward Array")
-        if not dak.lib.core.compatible_partitions(self.data, data):
+        if not dak.lib.core.compatible_partitions(self._data, data):
             raise ValueError(
                 "Input data must be partition-wise compatible with clustering data!"
             )
@@ -460,7 +460,7 @@ class DaskAwkwardClusterSequence(ClusterSequence):
 
         if not isinstance(data, dak.Array):
             raise TypeError("The input data is not a dask-awkward Array")
-        if not dak.lib.core.compatible_partitions(self.data, data):
+        if not dak.lib.core.compatible_partitions(self._data, data):
             raise ValueError(
                 "Input data must be partition-wise compatible with clustering data!"
             )
@@ -471,7 +471,7 @@ class DaskAwkwardClusterSequence(ClusterSequence):
 
         if not isinstance(data, dak.Array):
             raise TypeError("The input data is not a dask-awkward Array")
-        if not dak.lib.core.compatible_partitions(self.data, data):
+        if not dak.lib.core.compatible_partitions(self._data, data):
             raise ValueError(
                 "Input data must be partition-wise compatible with clustering data!"
             )
@@ -482,7 +482,7 @@ class DaskAwkwardClusterSequence(ClusterSequence):
 
         if not isinstance(data, dak.Array):
             raise TypeError("The input data is not a dask-awkward Array")
-        if not dak.lib.core.compatible_partitions(self.data, data):
+        if not dak.lib.core.compatible_partitions(self._data, data):
             raise ValueError(
                 "Input data must be partition-wise compatible with clustering data!"
             )
@@ -493,7 +493,7 @@ class DaskAwkwardClusterSequence(ClusterSequence):
 
         if not isinstance(data, dak.Array):
             raise TypeError("The input data is not a dask-awkward Array")
-        if not dak.lib.core.compatible_partitions(self.data, data):
+        if not dak.lib.core.compatible_partitions(self._data, data):
             raise ValueError(
                 "Input data must be partition-wise compatible with clustering data!"
             )
@@ -504,7 +504,7 @@ class DaskAwkwardClusterSequence(ClusterSequence):
 
         if not isinstance(data, dak.Array):
             raise TypeError("The input data is not a dask-awkward Array")
-        if not dak.lib.core.compatible_partitions(self.data, data):
+        if not dak.lib.core.compatible_partitions(self._data, data):
             raise ValueError(
                 "Input data must be partition-wise compatible with clustering data!"
             )
@@ -530,7 +530,7 @@ class DaskAwkwardClusterSequence(ClusterSequence):
 
         if not isinstance(data, dak.Array):
             raise TypeError("The input data is not a dask-awkward Array")
-        if not dak.lib.core.compatible_partitions(self.data, data):
+        if not dak.lib.core.compatible_partitions(self._data, data):
             raise ValueError(
                 "Input data must be partition-wise compatible with clustering data!"
             )
@@ -541,7 +541,7 @@ class DaskAwkwardClusterSequence(ClusterSequence):
 
         if not isinstance(data, dak.Array):
             raise TypeError("The input data is not a dask-awkward Array")
-        if not dak.lib.core.compatible_partitions(self.data, data):
+        if not dak.lib.core.compatible_partitions(self._data, data):
             raise ValueError(
                 "Input data must be partition-wise compatible with clustering data!"
             )
