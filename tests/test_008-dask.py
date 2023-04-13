@@ -85,3 +85,46 @@ def test_single():
     assert constituent_output == cluster.constituents().compute().to_list()
     constituent_index_output = [[0], [1, 2]]
     assert constituent_index_output == cluster.constituent_index().compute().to_list()
+
+
+def test_inclusive_from_file():
+    import uproot
+    from dask_awkward.lib.testutils import assert_eq
+
+    vector = pytest.importorskip("vector")
+
+    devents = uproot.dask({"tests/samples/pfnano_skim.root": "Events"})
+
+    dpfcands = dak.zip(
+        {
+            "pt": devents.PFCands_pt,
+            "eta": devents.PFCands_eta,
+            "phi": devents.PFCands_phi,
+            "mass": devents.PFCands_mass,
+        },
+        with_name="Momentum4D",
+        behavior=vector.backends.awkward.behavior,
+    )
+
+    djetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.4)
+    dcluseq = fastjet.ClusterSequence(dpfcands, djetdef)
+
+    events = uproot.open({"tests/samples/pfnano_skim.root": "Events"}).arrays(
+        ["PFCands_pt", "PFCands_eta", "PFCands_phi", "PFCands_mass"]
+    )
+
+    pfcands = ak.zip(
+        {
+            "pt": events.PFCands_pt,
+            "eta": events.PFCands_eta,
+            "phi": events.PFCands_phi,
+            "mass": events.PFCands_mass,
+        },
+        with_name="Momentum4D",
+        behavior=vector.backends.awkward.behavior,
+    )
+
+    jetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.4)
+    cluseq = fastjet.ClusterSequence(pfcands, jetdef)
+
+    assert_eq(dcluseq.inclusive_jets(), cluseq.inclusive_jets())
