@@ -93,9 +93,7 @@ def test_inclusive_from_file():
 
     vector = pytest.importorskip("vector")
 
-    testfile = os.abspath(
-        "https://github.com/scikit-hep/fastjet/blob/6759b1c4097edc71aa2a24b92d5620270def4208/tests/samples/pfnano_skim.root?raw=true"
-    )
+    testfile = "https://github.com/scikit-hep/fastjet/blob/6759b1c4097edc71aa2a24b92d5620270def4208/tests/samples/pfnano_skim.root?raw=true"
 
     devents = uproot.dask({testfile: "Events"})
 
