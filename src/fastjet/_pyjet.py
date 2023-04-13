@@ -242,7 +242,7 @@ class _FnDelayedInternalRepCaller:
             array.px.layout._touch_data(recursive=True)
             array.py.layout._touch_data(recursive=True)
             array.pz.layout._touch_data(recursive=True)
-            for	iarray in arrays:
+            for iarray in arrays:
                 iarray.E.layout._touch_data(recursive=True)
                 iarray.px.layout._touch_data(recursive=True)
                 iarray.py.layout._touch_data(recursive=True)
@@ -250,10 +250,14 @@ class _FnDelayedInternalRepCaller:
             length_zero_array = array.layout.form.length_zero_array(
                 behavior=array.behavior
             )
-            lz_arrays = tuple(iarray.length_zero_array(behavior=iarray.behavior) for iarray in arrays)
+            lz_arrays = tuple(
+                iarray.length_zero_array(behavior=iarray.behavior) for iarray in arrays
+            )
             seq = AwkwardClusterSequence(length_zero_array, self.jetdef)
             out = getattr(seq, self.name)(*lz_arrays, **self.kwargs)
-            return ak.Array(out.layout.to_typetracer(forget_length=True), behavior=out.behavior)
+            return ak.Array(
+                out.layout.to_typetracer(forget_length=True), behavior=out.behavior
+            )
         seq = AwkwardClusterSequence(array, self.jetdef)
         return getattr(seq, self.name)(*arrays, **self.kwargs)
 
