@@ -236,7 +236,7 @@ class _FnDelayedInternalRepCaller:
         self.jetdef = jetdef
         self.kwargs = kwargs
 
-    def __call__(self, array):
+    def __call__(self, array, *arrays):
         if ak.backend(array) == "typetracer":
             array.E.layout._touch_data(recursive=True)
             array.px.layout._touch_data(recursive=True)
