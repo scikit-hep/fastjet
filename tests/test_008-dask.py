@@ -95,9 +95,9 @@ def test_inclusive_from_file():
 
     vector = pytest.importorskip("vector")
 
-    testdir = os.path.dirname(os.path.abspath(__file__))
+    testdir = os.path.dirname(os.path.abspath(fastjet.__file__))
 
-    sample_loc = os.path.join(testdir, "/samples/pfnano_skim.root")
+    sample_loc = os.path.join(testdir, "tests/samples/pfnano_skim.root")
 
     devents = uproot.dask({sample_loc: "Events"})
 
