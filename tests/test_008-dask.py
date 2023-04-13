@@ -95,11 +95,9 @@ def test_inclusive_from_file():
 
     vector = pytest.importorskip("vector")
 
-    testdir = os.path.dirname(os.path.abspath(fastjet.__file__))
+    testdir = os.abspath("tests/samples/pfnano_skim.root")
 
-    sample_loc = os.path.join(testdir, "tests/samples/pfnano_skim.root")
-
-    devents = uproot.dask({sample_loc: "Events"})
+    devents = uproot.dask({testdir: "Events"})
 
     dpfcands = dak.zip(
         {
@@ -115,7 +113,7 @@ def test_inclusive_from_file():
     djetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.4)
     dcluseq = fastjet.ClusterSequence(dpfcands, djetdef)
 
-    events = uproot.open({sample_loc: "Events"}).arrays(
+    events = uproot.open({testdir: "Events"}).arrays(
         ["PFCands_pt", "PFCands_eta", "PFCands_phi", "PFCands_mass"]
     )
 
