@@ -88,16 +88,16 @@ def test_single():
 
 
 def test_inclusive_from_file():
-    import os
-
     import uproot
     from dask_awkward.lib.testutils import assert_eq
 
     vector = pytest.importorskip("vector")
 
-    testdir = os.abspath("tests/samples/pfnano_skim.root")
+    testfile = os.abspath(
+        "https://github.com/scikit-hep/fastjet/blob/6759b1c4097edc71aa2a24b92d5620270def4208/tests/samples/pfnano_skim.root?raw=true"
+    )
 
-    devents = uproot.dask({testdir: "Events"})
+    devents = uproot.dask({testfile: "Events"})
 
     dpfcands = dak.zip(
         {
@@ -113,7 +113,7 @@ def test_inclusive_from_file():
     djetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.4)
     dcluseq = fastjet.ClusterSequence(dpfcands, djetdef)
 
-    events = uproot.open({testdir: "Events"}).arrays(
+    events = uproot.open({testfile: "Events"}).arrays(
         ["PFCands_pt", "PFCands_eta", "PFCands_phi", "PFCands_mass"]
     )
 
