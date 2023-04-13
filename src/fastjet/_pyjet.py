@@ -238,6 +238,10 @@ class _FnDelayedInternalRepCaller:
 
     def __call__(self, array):
         if ak.backend(array) == "typetracer":
+            array.E.layout._touch_data(recursive=True)
+            array.px.layout._touch_data(recursive=True)
+            array.py.layout._touch_data(recursive=True)
+            array.pz.layout._touch_data(recursive=True)
             length_zero_array = array.layout.form.length_zero_array(
                 behavior=array.behavior
             )
