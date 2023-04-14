@@ -78,7 +78,7 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
             env = os.environ.copy()
             env["PYTHON"] = sys.executable
             env["PYTHON_INCLUDE"] = f'-I{sysconfig.get_path("include")}'
-            env["CXXFLAGS"] = "-O3 -Bstatic -lgmp -Bdynamic -std=c++17"
+            env["CXXFLAGS"] = "-O3 -Bstatic -lgmp -Bdynamic -std=c++17 -I`brew --prefix gmp`/include"
             env["ORIGIN"] = "$ORIGIN"  # if evaluated, it will still be '$ORIGIN'
 
             args = [
@@ -91,7 +91,7 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
                 f"--with-cgaldir={cgal_dir}",
                 "--enable-swig",
                 "--enable-pyext",
-                "LDFLAGS=-Wl,-rpath,$$ORIGIN/_fastjet_core/lib:$$ORIGIN",
+                "LDFLAGS=-Wl,-rpath,$$ORIGIN/_fastjet_core/lib:$$ORIGIN,-L`brew --prefix gmp`/lib",
             ]
 
             try:
