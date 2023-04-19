@@ -29,9 +29,9 @@
 Official FastJet bindings to Python and Awkward Array.
 
 Main features of Fastjet:
-  * Contains Vectorized as well as Non-Vectorized interface for Fastjet.
+  * Contains Vectorized, Out-of-core Vectorized (dask), as well as Non-Vectorized interface for Fastjet.
   * Compiled against the complete Fastjet library in C++.
-  * Has Awkward Array and Vector as dependency.
+  * Has Awkward Array, Vector, and optionally Dask as dependencies.
   * Provides the functionality to cluster multiple events at a time.
   * Input data can be in any coordinate system.
 
