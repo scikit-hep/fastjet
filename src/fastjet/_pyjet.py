@@ -252,12 +252,15 @@ class _FnDelayedInternalRepCaller:
                 behavior=array.behavior,
             )
             lz_arrays = tuple(
-                ak.Array(iarray.length_zero_array(highlevel=False), behavior=iarray.behavior) for iarray in arrays
+                ak.Array(
+                    iarray.length_zero_array(highlevel=False), behavior=iarray.behavior
+                )
+                for iarray in arrays
             )
             seq = AwkwardClusterSequence(length_zero_array, self.jetdef)
             out = getattr(seq, self.name)(*lz_arrays, **self.kwargs)
             return ak.Array(
-                out.layout.to_typetracer(forget_length=True), 
+                out.layout.to_typetracer(forget_length=True),
                 behavior=out.behavior,
             )
         seq = AwkwardClusterSequence(array, self.jetdef)
