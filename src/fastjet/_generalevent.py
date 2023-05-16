@@ -311,7 +311,8 @@ class _classgeneralevent:
         ):
             warnings.formatwarning = fastjet.formatwarning
             warnings.warn(
-                "dcut and exclusive jets for jet-finders other than kt, C/A or genkt with p>=0 should be interpreted with care."
+                "dcut and exclusive jets for jet-finders other than kt, C/A or genkt with p>=0 should be interpreted with care.",
+                stacklevel=2,
             )
         return
 
@@ -760,7 +761,6 @@ class _classgeneralevent:
         if len(self._cluster_inputs) == 0:
             raise TypeError("The Awkward Array is not valid")
         for i in range(len(self._cluster_inputs)):
-
             px = self._cluster_inputs[i].px
             py = self._cluster_inputs[i].py
             pz = self._cluster_inputs[i].pz

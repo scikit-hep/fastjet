@@ -225,9 +225,23 @@ class ClusterSequence:  # The super class
             fastjet._pyjet.AwkwardClusterSequence.__init__(
                 self, data=data, jetdef=jetdef
             )
-        if isinstance(data, list):
+        elif isinstance(data, list):
             self.__class__ = fastjet._swig.ClusterSequence
             fastjet._swig.ClusterSequence.__init__(self, data, jetdef)
+        else:
+            try:
+                import dask_awkward as dak
+            except ImportError:
+                dak = None
+            if dak is not None and isinstance(data, dak.Array):
+                self.__class__ = fastjet._pyjet.DaskAwkwardClusterSequence
+                fastjet._pyjet.DaskAwkwardClusterSequence.__init__(
+                    self, data=data, jetdef=jetdef
+                )
+            else:
+                raise TypeError(
+                    f"{data} must be an awkward.Array, dask_awkward.Array, or list!"
+                )
 
     def jet_def(self) -> JetDefinition:
         """Returns the Jet Definition Object associated with the instance
@@ -573,7 +587,8 @@ class ClusterSequence:  # The super class
             data (awkward.highlevel.Array): An Array containing the Jets.
 
         Returns:
-            awkward.highlevel.Array: Returns an Awkward Array of the same type as the input."""
+            awkward.highlevel.Array: Returns an Awkward Array of the same type as the input.
+        """
         raise AssertionError()
 
     def get_child(self, data: ak.Array) -> ak.Array:

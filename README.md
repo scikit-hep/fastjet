@@ -7,7 +7,6 @@
 
 [![PyPI platforms][pypi-platforms]][pypi-link]
 [![GitHub Discussion][github-discussions-badge]][github-discussions-link]
-[![Gitter][gitter-badge]][gitter-link]
 [![Scikit-HEP][sk-badge]](https://scikit-hep.org/)
 
 
@@ -19,9 +18,7 @@
 [conda-badge]:              https://img.shields.io/conda/vn/conda-forge/fastjet
 [conda-link]:               https://github.com/conda-forge/fastjet-feedstock
 [github-discussions-badge]: https://img.shields.io/static/v1?label=Discussions&message=Ask&color=blue&logo=github
-[github-discussions-link]:  https://github.com/aryan26roy/fastjet.git/discussions
-[gitter-badge]:             https://badges.gitter.im/https://github.com/aryan26roy/fastjet.git/community.svg
-[gitter-link]:              https://gitter.im/https://github.com/aryan26roy/fastjet.git/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge
+[github-discussions-link]:  https://github.com/scikit-hep/fastjet/discussions
 [pypi-link]:                https://pypi.org/project/fastjet/
 [pypi-platforms]:           https://img.shields.io/pypi/pyversions/fastjet
 [pypi-version]:             https://badge.fury.io/py/fastjet.svg
@@ -32,9 +29,9 @@
 Official FastJet bindings to Python and Awkward Array.
 
 Main features of Fastjet:
-  * Contains Vectorized as well as Non-Vectorized interface for Fastjet.
+  * Contains Vectorized, Out-of-core Vectorized (dask), as well as Non-Vectorized interface for Fastjet.
   * Compiled against the complete Fastjet library in C++.
-  * Has Awkward Array and Vector as dependency.
+  * Has Awkward Array, Vector, and optionally Dask as dependencies.
   * Provides the functionality to cluster multiple events at a time.
   * Input data can be in any coordinate system.
 

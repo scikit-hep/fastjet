@@ -61,13 +61,6 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
                 cgal_dir = DIR / zip_obj.namelist()[0]
                 zip_obj.extractall(DIR)
 
-            # Patch for FastJet core version 3.4.0
-            # To be removed when https://gitlab.com/fastjet/fastjet/-/merge_requests/1 is merged upstream
-            subprocess.run(
-                ["patch", "pyinterface/fastjet.i", DIR / "patch_fastjet_i.txt"],
-                cwd=FASTJET,
-            )
-
             # Patch for segfault of LimitedWarning
             # For more info see https://github.com/scikit-hep/fastjet/pull/131
             subprocess.run(
@@ -83,6 +76,7 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
 
             args = [
                 f"--prefix={OUTPUT}",
+                "--enable-thread-safety",
                 "--disable-auto-ptr",
                 "--enable-allcxxplugins",
                 "--enable-cgal-header-only",
@@ -108,6 +102,13 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
             env["ORIGIN"] = "$ORIGIN"  # if evaluated, it will still be '$ORIGIN'
             subprocess.run(["make", "-j"], cwd=FASTJET, env=env, check=True)
             subprocess.run(["make", "install"], cwd=FASTJET, env=env, check=True)
+
+            subprocess.run(
+                ["patch", "./Makefile.in", DIR / "patch_makefilein.txt"],
+                cwd=FASTJET_CONTRIB,
+                env=env,
+                check=True,
+            )
 
             subprocess.run(
                 [
