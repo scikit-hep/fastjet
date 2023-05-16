@@ -248,7 +248,7 @@ class _FnDelayedInternalRepCaller:
                 iarray.py.layout._touch_data(recursive=True)
                 iarray.pz.layout._touch_data(recursive=True)
             length_zero_array = ak.Array(
-                array.layout.form.length_zero_array(highevel=False),
+                array.layout.form.length_zero_array(highlevel=False),
                 behavior=array.behavior,
             )
             lz_arrays = tuple(
