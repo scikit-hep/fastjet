@@ -41,6 +41,7 @@ from fastjet._swig import GhostedAreaSpec  # noqa: F401, E402
 from fastjet._swig import GridMedianBackgroundEstimator  # noqa: F401, E402
 from fastjet._swig import IndexedSortHelper  # noqa: F401, E402
 from fastjet._swig import InternalError  # noqa: F401, E402
+from fastjet._swig import JetDefinition as JetDefinitionNoCast  # noqa: F401, E402
 from fastjet._swig import JetDefinition0Param  # noqa: F401, E402
 from fastjet._swig import JetDefinition1Param  # noqa: F401, E402
 from fastjet._swig import JetDefinition2Param  # noqa: F401, E402
@@ -171,7 +172,6 @@ from fastjet._swig import vectorPJ  # noqa: F401, E402
 from fastjet._swig import voronoi_area  # noqa: F401, E402
 from fastjet._swig import zeta2  # noqa: F401, E402
 from fastjet._swig import zeta3  # noqa: F401, E402
-from fastjet._swig import JetDefinition as JetDefinitionNoCast  # noqa: F401, E402
 from fastjet._utils import cos_theta  # noqa: F401, E402
 from fastjet._utils import dot_product  # noqa: F401, E402
 from fastjet._utils import have_same_momentum  # noqa: F401, E402
