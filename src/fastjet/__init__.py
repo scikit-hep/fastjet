@@ -1,6 +1,5 @@
 # BSD 3-Clause License; see https://github.com/scikit-hep/fastjet/blob/main/LICENSE
 
-from numbers import Number
 from typing import Union
 
 import awkward as ak
