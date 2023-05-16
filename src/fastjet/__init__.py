@@ -41,7 +41,6 @@ from fastjet._swig import GhostedAreaSpec  # noqa: F401, E402
 from fastjet._swig import GridMedianBackgroundEstimator  # noqa: F401, E402
 from fastjet._swig import IndexedSortHelper  # noqa: F401, E402
 from fastjet._swig import InternalError  # noqa: F401, E402
-from fastjet._swig import JetDefinition  # noqa: F401, E402
 from fastjet._swig import JetDefinition0Param  # noqa: F401, E402
 from fastjet._swig import JetDefinition1Param  # noqa: F401, E402
 from fastjet._swig import JetDefinition2Param  # noqa: F401, E402
@@ -172,6 +171,7 @@ from fastjet._swig import vectorPJ  # noqa: F401, E402
 from fastjet._swig import voronoi_area  # noqa: F401, E402
 from fastjet._swig import zeta2  # noqa: F401, E402
 from fastjet._swig import zeta3  # noqa: F401, E402
+from fastjet._swig import JetDefinition as JetDefinitionNoCast  # noqa: F401, E402
 from fastjet._utils import cos_theta  # noqa: F401, E402
 from fastjet._utils import dot_product  # noqa: F401, E402
 from fastjet._utils import have_same_momentum  # noqa: F401, E402
@@ -186,6 +186,37 @@ from fastjet.version import __version__  # noqa: E402
 
 # TODO: everything should be in this list. Except maybe __version__.
 __all__ = ("__version__",)
+
+
+class JetDefinition(JetDefinitionNoCast):
+    def __init__(
+        self,
+        jet_algorithm_in,
+        R_in,
+        recomb_scheme_in=0,
+        strategy_in=1,
+        nparameters_in=1,
+    ):
+        r"""
+
+        `JetDefinition(JetAlgorithm jet_algorithm_in, double R_in, RecombinationScheme
+            recomb_scheme_in, Strategy strategy_in, int nparameters_in)`
+
+        constructor to fully specify a jet-definition (together with information about
+        how algorithically to run it).
+
+        """
+        if not isinstance(R_in, (float, int)):
+            raise ValueError(
+                f"R_in should be a real number, got {R_in} of type {type(R_in)}"
+            )
+
+        if isinstance(R_in, int):
+            R_in = float(R_in)
+
+        super().__init__(
+            jet_algorithm_in, R_in, recomb_scheme_in, strategy_in, nparameters_in
+        )
 
 
 class ClusterSequence:  # The super class
