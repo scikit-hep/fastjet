@@ -60,7 +60,7 @@ class JetDefinition(JetDefinitionNoCast):
             args_list[1] = float(args[1])
             args = tuple(args_list)
 
-        _fastjet.JetDefinition_swiginit(self, _fastjet.new_JetDefinition(*args))
+        fastjet.JetDefinition_swiginit(self, fastjet.new_JetDefinition(*args))
 
 
 from fastjet._swig import JetDefinition0Param  # noqa: F401, E402
