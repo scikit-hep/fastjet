@@ -206,12 +206,12 @@ class JetDefinition(JetDefinitionNoCast):
         how algorithically to run it).
 
         """
-        if not isintance(R_in, (float, int)):
+        if not isinstance(R_in, (float, int)):
             raise ValueError(
                 f"R_in should be a real number, got {R_in} of type {type(R_in)}"
             )
 
-        if isinstance(R_in):
+        if isinstance(R_in, int):
             R_in = float(R_in)
 
         super(self).__init__(
