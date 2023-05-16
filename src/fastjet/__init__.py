@@ -214,7 +214,7 @@ class JetDefinition(JetDefinitionNoCast):
         if isinstance(R_in, int):
             R_in = float(R_in)
 
-        super(self).__init__(
+        super().__init__(
             jet_algorithm_in, R_in, recomb_scheme_in, strategy_in, nparameters_in
         )
 
