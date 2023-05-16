@@ -247,16 +247,18 @@ class _FnDelayedInternalRepCaller:
                 iarray.px.layout._touch_data(recursive=True)
                 iarray.py.layout._touch_data(recursive=True)
                 iarray.pz.layout._touch_data(recursive=True)
-            length_zero_array = array.layout.form.length_zero_array(
-                behavior=array.behavior
+            length_zero_array = ak.Array(
+                array.layout.form.length_zero_array(highevel=False),
+                behavior=array.behavior,
             )
             lz_arrays = tuple(
-                iarray.length_zero_array(behavior=iarray.behavior) for iarray in arrays
+                ak.Array(iarray.length_zero_array(highlevel=False), behavior=iarray.behavior) for iarray in arrays
             )
             seq = AwkwardClusterSequence(length_zero_array, self.jetdef)
             out = getattr(seq, self.name)(*lz_arrays, **self.kwargs)
             return ak.Array(
-                out.layout.to_typetracer(forget_length=True), behavior=out.behavior
+                out.layout.to_typetracer(forget_length=True), 
+                behavior=out.behavior,
             )
         seq = AwkwardClusterSequence(array, self.jetdef)
         return getattr(seq, self.name)(*arrays, **self.kwargs)
@@ -284,8 +286,9 @@ class DaskAwkwardClusterSequence(ClusterSequence):
         self._data = data
         self._jagedness = self._check_jaggedness(data._meta)
         self._flag = 1
-        length_zero_data = data._meta.layout.form.length_zero_array(
-            behavior=data.behavior
+        length_zero_data = ak.Array(
+            data._meta.layout.form.length_zero_array(highlevel=False),
+            behavior=data.behavior,
         )
         if (self._check_listoffset(data._meta) and self._jagedness == 2) or (
             self._check_listoffset_index(data._meta)
