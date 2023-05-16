@@ -42,27 +42,6 @@ from fastjet._swig import GridMedianBackgroundEstimator  # noqa: F401, E402
 from fastjet._swig import IndexedSortHelper  # noqa: F401, E402
 from fastjet._swig import InternalError  # noqa: F401, E402
 from fastjet._swig import JetDefinition as JetDefinitionNoCast  # noqa: F401, E402
-
-
-class JetDefinition(JetDefinitionNoCast):
-    def __init__(self, *args):
-        r"""
-
-        `JetDefinition(JetAlgorithm jet_algorithm_in, double R_in, RecombinationScheme
-            recomb_scheme_in, Strategy strategy_in, int nparameters_in)`
-
-        constructor to fully specify a jet-definition (together with information about
-        how algorithically to run it).
-
-        """
-        if len(args) > 1:
-            args_list = list(args)
-            args_list[1] = float(args[1])
-            args = tuple(args_list)
-
-        fastjet.JetDefinition_swiginit(self, fastjet.new_JetDefinition(*args))
-
-
 from fastjet._swig import JetDefinition0Param  # noqa: F401, E402
 from fastjet._swig import JetDefinition1Param  # noqa: F401, E402
 from fastjet._swig import JetDefinition2Param  # noqa: F401, E402
@@ -207,6 +186,25 @@ from fastjet.version import __version__  # noqa: E402
 
 # TODO: everything should be in this list. Except maybe __version__.
 __all__ = ("__version__",)
+
+
+class JetDefinition(JetDefinitionNoCast):
+    def __init__(self, *args):
+        r"""
+
+        `JetDefinition(JetAlgorithm jet_algorithm_in, double R_in, RecombinationScheme
+            recomb_scheme_in, Strategy strategy_in, int nparameters_in)`
+
+        constructor to fully specify a jet-definition (together with information about
+        how algorithically to run it).
+
+        """
+        if len(args) > 1:
+            args_list = list(args)
+            args_list[1] = float(args[1])
+            args = tuple(args_list)
+
+        fastjet.JetDefinition_swiginit(self, fastjet.new_JetDefinition(*args))
 
 
 class ClusterSequence:  # The super class
