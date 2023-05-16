@@ -3,6 +3,7 @@
 from typing import Union
 
 import awkward as ak
+from numbers import Number
 
 import fastjet._ext  # noqa: F401, E402
 import fastjet._pyjet  # noqa: F401, E402
@@ -41,6 +42,7 @@ from fastjet._swig import GhostedAreaSpec  # noqa: F401, E402
 from fastjet._swig import GridMedianBackgroundEstimator  # noqa: F401, E402
 from fastjet._swig import IndexedSortHelper  # noqa: F401, E402
 from fastjet._swig import InternalError  # noqa: F401, E402
+from fastjet._swig import JetDefinition as JetDefinitionNoCast # noqa: F401, E402
 from fastjet._swig import JetDefinition0Param  # noqa: F401, E402
 from fastjet._swig import JetDefinition1Param  # noqa: F401, E402
 from fastjet._swig import JetDefinition2Param  # noqa: F401, E402
@@ -171,7 +173,6 @@ from fastjet._swig import vectorPJ  # noqa: F401, E402
 from fastjet._swig import voronoi_area  # noqa: F401, E402
 from fastjet._swig import zeta2  # noqa: F401, E402
 from fastjet._swig import zeta3  # noqa: F401, E402
-from fastjet._swig import JetDefinition as JetDefinitionNoCast  # noqa: F401, E402
 from fastjet._utils import cos_theta  # noqa: F401, E402
 from fastjet._utils import dot_product  # noqa: F401, E402
 from fastjet._utils import have_same_momentum  # noqa: F401, E402
@@ -189,7 +190,7 @@ __all__ = ("__version__",)
 
 
 class JetDefinition(JetDefinitionNoCast):
-    def __init__(self, *args):
+    def __init__(self, jet_algorithm_in, R_in, recomb_scheme_in=0, strategy_in=1, nparameters_in=1):
         r"""
 
         `JetDefinition(JetAlgorithm jet_algorithm_in, double R_in, RecombinationScheme
@@ -199,12 +200,13 @@ class JetDefinition(JetDefinitionNoCast):
         how algorithically to run it).
 
         """
-        if len(args) > 1:
-            args_list = list(args)
-            args_list[1] = float(args[1])
-            args = tuple(args_list)
+        if not isintance(R_in, (float, int)):
+            raise ValueError(f"R_in should be a real number, got {R_in} of type {type(R_in)}")
+        
+        if isinstance(R_in):            
+            R_in = float(R_in)
 
-        fastjet.JetDefinition_swiginit(self, fastjet.new_JetDefinition(*args))
+        super(self).__init__(jet_algorithm_in, R_in, recomb_scheme_in, strategy_in, nparameters_in)
 
 
 class ClusterSequence:  # The super class
