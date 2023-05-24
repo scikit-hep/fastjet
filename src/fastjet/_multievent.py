@@ -192,6 +192,23 @@ class _classmultievent:
         out = ak.Array(ak.contents.ListOffsetArray(ak.index.Index64(off), out.layout))
         return out
 
+     def exclusive_jets_energy_correlator(self, njets = 10, n_point = 2, angle: int = 0, beta = 1, alpha = 0, func = "default"):
+        if njets <= 0:
+            raise ValueError("Njets cannot be <= 0")
+
+        np_results = self._results.to_numpy_energy_correlators(
+                njets, n_point, angle, beta, alpha, func
+            )
+        off = np_results[-1]
+        out = ak.Array(
+            ak.contents.ListOffsetArray(
+                ak.index.Index64(np_results[0]),
+                ak.contents.NumpyArray(np_results[1]),
+            ),
+        )
+        out = ak.Array(ak.contents.ListOffsetArray(ak.index.Index64(off), out.layout))
+        return out
+
     def exclusive_jets_lund_declusterings(self, njets):
         if njets <= 0:
             raise ValueError("Njets cannot be <= 0")
