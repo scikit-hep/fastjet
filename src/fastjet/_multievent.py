@@ -192,7 +192,7 @@ class _classmultievent:
         out = ak.Array(ak.contents.ListOffsetArray(ak.index.Index64(off), out.layout))
         return out
 
-     def exclusive_jets_energy_correlator(self, njets = 10, n_point = 2, angle: int = 0, beta = 1, alpha = 0, func = "default"):
+    def exclusive_jets_energy_correlator(self, njets = 10, n_point = 2, angle: int = 0, beta = 1, alpha = 0, func = "default"):
         if njets <= 0:
             raise ValueError("Njets cannot be <= 0")
 
