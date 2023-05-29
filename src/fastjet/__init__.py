@@ -355,7 +355,7 @@ class ClusterSequence:  # The super class
 
         raise AssertionError()
 
-    def exclusive_jets_energy_correlator(self, njets: int = 10, n_point: int = 2, angle: int = 0, beta: int = 1, alpha = 0, func = "default") -> ak.Array:
+    def exclusive_jets_energy_correlator(self, njets: int = 0, beta: int = 1, npoint: int = 0, angles: int = 0, alpha = 0, func = "default") -> ak.Array:
         """Returns the energy correlator of each exclusive jet.
 
         Args:
