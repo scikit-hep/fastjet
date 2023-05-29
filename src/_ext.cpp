@@ -21,6 +21,8 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
+#include <iostream> //debugging
+
 namespace fj = fastjet;
 namespace py = pybind11;
 using namespace pybind11::literals;
@@ -1631,7 +1633,6 @@ PYBIND11_MODULE(_ext, m) {
           energy_correlator = std::make_shared<fastjet::contrib::EnergyCorrelatorU3>(beta);}
         else if (func == "default") {
           energy_correlator = std::make_shared<fastjet::contrib::EnergyCorrelator>(npoint, beta);}
-
 
         std::vector<double> ECF_vec;
 

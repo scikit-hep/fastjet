@@ -446,20 +446,8 @@ class _classgeneralevent:
         self._out = []
         self._input_flag = 0
         for i in range(len(self._clusterable_level)):
-            np_results = self._results[i].to_numpy_energy_correlators(
-                njets, n_point, angle, beta, alpha, func
-            )
-            off = np_results[-1]
-            out = ak.Array(  
-                ak.contents.ListOffsetArray(
-                    ak.index.Index64(np_results[0]),
-                    ak.contents.NumpyArray(np_results[1]),
-                    ),
-                behavior=self.data.behavior,
-            )
-            self._out.append(
-                ak.Array(ak.contents.ListOffsetArray(ak.index.Index64(off), out.layout))
-            )
+            np_results = self._results[i].to_numpy_energy_correlators()
+            self._out.append(ak.Array(ak.contents.NumpyArray(np_results[0])))
         res = ak.Array(self._replace_multi())
         return res
 
