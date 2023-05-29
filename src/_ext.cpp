@@ -1651,6 +1651,15 @@ PYBIND11_MODULE(_ext, m) {
         return ECF;
       }, R"pbdoc(
         Calculates the energy correlators for each jet in each event.
+        Args:
+          n_jets: number of exclusive subjets.
+          beta: beta parameter for energy correlators.
+          npoint: n-point specification for ECFGs. Also used to determine desired n-point function for all series classes.
+          angles: number of angles for generalized energy correlators.
+          alpha: alpha parameter for generalized D2.
+          func: energy correlator function to use.
+        Returns:
+          Energy correlators for each jet in each event.
       )pbdoc")
       .def("to_numpy_exclusive_njet_lund_declusterings",
       [](const output_wrapper ow, const int n_jets = 0) {
