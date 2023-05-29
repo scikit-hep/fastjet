@@ -196,7 +196,7 @@ class _classmultievent:
         if njets <= 0:
             raise ValueError("Njets cannot be <= 0")
         np_results = self._results.to_numpy_energy_correlators(njets, n_point, angle, beta, alpha, func)        
-        out = ak.Array(ak.contents.NumPyArray(np_results))
+        out = ak.Array(ak.contents.NumpyArray(np_results))
         return out
 
     def exclusive_jets_lund_declusterings(self, njets):

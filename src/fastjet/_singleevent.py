@@ -186,7 +186,7 @@ class _classsingleevent:
 
         np_results = self._results.to_numpy_energy_correlators(njets, n_point, angle, beta, alpha, func)
         off = np_results[-1]
-        out = ak.Array(ak.contents.NumPyArray(np_results))
+        out = ak.Array(ak.contents.NumpyArray(np_results))
         return out[0]
 
     def exclusive_jets_lund_declusterings(self, njets):
