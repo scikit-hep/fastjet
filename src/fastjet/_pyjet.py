@@ -423,6 +423,9 @@ class DaskAwkwardClusterSequence(ClusterSequence):
 
     def exclusive_jets_constituents(self, njets=10):
         return _dak_dispatch(self, "exclusive_jets_constituents", njets=njets)
+    
+    def exclusive_jets_energy_correlator(self, njets = 0, beta = 1, npoint = 0, angles = 0, alpha = 0, func = "default"):
+        return _dak_dispatch(self, "exclusive_jets_energy_correlator", njets=njets, beta=beta, npoint=npoint, angles=angles, alpha=alpha, func=func)
 
     def exclusive_jets_lund_declusterings(self, njets=10):
         return _dak_dispatch(self, "exclusive_jets_lund_declusterings", njets=njets)
