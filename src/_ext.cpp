@@ -1587,12 +1587,6 @@ PYBIND11_MODULE(_ext, m) {
       [](const output_wrapper ow, const int n_jets = 0, const double beta = 1, double npoint = 0, int angles = 0, double alpha = 0, std::string func = "default") {
         auto css = ow.cse;
         int64_t len = css.size();
-        auto jk = 0;
-
-        for (int i = 0; i < len; i++){
-          jk += css[i]->exclusive_jets(n_jets).size();
-        }
-        jk++;
 
         std::transform(func.begin(), func.end(), func.begin(),
           [](unsigned char c){ return std::tolower(c); });
