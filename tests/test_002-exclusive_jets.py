@@ -185,14 +185,16 @@ def test_exclusive_energy_correlator():
         with_name="Momentum4D",
     )
 
-    jetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.8)
+    jetdef = fastjet.JetDefinition(fastjet.cambridge_algorithm, 0.8)
     cluster = fastjet._pyjet.AwkwardClusterSequence(array, jetdef)
 
     ec1 = cluster.exclusive_jets_energy_correlator(func='generic', npoint=1)
     ec2 = cluster.exclusive_jets_energy_correlator(func='generic', npoint=2)
     ecg2 = cluster.exclusive_jets_energy_correlator(func='generalized', npoint=2, angles=1)
 
-    assert ((ec2/ec1/ec1) == ecg2)
+    is_close = ak.ravel(ak.isclose(ak.Array([ec2/ec1/ec1]), ak.Array([ecg2]), rtol=1e-12, atol=0))
+
+    assert ak.all(is_close)
 
 def test_exclusive_energy_correlator_multi():
     array = ak.Array(
@@ -222,7 +224,9 @@ def test_exclusive_energy_correlator_multi():
     ec2 = cluster.exclusive_jets_energy_correlator(func='generic', npoint=2)
     ecg2 = cluster.exclusive_jets_energy_correlator(func='generalized', npoint=2, angles=1)
 
-    assert ak.all((ec2/ec1/ec1) == ecg2)
+    is_close = ak.ravel(ak.isclose((ec2/ec1/ec1), ecg2, rtol=1e-12, atol=0))
+
+    assert ak.all(is_close)
 
 def test_exclusive_constituents_multi():
     array = ak.Array(

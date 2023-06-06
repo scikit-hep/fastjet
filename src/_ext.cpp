@@ -13,8 +13,9 @@
 #include <fastjet/GhostedAreaSpec.hh>
 #include <fastjet/JetDefinition.hh>
 #include <fastjet/PseudoJet.hh>
-#include <fastjet/contrib/LundGenerator.hh>
 #include <fastjet/contrib/EnergyCorrelator.hh>
+#include <fastjet/contrib/LundGenerator.hh>
+
 
 #include <pybind11/numpy.h>
 #include <pybind11/operators.h>
