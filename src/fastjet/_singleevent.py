@@ -189,7 +189,6 @@ class _classsingleevent:
         np_results = self._results.to_numpy_energy_correlators(
             njets, beta, npoint, angles, alpha, func
         )
-        off = np_results[-1]
         out = ak.Array(ak.contents.NumpyArray(np_results))
         return out[0]
 
