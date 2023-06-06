@@ -188,9 +188,9 @@ def test_exclusive_energy_correlator():
     jetdef = fastjet.JetDefinition(fastjet.cambridge_algorithm, 0.8)
     cluster = fastjet._pyjet.AwkwardClusterSequence(array, jetdef)
 
-    ec1 = cluster.exclusive_jets_energy_correlator(func='generic', npoint=1)
-    ec2 = cluster.exclusive_jets_energy_correlator(func='generic', npoint=2)
-    ecg2 = cluster.exclusive_jets_energy_correlator(func='generalized', npoint=2, angles=1)
+    ec1 = cluster.exclusive_jets_energy_correlator(func="generic", npoint=1)
+    ec2 = cluster.exclusive_jets_energy_correlator(func="generic", npoint=2)
+    ecg2 = cluster.exclusive_jets_energy_correlator(func="generalized", npoint=2, angles=1)
 
     is_close = ak.ravel(ak.isclose(ak.Array([ec2/ec1/ec1]), ak.Array([ecg2]), rtol=1e-12, atol=0))
 
@@ -220,9 +220,9 @@ def test_exclusive_energy_correlator_multi():
     jetdef = fastjet.JetDefinition(fastjet.cambridge_algorithm, 0.8)
     cluster = fastjet._pyjet.AwkwardClusterSequence(array, jetdef)
 
-    ec1 = cluster.exclusive_jets_energy_correlator(func='generic', npoint=1)
-    ec2 = cluster.exclusive_jets_energy_correlator(func='generic', npoint=2)
-    ecg2 = cluster.exclusive_jets_energy_correlator(func='generalized', npoint=2, angles=1)
+    ec1 = cluster.exclusive_jets_energy_correlator(func="generic", npoint=1)
+    ec2 = cluster.exclusive_jets_energy_correlator(func="generic", npoint=2)
+    ecg2 = cluster.exclusive_jets_energy_correlator(func="generalized", npoint=2, angles=1)
 
     is_close = ak.ravel(ak.isclose((ec2/ec1/ec1), ecg2, rtol=1e-12, atol=0))
 

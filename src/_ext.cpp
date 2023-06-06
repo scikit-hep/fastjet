@@ -16,7 +16,6 @@
 #include <fastjet/contrib/EnergyCorrelator.hh>
 #include <fastjet/contrib/LundGenerator.hh>
 
-
 #include <pybind11/numpy.h>
 #include <pybind11/operators.h>
 #include <pybind11/pybind11.h>
