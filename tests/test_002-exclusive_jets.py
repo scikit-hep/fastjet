@@ -173,6 +173,7 @@ def test_exclusive_lund_declustering_multi():
 
     assert ak.all(is_close)
 
+
 def test_exclusive_energy_correlator():
     array = ak.Array(
         [
@@ -190,11 +191,16 @@ def test_exclusive_energy_correlator():
 
     ec1 = cluster.exclusive_jets_energy_correlator(func="generic", npoint=1)
     ec2 = cluster.exclusive_jets_energy_correlator(func="generic", npoint=2)
-    ecg2 = cluster.exclusive_jets_energy_correlator(func="generalized", npoint=2, angles=1)
+    ecg2 = cluster.exclusive_jets_energy_correlator(
+        func="generalized", npoint=2, angles=1
+    )
 
-    is_close = ak.ravel(ak.isclose(ak.Array([ec2/ec1/ec1]), ak.Array([ecg2]), rtol=1e-12, atol=0))
+    is_close = ak.ravel(
+        ak.isclose(ak.Array([ec2 / ec1 / ec1]), ak.Array([ecg2]), rtol=1e-12, atol=0)
+    )
 
     assert ak.all(is_close)
+
 
 def test_exclusive_energy_correlator_multi():
     array = ak.Array(
@@ -222,11 +228,14 @@ def test_exclusive_energy_correlator_multi():
 
     ec1 = cluster.exclusive_jets_energy_correlator(func="generic", npoint=1)
     ec2 = cluster.exclusive_jets_energy_correlator(func="generic", npoint=2)
-    ecg2 = cluster.exclusive_jets_energy_correlator(func="generalized", npoint=2, angles=1)
+    ecg2 = cluster.exclusive_jets_energy_correlator(
+        func="generalized", npoint=2, angles=1
+    )
 
-    is_close = ak.ravel(ak.isclose((ec2/ec1/ec1), ecg2, rtol=1e-12, atol=0))
+    is_close = ak.ravel(ak.isclose((ec2 / ec1 / ec1), ecg2, rtol=1e-12, atol=0))
 
     assert ak.all(is_close)
+
 
 def test_exclusive_constituents_multi():
     array = ak.Array(
