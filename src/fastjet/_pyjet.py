@@ -143,7 +143,7 @@ class AwkwardClusterSequence(ClusterSequence):
     def exclusive_jets_constituents(self, njets=10):
         return self._internalrep.exclusive_jets_constituents(njets)
 
-    def exclusive_jets_energy_correlator(self, njets = 0, beta = 1, npoint = 0, angles = 0, alpha = 0, func = "default"):
+    def exclusive_jets_energy_correlator(self, njets = 1, beta = 1, npoint = 0, angles = 0, alpha = 0, func = "generalized"):
         return self._internalrep.exclusive_jets_energy_correlator(njets, beta, npoint, angles, alpha, func)
 
     def exclusive_jets_lund_declusterings(self, njets=10):

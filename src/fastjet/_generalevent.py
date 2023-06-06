@@ -439,7 +439,7 @@ class _classgeneralevent:
         res = ak.Array(self._replace_multi())
         return res
 
-    def exclusive_jets_energy_correlator(self, njets = 10, n_point = 2, angle: int = 0, beta = 1, alpha = 0, func = "default"):
+    def exclusive_jets_energy_correlator(self, njets = 1, n_point = 0, angle: int = 0, beta = 1, alpha = 0, func = "generalized"):
         if njets <= 0:
             raise ValueError("Njets cannot be <= 0")
 

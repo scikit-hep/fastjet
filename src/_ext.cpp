@@ -1584,7 +1584,7 @@ PYBIND11_MODULE(_ext, m) {
           pt, eta, phi, m of inclusive jets.
       )pbdoc")
       .def("to_numpy_energy_correlators",
-      [](const output_wrapper ow, const int n_jets = 0, const double beta = 1, double npoint = 0, int angles = 0, double alpha = 0, std::string func = "default") {
+      [](const output_wrapper ow, const int n_jets = 1, const double beta = 1, double npoint = 0, int angles = 0, double alpha = 0, std::string func = "generalized") {
         auto css = ow.cse;
         int64_t len = css.size();
 
@@ -1603,7 +1603,7 @@ PYBIND11_MODULE(_ext, m) {
           energy_correlator = std::make_shared<fastjet::contrib::EnergyCorrelatorD2>(beta);}
         else if ( func == "generalized" ) {
           energy_correlator = std::make_shared<fastjet::contrib::EnergyCorrelatorGeneralized>(angles, npoint, beta);}
-        else if (func == "generalized2") {
+        else if (func == "generalizedd2") {
           energy_correlator = std::make_shared<fastjet::contrib::EnergyCorrelatorGeneralizedD2>(alpha, beta);}
         else if (func == "nseries") {
           energy_correlator = std::make_shared<fastjet::contrib::EnergyCorrelatorNseries>(npoint, beta);}
@@ -1625,8 +1625,8 @@ PYBIND11_MODULE(_ext, m) {
           energy_correlator = std::make_shared<fastjet::contrib::EnergyCorrelatorU2>(beta);}
         else if (func == "u3") {
           energy_correlator = std::make_shared<fastjet::contrib::EnergyCorrelatorU3>(beta);}
-        else if (func == "default") {
-          energy_correlator = std::make_shared<fastjet::contrib::EnergyCorrelator>(npoint, beta);}
+        else if (func == "generic") {
+          energy_correlator = std::make_shared<fastjet::contrib::EnergyCorrelator>(npoint, beta);} // The generic energy correlator is not normalized; i.e. does not use an momentum fraction when being calculated.
 
         std::vector<double> ECF_vec;
 
@@ -1648,7 +1648,7 @@ PYBIND11_MODULE(_ext, m) {
         Args:
           n_jets: number of exclusive subjets.
           beta: beta parameter for energy correlators.
-          npoint: n-point specification for ECFGs. Also used to determine desired n-point function for all series classes.
+          npoint: n-point specification for ECFs. Also used to determine desired n-point function for all series classes.
           angles: number of angles for generalized energy correlators.
           alpha: alpha parameter for generalized D2.
           func: energy correlator function to use.
