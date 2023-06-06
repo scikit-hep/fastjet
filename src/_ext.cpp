@@ -1626,7 +1626,7 @@ PYBIND11_MODULE(_ext, m) {
         else if (func == "u3") {
           energy_correlator = std::make_shared<fastjet::contrib::EnergyCorrelatorU3>(beta);}
         else if (func == "generic") {
-          energy_correlator = std::make_shared<fastjet::contrib::EnergyCorrelator>(npoint, beta);} // The generic energy correlator is not normalized; i.e. does not use an momentum fraction when being calculated.
+          energy_correlator = std::make_shared<fastjet::contrib::EnergyCorrelator>(npoint, beta);} // The generic energy correlator is not normalized; i.e. does not use a momentum fraction when being calculated.
 
         std::vector<double> ECF_vec;
 
