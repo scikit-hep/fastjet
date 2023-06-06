@@ -21,8 +21,6 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
-#include <iostream> //debugging
-
 namespace fj = fastjet;
 namespace py = pybind11;
 using namespace pybind11::literals;
