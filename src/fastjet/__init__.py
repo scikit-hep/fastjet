@@ -360,9 +360,10 @@ class ClusterSequence:  # The super class
         njets: int = 1,
         beta: int = 1,
         npoint: int = 0,
-        angles: int = 0,
+        angles: int = -1,
         alpha=0,
         func="generalized",
+        normalized=True,
     ) -> ak.Array:
         """Returns the energy correlator of each exclusive jet.
 

@@ -144,10 +144,10 @@ class AwkwardClusterSequence(ClusterSequence):
         return self._internalrep.exclusive_jets_constituents(njets)
 
     def exclusive_jets_energy_correlator(
-        self, njets=1, beta=1, npoint=0, angles=0, alpha=0, func="generalized"
+        self, njets=1, beta=1, npoint=0, angles=-1, alpha=0, func="generalized", normalized=True
     ):
         return self._internalrep.exclusive_jets_energy_correlator(
-            njets, beta, npoint, angles, alpha, func
+            njets, beta, npoint, angles, alpha, func, normalized,
         )
 
     def exclusive_jets_lund_declusterings(self, njets=10):
@@ -429,7 +429,7 @@ class DaskAwkwardClusterSequence(ClusterSequence):
         return _dak_dispatch(self, "exclusive_jets_constituents", njets=njets)
 
     def exclusive_jets_energy_correlator(
-        self, njets=1, beta=1, npoint=0, angles=0, alpha=0, func="generalized"
+        self, njets=1, beta=1, npoint=0, angles=-1, alpha=0, func="generalized", normalized=False,
     ):
         return _dak_dispatch(
             self,
@@ -440,6 +440,7 @@ class DaskAwkwardClusterSequence(ClusterSequence):
             angles=angles,
             alpha=alpha,
             func=func,
+            normalized=normalized,
         )
 
     def exclusive_jets_lund_declusterings(self, njets=10):
