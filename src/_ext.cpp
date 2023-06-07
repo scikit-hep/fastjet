@@ -1631,7 +1631,7 @@ PYBIND11_MODULE(_ext, m) {
         else if (func == "generic" && normalized == false) {
           energy_correlator = std::make_shared<fastjet::contrib::EnergyCorrelator>(npoint, beta);} // The generic energy correlator is not normalized; i.e. does not use a momentum fraction when being calculated.
         else if (func == "generic" && normalized == true) {
-          energy_correlator = std::make_shared<fastjet::contrib::EnergyCorrelatorGeneralized>(angles, npoint, beta);}
+          energy_correlator = std::make_shared<fastjet::contrib::EnergyCorrelatorGeneralized>(angles, npoint, beta);} //Using the Generalized class with angles=-1 returns a generic ECF that has been normalized
 
         std::vector<double> ECF_vec;
 
