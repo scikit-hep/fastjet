@@ -13,7 +13,6 @@
 #include <fastjet/GhostedAreaSpec.hh>
 #include <fastjet/JetDefinition.hh>
 #include <fastjet/PseudoJet.hh>
-#include <fastjet/contrib/SoftDrop.hh>
 #include <fastjet/contrib/EnergyCorrelator.hh>
 #include <fastjet/contrib/LundGenerator.hh>
 
