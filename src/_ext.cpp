@@ -13,6 +13,7 @@
 #include <fastjet/GhostedAreaSpec.hh>
 #include <fastjet/JetDefinition.hh>
 #include <fastjet/PseudoJet.hh>
+#include <fastjet/contrib/SoftDrop.hh>
 #include <fastjet/contrib/EnergyCorrelator.hh>
 #include <fastjet/contrib/LundGenerator.hh>
 
@@ -1581,8 +1582,12 @@ PYBIND11_MODULE(_ext, m) {
         Returns:
           pt, eta, phi, m of inclusive jets.
       )pbdoc")
+      /*.def("to_numpy_softdrop",
+      [](const output_wrapper ow, double beta, double symmetry_cut, ){
+
+      })*/
       .def("to_numpy_energy_correlators",
-      [](const output_wrapper ow, const int n_jets = 1, const double beta = 1, double npoint = 0, int angles = 0, double alpha = 0, std::string func = "generalized") {
+      [](const output_wrapper ow, const int n_jets = 1, const double beta = 1, double npoint = 0, int angles = 0, double alpha = 0, std::string func = "generalized", bool normalized = true) {
         auto css = ow.cse;
         int64_t len = css.size();
 
@@ -1623,8 +1628,10 @@ PYBIND11_MODULE(_ext, m) {
           energy_correlator = std::make_shared<fastjet::contrib::EnergyCorrelatorU2>(beta);}
         else if (func == "u3") {
           energy_correlator = std::make_shared<fastjet::contrib::EnergyCorrelatorU3>(beta);}
-        else if (func == "generic") {
+        else if (func == "generic" && normalized == false) {
           energy_correlator = std::make_shared<fastjet::contrib::EnergyCorrelator>(npoint, beta);} // The generic energy correlator is not normalized; i.e. does not use a momentum fraction when being calculated.
+        else if (func == "generic" && normalized == true) {
+          energy_correlator = std::make_shared<fastjet::contrib::EnergyCorrelatorGeneralized>(angles, npoint, beta);}
 
         std::vector<double> ECF_vec;
 

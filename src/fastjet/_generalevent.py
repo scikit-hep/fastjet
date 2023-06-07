@@ -440,7 +440,7 @@ class _classgeneralevent:
         return res
 
     def exclusive_jets_energy_correlator(
-        self, njets=1, n_point=0, angle: int = 0, beta=1, alpha=0, func="generalized"
+        self, njets=1, n_point=0, angles: int = -1, beta=1, alpha=0, func="generalized", normalized=True,
     ):
         if njets <= 0:
             raise ValueError("Njets cannot be <= 0")

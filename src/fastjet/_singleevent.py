@@ -181,13 +181,13 @@ class _classsingleevent:
         return out[0]
 
     def exclusive_jets_energy_correlator(
-        self, njets=1, beta=1, npoint=0, angles=0, alpha=0, func="generalized"
+        self, njets=1, beta=1, npoint=0, angles=-1, alpha=0, func="generalized", normalized=True,
     ):
         if njets <= 0:
             raise ValueError("Njets cannot be <= 0")
 
         np_results = self._results.to_numpy_energy_correlators(
-            njets, beta, npoint, angles, alpha, func
+            njets, beta, npoint, angles, alpha, func, normalized,
         )
         out = ak.Array(ak.contents.NumpyArray(np_results))
         return out[0]
