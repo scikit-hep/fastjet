@@ -13,6 +13,7 @@
 #include <fastjet/GhostedAreaSpec.hh>
 #include <fastjet/JetDefinition.hh>
 #include <fastjet/PseudoJet.hh>
+#include <fastjet/contrib/EnergyCorrelator.hh>
 #include <fastjet/contrib/LundGenerator.hh>
 
 #include <pybind11/numpy.h>
@@ -1579,6 +1580,78 @@ PYBIND11_MODULE(_ext, m) {
           None.
         Returns:
           pt, eta, phi, m of inclusive jets.
+      )pbdoc")
+      .def("to_numpy_energy_correlators",
+      [](const output_wrapper ow, const int n_jets = 1, const double beta = 1, double npoint = 0, int angles = 0, double alpha = 0, std::string func = "generalized") {
+        auto css = ow.cse;
+        int64_t len = css.size();
+
+        std::transform(func.begin(), func.end(), func.begin(),
+          [](unsigned char c){ return std::tolower(c); });
+        auto energy_correlator = std::shared_ptr<fastjet::FunctionOfPseudoJet<double>>(nullptr);
+        if ( func == "ratio" ) {
+          energy_correlator = std::make_shared<fastjet::contrib::EnergyCorrelatorRatio>(npoint, beta); }
+        else if ( func == "doubleratio" ) {
+          energy_correlator = std::make_shared<fastjet::contrib::EnergyCorrelatorDoubleRatio>(npoint, beta); }
+        else if ( func == "c1" ) {
+          energy_correlator = std::make_shared<fastjet::contrib::EnergyCorrelatorC1>(beta);}
+        else if ( func == "c2" ) {
+          energy_correlator = std::make_shared<fastjet::contrib::EnergyCorrelatorC2>(beta);}
+        else if ( func == "d2" ) {
+          energy_correlator = std::make_shared<fastjet::contrib::EnergyCorrelatorD2>(beta);}
+        else if ( func == "generalized" ) {
+          energy_correlator = std::make_shared<fastjet::contrib::EnergyCorrelatorGeneralized>(angles, npoint, beta);}
+        else if (func == "generalizedd2") {
+          energy_correlator = std::make_shared<fastjet::contrib::EnergyCorrelatorGeneralizedD2>(alpha, beta);}
+        else if (func == "nseries") {
+          energy_correlator = std::make_shared<fastjet::contrib::EnergyCorrelatorNseries>(npoint, beta);}
+        else if (func == "n2") {
+          energy_correlator = std::make_shared<fastjet::contrib::EnergyCorrelatorN2>(beta);}
+        else if (func == "n3") {
+          energy_correlator = std::make_shared<fastjet::contrib::EnergyCorrelatorN3>(beta);}
+        else if (func == "mseries") {
+          energy_correlator = std::make_shared<fastjet::contrib::EnergyCorrelatorMseries>(npoint, beta);}
+        else if (func == "m2") {
+          energy_correlator = std::make_shared<fastjet::contrib::EnergyCorrelatorM2>(beta);}
+        else if (func == "cseries") {
+          energy_correlator = std::make_shared<fastjet::contrib::EnergyCorrelatorCseries>(npoint, beta);}
+        else if (func == "useries") {
+          energy_correlator = std::make_shared<fastjet::contrib::EnergyCorrelatorUseries>(npoint, beta);}
+        else if (func == "u1") {
+          energy_correlator = std::make_shared<fastjet::contrib::EnergyCorrelatorU1>(beta);}
+        else if (func == "u2") {
+          energy_correlator = std::make_shared<fastjet::contrib::EnergyCorrelatorU2>(beta);}
+        else if (func == "u3") {
+          energy_correlator = std::make_shared<fastjet::contrib::EnergyCorrelatorU3>(beta);}
+        else if (func == "generic") {
+          energy_correlator = std::make_shared<fastjet::contrib::EnergyCorrelator>(npoint, beta);} // The generic energy correlator is not normalized; i.e. does not use a momentum fraction when being calculated.
+
+        std::vector<double> ECF_vec;
+
+        for (unsigned int i = 0; i < css.size(); i++){  // iterate through events
+          auto jets = css[i]->exclusive_jets(n_jets);
+          int size = css[i]->exclusive_jets(n_jets).size();
+
+          for (unsigned int j = 0; j < jets.size(); j++){
+            auto ecf_result = energy_correlator->result(jets[j]); //
+            ECF_vec.push_back(ecf_result);
+          }
+        }
+
+        auto ECF = py::array(ECF_vec.size(), ECF_vec.data());
+
+        return ECF;
+      }, R"pbdoc(
+        Calculates the energy correlators for each jet in each event.
+        Args:
+          n_jets: number of exclusive subjets.
+          beta: beta parameter for energy correlators.
+          npoint: n-point specification for ECFs. Also used to determine desired n-point function for all series classes.
+          angles: number of angles for generalized energy correlators.
+          alpha: alpha parameter for generalized D2.
+          func: energy correlator function to use.
+        Returns:
+          Energy correlators for each jet in each event.
       )pbdoc")
       .def("to_numpy_exclusive_njet_lund_declusterings",
       [](const output_wrapper ow, const int n_jets = 0) {

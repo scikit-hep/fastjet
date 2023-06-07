@@ -174,6 +174,69 @@ def test_exclusive_lund_declustering_multi():
     assert ak.all(is_close)
 
 
+def test_exclusive_energy_correlator():
+    array = ak.Array(
+        [
+            {"px": 1.2, "py": 3.2, "pz": 5.4, "E": 2.5, "ex": 0.78},
+            {"px": 1.25, "py": 3.15, "pz": 5.4, "E": 2.4, "ex": 0.78},
+            {"px": 1.4, "py": 3.15, "pz": 5.4, "E": 2.0, "ex": 0.78},
+            {"px": 32.2, "py": 64.21, "pz": 543.34, "E": 24.12, "ex": 0.35},
+            {"px": 32.45, "py": 63.21, "pz": 543.14, "E": 24.56, "ex": 0.0},
+        ],
+        with_name="Momentum4D",
+    )
+
+    jetdef = fastjet.JetDefinition(fastjet.cambridge_algorithm, 0.8)
+    cluster = fastjet._pyjet.AwkwardClusterSequence(array, jetdef)
+
+    ec1 = cluster.exclusive_jets_energy_correlator(func="generic", npoint=1)
+    ec2 = cluster.exclusive_jets_energy_correlator(func="generic", npoint=2)
+    ecg2 = cluster.exclusive_jets_energy_correlator(
+        func="generalized", npoint=2, angles=1
+    )
+
+    is_close = ak.ravel(
+        ak.isclose(ak.Array([ec2 / ec1 / ec1]), ak.Array([ecg2]), rtol=1e-12, atol=0)
+    )
+
+    assert ak.all(is_close)
+
+
+def test_exclusive_energy_correlator_multi():
+    array = ak.Array(
+        [
+            [
+                {"px": 1.2, "py": 3.2, "pz": 5.4, "E": 2.5, "ex": 0.78},
+                {"px": 1.25, "py": 3.15, "pz": 5.4, "E": 2.4, "ex": 0.78},
+                {"px": 1.4, "py": 3.15, "pz": 5.4, "E": 2.0, "ex": 0.78},
+                {"px": 32.2, "py": 64.21, "pz": 543.34, "E": 24.12, "ex": 0.35},
+                {"px": 32.45, "py": 63.21, "pz": 543.14, "E": 24.56, "ex": 0.0},
+            ],
+            [
+                {"px": 1.2, "py": 3.2, "pz": 5.4, "E": 2.5, "ex": 0.78},
+                {"px": 1.25, "py": 3.15, "pz": 5.4, "E": 2.4, "ex": 0.78},
+                {"px": 1.4, "py": 3.15, "pz": 5.4, "E": 2.0, "ex": 0.78},
+                {"px": 32.2, "py": 64.21, "pz": 543.34, "E": 24.12, "ex": 0.35},
+                {"px": 32.45, "py": 63.21, "pz": 543.14, "E": 24.56, "ex": 0.0},
+            ],
+        ],
+        with_name="Momentum4D",
+    )
+
+    jetdef = fastjet.JetDefinition(fastjet.cambridge_algorithm, 0.8)
+    cluster = fastjet._pyjet.AwkwardClusterSequence(array, jetdef)
+
+    ec1 = cluster.exclusive_jets_energy_correlator(func="generic", npoint=1)
+    ec2 = cluster.exclusive_jets_energy_correlator(func="generic", npoint=2)
+    ecg2 = cluster.exclusive_jets_energy_correlator(
+        func="generalized", npoint=2, angles=1
+    )
+
+    is_close = ak.ravel(ak.isclose((ec2 / ec1 / ec1), ecg2, rtol=1e-12, atol=0))
+
+    assert ak.all(is_close)
+
+
 def test_exclusive_constituents_multi():
     array = ak.Array(
         [
