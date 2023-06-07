@@ -1582,10 +1582,6 @@ PYBIND11_MODULE(_ext, m) {
         Returns:
           pt, eta, phi, m of inclusive jets.
       )pbdoc")
-      /*.def("to_numpy_softdrop",
-      [](const output_wrapper ow, double beta, double symmetry_cut, ){
-
-      })*/
       .def("to_numpy_energy_correlators",
       [](const output_wrapper ow, const int n_jets = 1, const double beta = 1, double npoint = 0, int angles = 0, double alpha = 0, std::string func = "generalized", bool normalized = true) {
         auto css = ow.cse;
