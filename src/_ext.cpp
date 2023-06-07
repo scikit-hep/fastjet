@@ -112,6 +112,21 @@ PYBIND11_MODULE(_ext, m) {
         py::return_value_policy::take_ownership);
   /// Jet algorithm definitions
 
+  py::enum_<output_wrapper::SymmetryMeasure>(m, "SymmetryMeasure")
+        .value("scalar_z", scalar_z)
+        .value("vector_z", vector_z)
+        .value("y", y)
+        .value("theta_E", theta_E)
+        .value("cos_theta_E", cos_theta_E)
+        .export_values();
+      
+  py::enum_<RecursionChoice>(m, "RecursionChoice")
+        .value("larger_pt", larger_pt)
+        .value("larger_mt", larger_mt)
+        .value("larger_m", larger_m)
+        .value("larger_E", larger_E)
+        .export_values();
+
   py::class_<output_wrapper>(m, "output_wrapper")
     .def_property("cse", &output_wrapper::getCluster,&output_wrapper::setCluster)
     .def("to_numpy",
@@ -1582,6 +1597,17 @@ PYBIND11_MODULE(_ext, m) {
         Returns:
           pt, eta, phi, m of inclusive jets.
       )pbdoc")
+      .def("to_numpy_softdrop_pruning",
+      [](const output_wrapper ow, double beta = 0, double symmetry_cut = 0.1, SymmetryMeasure symmetry_measure, double R0 = 0.8, double mu_cut = std::numeric_limits<double>::infinity(), RecursionChoice recuriosn_choice = larger_pt, const FunctionOfPseudoJet<PseudoJet> * subtractor = 0){
+        auto css = ow.cse;
+        int64_t len = css.size();
+
+        fastjet::contrib::SoftDrop sd(beta, symmetry_cut, R0);
+
+        for (unsigned int i = 0; i < css.size(); i++){
+            fastjet::PseudoJet sd_jet = sd(css[i]);
+        }
+      })
       .def("to_numpy_energy_correlators",
       [](const output_wrapper ow, const int n_jets = 1, const double beta = 1, double npoint = 0, int angles = 0, double alpha = 0, std::string func = "generalized", bool normalized = true) {
         auto css = ow.cse;
