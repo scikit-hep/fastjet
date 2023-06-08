@@ -137,7 +137,7 @@ class _classsingleevent:
             ),
             behavior=self.data.behavior,
         )
-    
+
     def exclusive_jets_up_to(self, n_jets):
         self._warn_for_exclusive()
         if n_jets == 0:
