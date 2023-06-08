@@ -416,7 +416,7 @@ class DaskAwkwardClusterSequence(ClusterSequence):
     def exclusive_jets(self, n_jets=-1, dcut=-1):
         return _dak_dispatch(self, "exclusive_jets", n_jets=n_jets, dcut=dcut)
 
-    def exclusive_jets_up_to(self, n_jets=-1)
+    def exclusive_jets_up_to(self, n_jets=-1):
         return _dak_dispatch(self, "exclusive_jets_up_to", n_jets=n_jets)
 
     def exclusive_jets_ycut(self, ycut=-1):
