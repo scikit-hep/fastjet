@@ -112,21 +112,6 @@ PYBIND11_MODULE(_ext, m) {
         py::return_value_policy::take_ownership);
   /// Jet algorithm definitions
 
-  py::enum_<output_wrapper::SymmetryMeasure>(m, "SymmetryMeasure")
-        .value("scalar_z", scalar_z)
-        .value("vector_z", vector_z)
-        .value("y", y)
-        .value("theta_E", theta_E)
-        .value("cos_theta_E", cos_theta_E)
-        .export_values();
-      
-  py::enum_<RecursionChoice>(m, "RecursionChoice")
-        .value("larger_pt", larger_pt)
-        .value("larger_mt", larger_mt)
-        .value("larger_m", larger_m)
-        .value("larger_E", larger_E)
-        .export_values();
-
   py::class_<output_wrapper>(m, "output_wrapper")
     .def_property("cse", &output_wrapper::getCluster,&output_wrapper::setCluster)
     .def("to_numpy",
@@ -1598,20 +1583,27 @@ PYBIND11_MODULE(_ext, m) {
           pt, eta, phi, m of inclusive jets.
       )pbdoc")
       .def("to_numpy_softdrop_pruning",
-      [](const output_wrapper ow, double beta = 0, double symmetry_cut = 0.1, SymmetryMeasure symmetry_measure, double R0 = 0.8, double mu_cut = std::numeric_limits<double>::infinity(), RecursionChoice recuriosn_choice = larger_pt, const FunctionOfPseudoJet<PseudoJet> * subtractor = 0){
+      [](const output_wrapper ow, const int n_jets = 1, fastjet::contrib::RecursiveSymmetryCutBase::SymmetryMeasure symmetry_measure, 
+      double beta = 0, double symmetry_cut = 0.1, double R0 = 0.8){
+        
         auto css = ow.cse;
-        int64_t len = css.size();
 
-        fastjet::contrib::SoftDrop sd(beta, symmetry_cut, R0);
+        std::vector<double> groomed;
+        symmetry_measure = fastjet::contrib::RecursiveSymmetryCutBase::SymmetryMeasure::scalar_z;
+        fastjet::contrib::SoftDrop* sd = new fastjet::contrib::SoftDrop(beta, symmetry_cut, symmetry_measure, R0);
 
-        for (unsigned int i = 0; i < css.size(); i++){
-            fastjet::PseudoJet sd_jet = sd(css[i]);
+        for (unsigned int i = 0; i < css.size(); i++){  // iterate through events
+          auto jets = css[i]->exclusive_jets(n_jets);
+          for (unsigned int j = 0; j < jets.size(); j++){
+            auto soft = sd->result(jets[j]); //
+            groomed.push_back(soft.pt());
+          }
         }
+        return 0;
       })
       .def("to_numpy_energy_correlators",
       [](const output_wrapper ow, const int n_jets = 1, const double beta = 1, double npoint = 0, int angles = 0, double alpha = 0, std::string func = "generalized", bool normalized = true) {
         auto css = ow.cse;
-        int64_t len = css.size();
 
         std::transform(func.begin(), func.end(), func.begin(),
           [](unsigned char c){ return std::tolower(c); });
@@ -1659,7 +1651,6 @@ PYBIND11_MODULE(_ext, m) {
 
         for (unsigned int i = 0; i < css.size(); i++){  // iterate through events
           auto jets = css[i]->exclusive_jets(n_jets);
-          int size = css[i]->exclusive_jets(n_jets).size();
 
           for (unsigned int j = 0; j < jets.size(); j++){
             auto ecf_result = energy_correlator->result(jets[j]); //
@@ -1710,14 +1701,12 @@ PYBIND11_MODULE(_ext, m) {
         int *ptrjetoffsets = (int *)bufjetoffsets.ptr;
         size_t jetidx = 0;
 
-        size_t idxh = 0;
         ptrjetoffsets[jetidx] = 0;
         jetidx++;
         auto eventprev = 0;
 
         for (unsigned int i = 0; i < css.size(); i++){  // iterate through events
           auto jets = css[i]->exclusive_jets(n_jets);
-          int size = css[i]->exclusive_jets(n_jets).size();
           auto prev = ptrjetoffsets[jetidx-1];
 
           for (unsigned int j = 0; j < jets.size(); j++){
