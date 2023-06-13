@@ -217,6 +217,12 @@ class JetDefinition(JetDefinitionNoCast):
         super().__init__(
             jet_algorithm_in, R_in, recomb_scheme_in, strategy_in, nparameters_in
         )
+    
+    def __setstate__(self, state):
+        self.__init__(*state['args'])
+
+    def __getstate__(self):
+        return {'args': self.args}
 
 
 class ClusterSequence:  # The super class
