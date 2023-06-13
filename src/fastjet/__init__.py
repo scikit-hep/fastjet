@@ -224,10 +224,9 @@ class JetDefinition(JetDefinitionNoCast):
             new_args = args[:]
             new_args[1] = R_in
 
-        super().__init__(*new_args, **kwargs)
-
         self.args = new_args
         self.kwargs = new_kwargs
+        super().__init__(*new_args, **kwargs)
 
     def __setstate__(self, state):
         self.__init__(*state["args"], **state["kwargs"])
