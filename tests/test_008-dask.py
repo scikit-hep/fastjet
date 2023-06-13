@@ -12,7 +12,7 @@ vector = pytest.importorskip("vector")  # noqa: F401
 def test_multi():
     from distributed import Client
 
-    with Client() as client:
+    with Client() as _:
         array = ak.Array(
             [
                 [
