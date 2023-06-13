@@ -1583,14 +1583,45 @@ PYBIND11_MODULE(_ext, m) {
           pt, eta, phi, m of inclusive jets.
       )pbdoc")
       .def("to_numpy_softdrop_pruning",
-      [](const output_wrapper ow, const int n_jets = 1, fastjet::contrib::RecursiveSymmetryCutBase::SymmetryMeasure symmetry_measure, 
-      double beta = 0, double symmetry_cut = 0.1, double R0 = 0.8){
+      [](const output_wrapper ow, const int n_jets = 1, double beta = 0, double symmetry_cut = 0.1, 
+        std::string symmetry_measure = "scalar_z", double R0 = 0.8, std::string recursion_choice = "larger_pt",
+        const FunctionOfPseudoJet<PseudoJet> * subtractor = 0, double mu_cut = std::numeric_limits<double>::infinity()){
         
         auto css = ow.cse;
-
         std::vector<double> groomed;
-        symmetry_measure = fastjet::contrib::RecursiveSymmetryCutBase::SymmetryMeasure::scalar_z;
-        fastjet::contrib::SoftDrop* sd = new fastjet::contrib::SoftDrop(beta, symmetry_cut, symmetry_measure, R0);
+
+        fastjet::contrib::RecursiveSymmetryCutBase::SymmetryMeasure sym_meas;
+        if (symmetry_measure == "scalar_z") {
+          sym_meas = fastjet::contrib::RecursiveSymmetryCutBase::SymmetryMeasure::scalar_z;
+        }
+        else if (symmetry_measure == "vector_z") {
+          sym_meas = fastjet::contrib::RecursiveSymmetryCutBase::SymmetryMeasure::vector_z;
+        }
+        else if (symmetry_measure == "y") {
+          sym_meas = fastjet::contrib::RecursiveSymmetryCutBase::SymmetryMeasure::y;
+        }
+        else if (symmetry_measure == "theta_E") {
+          sym_meas = fastjet::contrib::RecursiveSymmetryCutBase::SymmetryMeasure::theta_E;
+        }
+        else if (symmetry_measure == "cos_theta_E") {
+          sym_meas = fastjet::contrib::RecursiveSymmetryCutBase::SymmetryMeasure::cos_theta_E;
+        }
+
+        fastjet::contrib::RecursiveSymmetryCutBase::RecursionChoice rec_choice;
+        if (recursion_choice == "larger_pt") {
+          rec_choice = fastjet::contrib::RecursiveSymmetryCutBase::RecursionChoice::larger_pt;
+        }
+        else if (recursion_choice == "larger_mt") {
+          rec_choice = fastjet::contrib::RecursiveSymmetryCutBase::RecursionChoice::larger_mt;
+        }
+        else if (recursion_choice == "larger_m") {
+          rec_choice = fastjet::contrib::RecursiveSymmetryCutBase::RecursionChoice::larger_m;
+        }
+        else if (recursion_choice == "larger_E") {
+          rec_choice = fastjet::contrib::RecursiveSymmetryCutBase::RecursionChoice::larger_E;
+        }
+        
+        fastjet::contrib::SoftDrop* sd = new fastjet::contrib::SoftDrop(beta, symmetry_cut, sym_meas, R0, mu_cut, rec_choice, subtractor);
 
         for (unsigned int i = 0; i < css.size(); i++){  // iterate through events
           auto jets = css[i]->exclusive_jets(n_jets);
