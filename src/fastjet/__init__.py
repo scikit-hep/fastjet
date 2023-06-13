@@ -222,7 +222,6 @@ class JetDefinition(JetDefinitionNoCast):
             new_kwargs["R_in"] = R_in
         else:
             new_args = (args[0], R_in, *args[2:])
-            new_args[1] = R_in
 
         self.args = new_args
         self.kwargs = new_kwargs
