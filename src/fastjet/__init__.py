@@ -189,11 +189,7 @@ __all__ = ("__version__",)
 
 
 class JetDefinition(JetDefinitionNoCast):
-    def __init__(
-        self,
-        *args,
-        **kwargs
-    ):
+    def __init__(self, *args, **kwargs):
         r"""
 
         `JetDefinition(JetAlgorithm jet_algorithm_in, double R_in, RecombinationScheme
@@ -203,15 +199,14 @@ class JetDefinition(JetDefinitionNoCast):
         how algorithically to run it).
 
         """
-        
+
         R_in = kwargs.pop("R_in", None)
         as_kwargs = False
         if R_in is None:
             R_in = args[1]
         else:
             as_kwargs = True
-           
-        
+
         if not isinstance(R_in, (float, int)):
             raise ValueError(
                 f"R_in should be a real number, got {R_in} of type {type(R_in)}"
@@ -219,7 +214,7 @@ class JetDefinition(JetDefinitionNoCast):
 
         if isinstance(R_in, int):
             R_in = float(R_in)
-        
+
         new_args = args
         new_kwargs = kwargs
         if as_kwargs:
@@ -229,13 +224,10 @@ class JetDefinition(JetDefinitionNoCast):
             new_args = args[:]
             new_args[1] = R_in
 
-        super().__init__(
-                *new_args, **kwargs
-        )
+        super().__init__(*new_args, **kwargs)
 
         self.args = new_args
         self.kwargs = new_kwargs
-        
 
     def __setstate__(self, state):
         self.__init__(*state["args"], **state["kwargs"])
