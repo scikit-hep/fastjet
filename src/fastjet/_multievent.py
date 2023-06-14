@@ -208,14 +208,23 @@ class _classmultievent:
         py = ak.unflatten(ak.Array(ak.contents.NumpyArray(np_results[1])), ak.Array(ak.contents.NumpyArray(np_results[4])), highlevel=False)
         pz = ak.unflatten(ak.Array(ak.contents.NumpyArray(np_results[2])), ak.Array(ak.contents.NumpyArray(np_results[4])), highlevel=False)
         E = ak.unflatten(ak.Array(ak.contents.NumpyArray(np_results[3])), ak.Array(ak.contents.NumpyArray(np_results[4])), highlevel=False)
-        #jetpt = ak.unflatten(ak.Array(ak.contents.NumpyArray(np_results[5])), ak.Array(ak.contents.NumpyArray(np_results[4])), highlevel=False)
-        #jeteta = ak.unflatten(ak.Array(ak.contents.NumpyArray(np_results[6])), ak.Array(ak.contents.NumpyArray(np_results[4])), highlevel=False)
-        #jetphi = ak.unflatten(ak.Array(ak.contents.NumpyArray(np_results[7])), ak.Array(ak.contents.NumpyArray(np_results[4])), highlevel=False)
-        #jetmass = ak.unflatten(ak.Array(ak.contents.NumpyArray(np_results[8])), ak.Array(ak.contents.NumpyArray(np_results[4])), highlevel=False)
+        jetpt = ak.Array(ak.contents.NumpyArray(np_results[5]))
+        jeteta = ak.Array(ak.contents.NumpyArray(np_results[6]))
+        jetphi = ak.Array(ak.contents.NumpyArray(np_results[7]))
+        jetmass = ak.Array(ak.contents.NumpyArray(np_results[8]))
 
-        out = ak.zip({"px": px, "py": py, "pz": pz, "E": E}, depth_limit=2)
+        out = ak.zip({
+            "constituents":
+                ak.zip(
+                    {"px": px, "py": py, "pz": pz, "E": E}, depth_limit=2),
+            "msoftdrop": jetmass,
+            "ptsoftdrop": jetpt,
+            "etasoftdrop": jeteta,
+            "phisoftdrop": jetphi,},
+            depth_limit=1
+        )
+
         return out
-
 
     def exclusive_jets_energy_correlator(
         self, njets=1, beta=1, npoint=0, angles=-1, alpha=0, func="generalized", normalized=True,
