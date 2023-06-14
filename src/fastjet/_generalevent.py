@@ -438,6 +438,23 @@ class _classgeneralevent:
             )
         res = ak.Array(self._replace_multi())
         return res
+    
+    def exclusive_jets_softdrop_grooming(
+        self, njets=1, beta = 0.0, symmetry_cut = 0.1, symmetry_measure = "scalar_z", R0 = 0.8, recursion_choice = "larger_pt",
+        #subtractor = 0, 
+        mu_cut = float('inf'),
+    ):
+        if njets <= 0:
+            raise ValueError("Njets cannot be <= 0")
+        
+        self._out = []
+        self._input_flag = 0
+        for i in range(len(self._clusterable_level)):
+            np_results = self._results[i].to_numpy_softdrop_grooming()
+            self._out.append(ak.Array(ak.contents.NumpyArray(np_results[0])))
+        res = ak.Array(self._replace_multi())
+        return res
+
 
     def exclusive_jets_energy_correlator(
         self, njets=1, n_point=0, angles: int = -1, beta=1, alpha=0, func="generalized", normalized=True,

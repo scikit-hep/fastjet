@@ -142,6 +142,16 @@ class AwkwardClusterSequence(ClusterSequence):
 
     def exclusive_jets_constituents(self, njets=10):
         return self._internalrep.exclusive_jets_constituents(njets)
+    
+    def exclusive_jets_softdrop_grooming(
+        self, njets=1, beta = 0.0, symmetry_cut = 0.1, symmetry_measure = "scalar_z", R0 = 0.8, recursion_choice = "larger_pt",
+        #subtractor = 0, 
+        mu_cut = float('inf'),
+    ):
+        return self._internalrep.exclusive_jets_softdrop_grooming(
+            njets, beta, symmetry_cut, symmetry_measure, R0, recursion_choice, #subtractor, 
+            mu_cut,
+        )
 
     def exclusive_jets_energy_correlator(
         self, njets=1, beta=1, npoint=0, angles=-1, alpha=0, func="generalized", normalized=True

@@ -180,6 +180,21 @@ class _classsingleevent:
         out = ak.Array(ak.contents.ListOffsetArray(ak.index.Index64(off), out.layout))
         return out[0]
 
+    def exclusive_jets_softdrop_grooming(
+        self, njets=1, beta = 0.0, symmetry_cut = 0.1, symmetry_measure = "scalar_z", R0 = 0.8, recursion_choice = "larger_pt",
+        #subtractor = 0, 
+        mu_cut = float('inf'),
+    ):
+        if njets <= 0:
+            raise ValueError("Njets cannot be <= 0")
+        
+        np_results = self._results.to_numpy_softdrop_grooming(
+            njets, beta, symmetry_cut, symmetry_measure, R0, recursion_choice, #subtractor, 
+            mu_cut,
+        )
+        out = ak.Array(ak.contents.NumpyArray(np_results))
+        return out[0]
+
     def exclusive_jets_energy_correlator(
         self, njets=1, beta=1, npoint=0, angles=-1, alpha=0, func="generalized", normalized=True,
     ):
