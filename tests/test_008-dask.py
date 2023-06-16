@@ -93,6 +93,7 @@ def test_single():
 
 def test_inclusive_from_file():
     import os
+
     import uproot
     from dask_awkward.lib.testutils import assert_eq
 
