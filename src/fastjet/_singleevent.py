@@ -180,6 +180,40 @@ class _classsingleevent:
         out = ak.Array(ak.contents.ListOffsetArray(ak.index.Index64(off), out.layout))
         return out[0]
 
+    def exclusive_jets_softdrop_grooming(
+        self, njets=1, beta = 0.0, symmetry_cut = 0.1, symmetry_measure = "scalar_z", R0 = 0.8, recursion_choice = "larger_pt",
+        #subtractor = 0, 
+        mu_cut = float('inf'),
+    ):
+        if njets <= 0:
+            raise ValueError("Njets cannot be <= 0")
+        
+        np_results = self._results.to_numpy_softdrop_grooming(
+            njets, beta, symmetry_cut, symmetry_measure, R0, recursion_choice, #subtractor, 
+            mu_cut,
+        )
+
+        px = ak.unflatten(ak.Array(ak.contents.NumpyArray(np_results[0])), ak.Array(ak.contents.NumpyArray(np_results[4])), highlevel=False)
+        py = ak.unflatten(ak.Array(ak.contents.NumpyArray(np_results[1])), ak.Array(ak.contents.NumpyArray(np_results[4])), highlevel=False)
+        pz = ak.unflatten(ak.Array(ak.contents.NumpyArray(np_results[2])), ak.Array(ak.contents.NumpyArray(np_results[4])), highlevel=False)
+        E = ak.unflatten(ak.Array(ak.contents.NumpyArray(np_results[3])), ak.Array(ak.contents.NumpyArray(np_results[4])), highlevel=False)
+        jetpt = ak.Array(ak.contents.NumpyArray(np_results[5]))
+        jeteta = ak.Array(ak.contents.NumpyArray(np_results[6]))
+        jetphi = ak.Array(ak.contents.NumpyArray(np_results[7]))
+        jetmass = ak.Array(ak.contents.NumpyArray(np_results[8]))
+
+        out = ak.zip({
+            "constituents":
+                ak.zip(
+                    {"px": px, "py": py, "pz": pz, "E": E}, depth_limit=2),
+            "msoftdrop": jetmass,
+            "ptsoftdrop": jetpt,
+            "etasoftdrop": jeteta,
+            "phisoftdrop": jetphi,},
+            depth_limit=1
+        )
+        return out[0]
+
     def exclusive_jets_energy_correlator(
         self, njets=1, beta=1, npoint=0, angles=-1, alpha=0, func="generalized", normalized=True,
     ):

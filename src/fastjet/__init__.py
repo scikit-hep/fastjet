@@ -369,16 +369,27 @@ class ClusterSequence:  # The super class
         """
 
         raise AssertionError()
+    
+    def exclusive_jets_softdrop_grooming(
+        self, njets: int = 1, beta: int = 0, symmetry_cut: float = 0.1, symmetry_measure="scalar_z", R0: float = 0.8, recursion_choice="larger_pt",
+        #subtractor: int = 0,
+        mu_cut: float = float('inf'),
+    ) -> ak.Array:
+        """Performs softdrop pruning on jets.
+        Args:
+          n_jets: number of exclusive subjets.
+          beta: softdrop beta parameter.
+          symmetry_cut: softdrop symmetry cut value.
+          symmetry_measure: Which symmetry measure to use, found in RecursiveSymmetryCutBase.hh
+          R0: softdrop R0 parameter.
+          recursion_choice: Which recursion choice to use, found in RecursiveSymmetryCutBase.hh
+          subtractor: an optional pointer to a pileup subtractor (ignored if zero)
+        Returns:
+          Returns an array of values from the jet after it has been groomed by softdrop."""
+        raise AssertionError()
 
     def exclusive_jets_energy_correlator(
-        self,
-        njets: int = 1,
-        beta: int = 1,
-        npoint: int = 0,
-        angles: int = -1,
-        alpha=0,
-        func="generalized",
-        normalized=True,
+        self, njets: int = 1, beta: int = 1, npoint: int = 0, angles: int = -1, alpha=0, func="generalized", normalized=True,
     ) -> ak.Array:
         """Returns the energy correlator of each exclusive jet.
 
@@ -391,6 +402,7 @@ class ClusterSequence:  # The super class
         Returns:
             awkward.highlevel.Array: Returns an Awkward Array of the same type as the input.
         """
+        raise AssertionError()
 
     def exclusive_jets_lund_declusterings(self, njets: int = 10) -> ak.Array:
         """Returns the Lund declustering Delta and k_T parameters from exclusive n_jets.
