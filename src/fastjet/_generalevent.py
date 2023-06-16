@@ -450,8 +450,31 @@ class _classgeneralevent:
         self._out = []
         self._input_flag = 0
         for i in range(len(self._clusterable_level)):
-            np_results = self._results[i].to_numpy_softdrop_grooming()
-            self._out.append(ak.Array(ak.contents.NumpyArray(np_results[0])))
+            np_results = self._results.to_numpy_softdrop_grooming(
+            njets, beta, symmetry_cut, symmetry_measure, R0, recursion_choice, #subtractor, 
+            mu_cut,
+        )
+
+        px = ak.unflatten(ak.Array(ak.contents.NumpyArray(np_results[0])), ak.Array(ak.contents.NumpyArray(np_results[4])), highlevel=False)
+        py = ak.unflatten(ak.Array(ak.contents.NumpyArray(np_results[1])), ak.Array(ak.contents.NumpyArray(np_results[4])), highlevel=False)
+        pz = ak.unflatten(ak.Array(ak.contents.NumpyArray(np_results[2])), ak.Array(ak.contents.NumpyArray(np_results[4])), highlevel=False)
+        E = ak.unflatten(ak.Array(ak.contents.NumpyArray(np_results[3])), ak.Array(ak.contents.NumpyArray(np_results[4])), highlevel=False)
+        jetpt = ak.Array(ak.contents.NumpyArray(np_results[5]))
+        jeteta = ak.Array(ak.contents.NumpyArray(np_results[6]))
+        jetphi = ak.Array(ak.contents.NumpyArray(np_results[7]))
+        jetmass = ak.Array(ak.contents.NumpyArray(np_results[8]))
+
+        self._out.append(ak.zip({
+            "constituents":
+                ak.zip(
+                    {"px": px, "py": py, "pz": pz, "E": E}, depth_limit=2),
+            "msoftdrop": jetmass,
+            "ptsoftdrop": jetpt,
+            "etasoftdrop": jeteta,
+            "phisoftdrop": jetphi,},
+            depth_limit=1
+            )
+        )
         res = ak.Array(self._replace_multi())
         return res
 

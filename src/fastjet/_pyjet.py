@@ -438,6 +438,24 @@ class DaskAwkwardClusterSequence(ClusterSequence):
     def exclusive_jets_constituents(self, njets=10):
         return _dak_dispatch(self, "exclusive_jets_constituents", njets=njets)
 
+    def exclusive_jets_softdrop_grooming(
+        self, njets=1, beta = 0.0, symmetry_cut = 0.1, symmetry_measure = "scalar_z", R0 = 0.8, recursion_choice = "larger_pt",
+        #subtractor = 0, 
+        mu_cut = float('inf'),
+    ):
+        return _dak_dispatch(
+            self,
+            "exclusive_jets_softdrop_grooming",
+            njets=njets, 
+            beta=beta, 
+            symmetry_cut=symmetry_cut, 
+            symmetry_measure=symmetry_measure, 
+            R0=R0, 
+            recursion_choice=recursion_choice, 
+            #subtractor=subtractor, 
+            mu_cut=mu_cut,
+        )
+
     def exclusive_jets_energy_correlator(
         self, njets=1, beta=1, npoint=0, angles=-1, alpha=0, func="generalized", normalized=False,
     ):
