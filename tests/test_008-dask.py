@@ -91,7 +91,9 @@ def test_single():
         ]
         assert constituent_output == cluster.constituents().compute().to_list()
         constituent_index_output = [[0], [1, 2]]
-        assert constituent_index_output == cluster.constituent_index().compute().to_list()
+        assert (
+            constituent_index_output == cluster.constituent_index().compute().to_list()
+        )
 
 
 def test_inclusive_from_file():
@@ -100,7 +102,7 @@ def test_inclusive_from_file():
     import uproot
     from dask_awkward.lib.testutils import assert_eq
     from distributed import Client
-    
+
     with Client() as _:
         data_dir = Path(__file__).parent / "samples"
         testfile = data_dir / "pfnano_skim.root"
