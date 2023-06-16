@@ -92,12 +92,13 @@ def test_single():
 
 
 def test_inclusive_from_file():
+    import os
     import uproot
     from dask_awkward.lib.testutils import assert_eq
 
     vector = pytest.importorskip("vector")
 
-    testfile = "https://github.com/scikit-hep/fastjet/blob/main/tests/samples/pfnano_skim.root?raw=true"
+    testfile = os.getcwd() + "/tests/samples/pfnano_skim.root"
 
     devents = uproot.dask({testfile: "Events"})
 
