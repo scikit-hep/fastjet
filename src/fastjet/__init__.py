@@ -371,13 +371,7 @@ class ClusterSequence:  # The super class
         raise AssertionError()
     
     def exclusive_jets_softdrop_grooming(
-        self,
-        njets: int = 1,
-        beta: int = 0,
-        symmetry_cut: float = 0.1,
-        symmetry_measure="scalar_z",
-        R0: float = 0.8,
-        recursion_choice="larger_pt",
+        self, njets: int = 1, beta: int = 0, symmetry_cut: float = 0.1, symmetry_measure="scalar_z", R0: float = 0.8, recursion_choice="larger_pt",
         #subtractor: int = 0,
         mu_cut: float = float('inf'),
     ) -> ak.Array:
@@ -395,14 +389,7 @@ class ClusterSequence:  # The super class
         raise AssertionError()
 
     def exclusive_jets_energy_correlator(
-        self,
-        njets: int = 1,
-        beta: int = 1,
-        npoint: int = 0,
-        angles: int = -1,
-        alpha=0,
-        func="generalized",
-        normalized=True,
+        self, njets: int = 1, beta: int = 1, npoint: int = 0, angles: int = -1, alpha=0, func="generalized", normalized=True,
     ) -> ak.Array:
         """Returns the energy correlator of each exclusive jet.
 

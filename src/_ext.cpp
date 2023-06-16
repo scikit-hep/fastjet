@@ -13,9 +13,9 @@
 #include <fastjet/GhostedAreaSpec.hh>
 #include <fastjet/JetDefinition.hh>
 #include <fastjet/PseudoJet.hh>
-#include <fastjet/contrib/SoftDrop.hh>
 #include <fastjet/contrib/EnergyCorrelator.hh>
 #include <fastjet/contrib/LundGenerator.hh>
+#include <fastjet/contrib/SoftDrop.hh>
 
 #include <pybind11/numpy.h>
 #include <pybind11/operators.h>
@@ -1585,7 +1585,7 @@ PYBIND11_MODULE(_ext, m) {
           pt, eta, phi, m of inclusive jets.
       )pbdoc")
       .def("to_numpy_softdrop_grooming",
-      [](const output_wrapper ow, const int n_jets = 1, double beta = 0, double symmetry_cut = 0.1, 
+      [](const output_wrapper ow, const int n_jets = 1, double beta = 0, double symmetry_cut = 0.1,
         std::string symmetry_measure = "scalar_z", double R0 = 0.8, std::string recursion_choice = "larger_pt",
         /*const FunctionOfPseudoJet<PseudoJet> * subtractor = 0,*/ double mu_cut = std::numeric_limits<double>::infinity()){
         
@@ -1630,13 +1630,13 @@ PYBIND11_MODULE(_ext, m) {
         else if (recursion_choice == "larger_E") {
           rec_choice = fastjet::contrib::RecursiveSymmetryCutBase::RecursionChoice::larger_E;
         }
-        
+
         fastjet::contrib::SoftDrop* sd = new fastjet::contrib::SoftDrop(beta, symmetry_cut, sym_meas, R0, mu_cut, rec_choice/*, subtractor*/);
 
         for (unsigned int i = 0; i < css.size(); i++){  // iterate through events
           auto jets = css[i]->exclusive_jets(n_jets);
           for (unsigned int j = 0; j < jets.size(); j++){
-            auto soft = sd->result(jets[j]); 
+            auto soft = sd->result(jets[j]);
             nconstituents.push_back(soft.constituents().size());
             jet_groomed_pt.push_back(soft.pt());
             jet_groomed_eta.push_back(soft.eta());
