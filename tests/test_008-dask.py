@@ -92,14 +92,15 @@ def test_single():
 
 
 def test_inclusive_from_file():
-    import os
+    from pathlib import Path
 
     import uproot
     from dask_awkward.lib.testutils import assert_eq
 
     vector = pytest.importorskip("vector")
 
-    testfile = os.getcwd() + "/tests/samples/pfnano_skim.root"
+    data_dir = Path(__file__).parent / "samples"
+    testfile = data_dir / "pfnano_skim.root"
 
     devents = uproot.dask({testfile: "Events"})
 
