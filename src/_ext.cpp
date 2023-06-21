@@ -1643,7 +1643,6 @@ PYBIND11_MODULE(_ext, m) {
       .def("to_numpy_energy_correlators",
       [](const output_wrapper ow, const int n_jets = 1, const double beta = 1, double npoint = 0, int angles = 0, double alpha = 0, std::string func = "generalized") {
         auto css = ow.cse;
-        int64_t len = css.size();
 
         std::transform(func.begin(), func.end(), func.begin(),
           [](unsigned char c){ return std::tolower(c); });
@@ -1689,7 +1688,6 @@ PYBIND11_MODULE(_ext, m) {
 
         for (unsigned int i = 0; i < css.size(); i++){  // iterate through events
           auto jets = css[i]->exclusive_jets(n_jets);
-          int size = css[i]->exclusive_jets(n_jets).size();
 
           for (unsigned int j = 0; j < jets.size(); j++){
             auto ecf_result = energy_correlator->result(jets[j]); //
@@ -1740,14 +1738,12 @@ PYBIND11_MODULE(_ext, m) {
         int *ptrjetoffsets = (int *)bufjetoffsets.ptr;
         size_t jetidx = 0;
 
-        size_t idxh = 0;
         ptrjetoffsets[jetidx] = 0;
         jetidx++;
         auto eventprev = 0;
 
         for (unsigned int i = 0; i < css.size(); i++){  // iterate through events
           auto jets = css[i]->exclusive_jets(n_jets);
-          int size = css[i]->exclusive_jets(n_jets).size();
           auto prev = ptrjetoffsets[jetidx-1];
 
           for (unsigned int j = 0; j < jets.size(); j++){
