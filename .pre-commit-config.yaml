@@ -24,7 +24,7 @@ repos:
   - id: isort
 
 - repo: https://github.com/asottile/pyupgrade
-  rev: v3.6.0
+  rev: v3.7.0
   hooks:
   - id: pyupgrade
     args: ["--py36-plus"]
@@ -48,7 +48,7 @@ repos:
     stages: [manual]
 
 - repo: https://github.com/pre-commit/mirrors-clang-format
-  rev: "v16.0.4"
+  rev: "v16.0.6"
   hooks:
     - id: clang-format
       types_or: [c++, c, cuda]
