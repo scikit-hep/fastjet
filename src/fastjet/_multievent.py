@@ -147,6 +147,29 @@ class _classmultievent:
             behavior=self.data.behavior,
         )
 
+    def exclusive_jets_up_to(self, n_jets):
+        self._warn_for_exclusive()
+        if n_jets == 0:
+            raise ValueError("Njets cannot be 0")
+        np_results = self._results.to_numpy_exclusive_njet_up_to(n_jets)
+        of = np_results[-1]
+        return ak.Array(
+            ak.contents.ListOffsetArray(
+                ak.index.Index64(of),
+                ak.contents.RecordArray(
+                    (
+                        ak.contents.NumpyArray(np_results[0]),
+                        ak.contents.NumpyArray(np_results[1]),
+                        ak.contents.NumpyArray(np_results[2]),
+                        ak.contents.NumpyArray(np_results[3]),
+                    ),
+                    ("px", "py", "pz", "E"),
+                    parameters={"__record__": "Momentum4D"},
+                ),
+            ),
+            behavior=self.data.behavior,
+        )
+
     def exclusive_jets_ycut(self, ycut):
         np_results = self._results.to_numpy_exclusive_ycut(ycut)
         of = np_results[-1]
