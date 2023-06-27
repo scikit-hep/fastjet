@@ -37,7 +37,7 @@ The JetDefinition class takes `JetAlgorithms <http://fastjet.fr/repo/doxygen-3.4
 	d_{ij} &= \frac{\Delta R_{ij}^2}{R^2}, \\
 	d_{iB} &= 1.
 	\end{align*}
-* ``antikt_algorithm`` : Like the :math:`k_t` but with distance measures 
+* ``antikt_algorithm`` : Like the :math:`k_t` but with distance measures
 
   .. math::
 	\begin{align*}
@@ -59,7 +59,7 @@ The JetDefinition class takes `JetAlgorithms <http://fastjet.fr/repo/doxygen-3.4
     d_{ij} = 2\min(E_{i}^{2},E_{j}^{2}) (1-\cos\theta_{ij}).
 
 * ``ee_genkt_algorithm`` : The :math:`e^+e^-` ``genkt`` algorithm with distance measures
-  
+
   .. math::
 	\begin{align*}
     d_{ij} &= \min(E_{i}^{2p},E_{j}^{2p}) \frac{1-\cos\theta_{ij}}{1-\cos R}, \\
