@@ -105,13 +105,14 @@ The ``with_name`` argument is used to specify the name of the vector that will b
 The previous example with ``("px", "py", "pz", "E")`` fields still works: ::
 
 	>>> array3 = ak.Array(
-    ...     [
-    ...         {"px": 1.2, "py": 3.2, "pz": 5.4, "E": 23.5},
-    ...         {"px": 32.2, "py": 64.21, "pz": 543.34, "E": 755.12},
-    ...         {"px": 32.45, "py": 63.21, "pz": 543.14, "E": 835.56},
-    ...     ],
+	...     [
+	...         {"px": 1.2, "py": 3.2, "pz": 5.4, "E": 23.5},
+	...         {"px": 32.2, "py": 64.21, "pz": 543.34, "E": 755.12},
+	...         {"px": 32.45, "py": 63.21, "pz": 543.14, "E": 835.56},
+	...     ],
 	...     with_name="Momentum4D",
-    ... )
+	... )
+
 
 It is good practice to register the behavior of the vector before using it in ``fastjet``.
 
@@ -121,21 +122,21 @@ ClusterSequence Class
 After defining the JetDefinition class, the user can provide this instance to the ClusterSequence class as an argument, along with the input data to perform the clustering: ::
 
 	>>> cluster = fastjet.ClusterSequence(array1, jetdef)
-			#--------------------------------------------------------------------------
-			#                         FastJet release 3.4.1
-			#                 M. Cacciari, G.P. Salam and G. Soyez
-			#     A software package for jet finding and analysis at colliders
-			#                           http://fastjet.fr
-			#
-			# Please cite EPJC72(2012)1896 [arXiv:1111.6097] if you use this package
-			# for scientific work and optionally PLB641(2006)57 [hep-ph/0512210].
-			#
-			# FastJet is provided without warranty under the GNU GPL v2 or higher.
-			# It uses T. Chan's closest pair algorithm, S. Fortune's Voronoi code,
-			# CGAL and 3rd party plugin jet algorithms. See COPYING file for details.
-			#--------------------------------------------------------------------------
+	#--------------------------------------------------------------------------
+	#                         FastJet release 3.4.1
+	#                 M. Cacciari, G.P. Salam and G. Soyez
+	#     A software package for jet finding and analysis at colliders
+	#                           http://fastjet.fr
+	#
+	# Please cite EPJC72(2012)1896 [arXiv:1111.6097] if you use this package
+	# for scientific work and optionally PLB641(2006)57 [hep-ph/0512210].
+	#
+	# FastJet is provided without warranty under the GNU GPL v2 or higher.
+	# It uses T. Chan's closest pair algorithm, S. Fortune's Voronoi code,
+	# CGAL and 3rd party plugin jet algorithms. See COPYING file for details.
+	#--------------------------------------------------------------------------
 	>>> cluster
-           <fastjet._pyjet.AwkwardClusterSequence object at 0x7f1413120a90>
+	<fastjet._pyjet.AwkwardClusterSequence object at 0x7f1413120a90>
 
 
 Extracting Information
@@ -143,7 +144,7 @@ Extracting Information
 Any output that has to be an Array will be an Awkward Array in the array oriented interface. For example: ::
 
 	>>> cluster.inclusive_jets()
-	   <MomentumArray4D [{px: 1.2, py: 3.2, pz: 5.4, ...}, ...] type='2 * Momentum...'>
+	<MomentumArray4D [{px: 1.2, py: 3.2, pz: 5.4, ...}, ...] type='2 * Momentum...'>
 
 Limitations
 -----------
