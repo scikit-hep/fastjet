@@ -96,14 +96,14 @@ After defining the JetDefinition class, the user can provide this instance to th
 	>>> cluster = fastjet.ClusterSequence(array, jetdef)
 	#--------------------------------------------------------------------------
 	#                         FastJet release 3.4.1
-	#                 M. Cacciari, G.P. Salam and G. Soyez                  
-	#     A software package for jet finding and analysis at colliders      
-	#                           http://fastjet.fr                           
-	#	                                                                      
+	#                 M. Cacciari, G.P. Salam and G. Soyez
+	#     A software package for jet finding and analysis at colliders
+	#                           http://fastjet.fr
+	#
 	# Please cite EPJC72(2012)1896 [arXiv:1111.6097] if you use this package
-	# for scientific work and optionally PLB641(2006)57 [hep-ph/0512210].   
-	#                                                                       
-	# FastJet is provided without warranty under the GNU GPL v2 or higher.  
+	# for scientific work and optionally PLB641(2006)57 [hep-ph/0512210].
+	#
+	# FastJet is provided without warranty under the GNU GPL v2 or higher.
 	# It uses T. Chan's closest pair algorithm, S. Fortune's Voronoi code,
 	# CGAL and 3rd party plugin jet algorithms. See COPYING file for details.
 	#--------------------------------------------------------------------------
