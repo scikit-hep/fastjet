@@ -8,9 +8,9 @@ Clustering Specification
 
 The fastjet library has some clases specifically made to provide the different parameters for clustering. This includes the following classes :
 
-* `JetDefinition <http://fastjet.fr/repo/doxygen-3.4.0/classfastjet_1_1JetDefinition.html>`__
-* `AreaDefinition <http://fastjet.fr/repo/doxygen-3.4.0/classfastjet_1_1AreaDefinition.html>`__
-* `RangeDefinition <http://fastjet.fr/repo/doxygen-3.4.0/classfastjet_1_1RangeDefinition.html>`__
+* `JetDefinition <http://fastjet.fr/repo/doxygen-3.4.1/classfastjet_1_1JetDefinition.html>`__
+* `AreaDefinition <http://fastjet.fr/repo/doxygen-3.4.1/classfastjet_1_1AreaDefinition.html>`__
+* `RangeDefinition <http://fastjet.fr/repo/doxygen-3.4.1/classfastjet_1_1RangeDefinition.html>`__
 
 For example, the JetDefinition class can be instantiated in the following way: ::
 
@@ -21,16 +21,56 @@ The JetDefinition class takes varied number of arguments, the first argument is 
 
 The JetAlgorithms
 ----------------------
-The JetDefinition class takes `JetAlgorithms <http://fastjet.fr/repo/doxygen-3.4.0/namespacefastjet.html#a6377b557cbb936d4046d2aa936170dc0>`__  as arguments. In the above example we have chosen the Anti-kt algorithm. The list of algorithms is as following:
+The JetDefinition class takes `JetAlgorithms <http://fastjet.fr/repo/doxygen-3.4.1/namespacefastjet.html#a6377b557cbb936d4046d2aa936170dc0>`__  as arguments. In the above example we have chosen the Anti-kt algorithm. The list of algorithms is as following:
 
-* ``ee_genkt_algorithm`` : The e+e- genkt algorithm (R > 2 and p=1 gives ee_kt)
-* ``ee_kt_algorithm`` : The e+e- kt algorithm
-* ``genkt_algorithm`` : Like the k_t but with distance measures dij = min(kti^{2p},ktj^{2p}) Delta R_{ij}^2 / R^2 diB = 1/kti^{2p} where p = extra_param()
-* ``kt_algorithm`` : The longitudinally invariant kt algorithm
-* ``cambridge_for_passive_algorithm`` : A version of cambridge with a special distance measure for particles whose pt is < extra_param(); This is not usually intended for end users, but is instead automatically selected when requesting a passive Cambridge area.
-* ``cambridge_algorithm`` : The longitudinally invariant variant of the cambridge algorithm (aka Aachen algoithm).
-* ``antikt_algorithm`` : Like the k_t but with distance measures dij = min(1/kti^2,1/ktj^2) Delta R_{ij}^2 / R^2 diB = 1/kti^2
-* There are other algorithms mentioned do not work.
+* ``kt_algorithm`` : The longitudinally invariant :math:`k_t` algorithm with distance measures
+
+  .. math::
+	\begin{align*}
+	d_{ij} &= \min(p_{Ti}^2,p_{Tj}^2) \frac{\Delta R_{ij}^2}{R^2}, \\
+	d_{iB} &= p_{Ti}^2.
+	\end{align*}
+* ``cambridge_algorithm`` : The longitudinally invariant variant of the cambridge algorithm (aka Aachen algoithm) with distance measures
+
+  .. math::
+	\begin{align*}
+	d_{ij} &= \frac{\Delta R_{ij}^2}{R^2}, \\
+	d_{iB} &= 1.
+	\end{align*}
+* ``antikt_algorithm`` : Like the :math:`k_t` but with distance measures 
+
+  .. math::
+	\begin{align*}
+	d_{ij} &= \min(p_{Ti}^{-2},p_{Tj}^{-2}) \frac{\Delta R_{ij}^2}{R^2}, \\
+	d_{iB} &= p_{Ti}^{-2}.
+	\end{align*}
+* ``genkt_algorithm`` : The generalized :math:`k_t` algorithm but with distance measures
+
+  .. math::
+	\begin{align*}
+    d_{ij} &= \min(p_{Ti}^{2p},p_{Tj}^{2p}) \frac{\Delta R_{ij}^2}{R^2}, \\
+    d_{iB} &= p_{Ti}^{2p}
+	\end{align*}
+
+  where ``p = extra_param()``. Special cases are for :math:`p=1` (gives the :math:`k_t` algorithm), :math:`p=0` (gives the Cambridge/Aachen algorithm), and :math:`p=-1` (gives the anti-:math:`k_t` algorithm),.
+* ``ee_kt_algorithm`` : The :math:`e^+e^-` :math:`k_t` algorithm (also known as Durham algoithm) with distance measure
+
+  .. math::
+    d_{ij} = 2\min(E_{i}^{2},E_{j}^{2}) (1-\cos\theta_{ij}).
+
+* ``ee_genkt_algorithm`` : The :math:`e^+e^-` ``genkt`` algorithm with distance measures
+  
+  .. math::
+	\begin{align*}
+    d_{ij} &= \min(E_{i}^{2p},E_{j}^{2p}) \frac{1-\cos\theta_{ij}}{1-\cos R}, \\
+    d_{iB} &= E_{i}^{2p}
+	\end{align*}
+
+  For :math:`\pi < R < 3\pi` and :math:`p=1` it gives the ``ee_kt`` algorithm.
+* ``cambridge_for_passive_algorithm`` : A version of cambridge with a special distance measure for particles with ``pt < extra_param()``. This is not usually intended for end users, but is instead automatically selected when requesting a passive Cambridge area.
+* Other algorithms that are not mentioned are most likely not implemented yet.
+
+For a more complete description of the algorithms, please refer to the `fastjet manual <http://fastjet.fr/repo/fastjet-doc-3.4.1.pdf>`__.
 
 The Data
 ---------
