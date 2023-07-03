@@ -201,6 +201,8 @@ class _classsingleevent:
         jeteta = ak.Array(ak.contents.NumpyArray(np_results[6]))
         jetphi = ak.Array(ak.contents.NumpyArray(np_results[7]))
         jetmass = ak.Array(ak.contents.NumpyArray(np_results[8]))
+        jetE = ak.Array(ak.contents.NumpyArray(np_results[9]))
+        jetpz = ak.Array(ak.contents.NumpyArray(np_results[10]))
 
         out = ak.zip({
             "constituents":
@@ -209,7 +211,9 @@ class _classsingleevent:
             "msoftdrop": jetmass,
             "ptsoftdrop": jetpt,
             "etasoftdrop": jeteta,
-            "phisoftdrop": jetphi,},
+            "phisoftdrop": jetphi,
+            "Esoftdrop": jetE,
+            "pzsoftdrop": jetpz,},
             depth_limit=1
         )
         return out[0]

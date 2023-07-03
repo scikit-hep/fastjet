@@ -173,6 +173,32 @@ def test_exclusive_lund_declustering_multi():
 
     assert ak.all(is_close)
 
+def test_exclsuive_jets_softdrop_grooming():
+    array = ak.Array(
+        [
+            {"px": -13.5, "py": 9.38, "pz": 17.8, "E": 24.2, "ex": 0.78},
+            {"px": -8.6, "py": 6.05, "pz": 12.2, "E": 16.1, "ex": 0.78},
+            {"px": -4.86, "py": 3.38, "pz": 6.71, "E": 8.95, "ex": 0.78},
+            {"px": -70.7, "py": 48.0, "pz": 96.5, "E": 129.0, "ex": 0.35},
+            {"px": -33.4, "py": 22.6, "pz": 45.5, "E": 60.8, "ex": 0.0},
+        ],
+        with_name="Momentum4D",
+    )
+
+    jetdef = fastjet.JetDefinition(fastjet.cambridge_algorithm, 0.8)
+    cluster = fastjet._pyjet.AwkwardClusterSequence(array, jetdef)
+
+    softdrop = cluster.exclusive_jets_softdrop_grooming()
+    
+    #softdrop_output = ak.Array(
+    #    ak.zip(
+    #        "consituents": 
+    #            {"px": 32.2, "py": 64.21, "pz": 543.34, "E": 24.12},
+    #            {"px": 32.45, "py": 63.21, "pz": 543.14, "E": 24.56},
+    #        "msoftdrop":
+
+            
+    #    )
 
 def test_exclusive_energy_correlator():
     array = ak.Array(

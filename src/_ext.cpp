@@ -1599,6 +1599,8 @@ PYBIND11_MODULE(_ext, m) {
         std::vector<double> jet_groomed_eta;
         std::vector<double> jet_groomed_phi;
         std::vector<double> jet_groomed_m;
+        std::vector<double> jet_groomed_E;
+        std::vector<double> jet_groomed_pz;
 
         fastjet::contrib::RecursiveSymmetryCutBase::SymmetryMeasure sym_meas = fastjet::contrib::RecursiveSymmetryCutBase::SymmetryMeasure::scalar_z;
         if (symmetry_measure == "scalar_z") {
@@ -1642,6 +1644,8 @@ PYBIND11_MODULE(_ext, m) {
             jet_groomed_eta.push_back(soft.eta());
             jet_groomed_phi.push_back(soft.phi());
             jet_groomed_m.push_back(soft.m());
+            jet_groomed_E.push_back(soft.E());
+            jet_groomed_pz.push_back(soft.pz());
             for (unsigned int k = 0; k < soft.constituents().size(); k++){
               consts_groomed_px.push_back(soft.constituents()[k].px());
               consts_groomed_py.push_back(soft.constituents()[k].py());
@@ -1660,6 +1664,8 @@ PYBIND11_MODULE(_ext, m) {
         auto jet_eta = py::array(jet_groomed_eta.size(), jet_groomed_eta.data());
         auto jet_phi = py::array(jet_groomed_phi.size(), jet_groomed_phi.data());
         auto jet_m = py::array(jet_groomed_m.size(), jet_groomed_m.data());
+        auto jet_E = py::array(jet_groomed_E.size(), jet_groomed_E.data());
+        auto jet_pz = py::array(jet_groomed_pz.size(), jet_groomed_pz.data());
 
         return std::make_tuple(
             consts_px,
@@ -1670,7 +1676,9 @@ PYBIND11_MODULE(_ext, m) {
             jet_pt,
             jet_eta,
             jet_phi,
-            jet_m
+            jet_m,
+            jet_E,
+            jet_pz
           );
       }, R"pbdoc(
         Performs softdrop pruning on jets.
