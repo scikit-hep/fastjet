@@ -450,7 +450,7 @@ class _classgeneralevent:
         self._out = []
         self._input_flag = 0
         for i in range(len(self._clusterable_level)):
-            np_results = self._results.to_numpy_softdrop_grooming(
+            np_results = self._results[i].to_numpy_softdrop_grooming(
             njets, beta, symmetry_cut, symmetry_measure, R0, recursion_choice, #subtractor, 
             mu_cut,
         )
