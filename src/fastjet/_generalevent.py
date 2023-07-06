@@ -438,27 +438,54 @@ class _classgeneralevent:
             )
         res = ak.Array(self._replace_multi())
         return res
-    
+
     def exclusive_jets_softdrop_grooming(
-        self, njets=1, beta = 0.0, symmetry_cut = 0.1, symmetry_measure = "scalar_z", R0 = 0.8, recursion_choice = "larger_pt",
-        #subtractor = 0, 
-        mu_cut = float('inf'),
+        self,
+        njets=1,
+        beta=0.0,
+        symmetry_cut=0.1,
+        symmetry_measure="scalar_z",
+        R0=0.8,
+        recursion_choice="larger_pt",
+        # subtractor = 0,
+        mu_cut=float("inf"),
     ):
         if njets <= 0:
             raise ValueError("Njets cannot be <= 0")
-        
+
         self._out = []
         self._input_flag = 0
         for i in range(len(self._clusterable_level)):
             np_results = self._results[i].to_numpy_softdrop_grooming(
-            njets, beta, symmetry_cut, symmetry_measure, R0, recursion_choice, #subtractor, 
-            mu_cut,
-        )
+                njets,
+                beta,
+                symmetry_cut,
+                symmetry_measure,
+                R0,
+                recursion_choice,  # subtractor,
+                mu_cut,
+            )
 
-        px = ak.unflatten(ak.Array(ak.contents.NumpyArray(np_results[0])), ak.Array(ak.contents.NumpyArray(np_results[4])), highlevel=False)
-        py = ak.unflatten(ak.Array(ak.contents.NumpyArray(np_results[1])), ak.Array(ak.contents.NumpyArray(np_results[4])), highlevel=False)
-        pz = ak.unflatten(ak.Array(ak.contents.NumpyArray(np_results[2])), ak.Array(ak.contents.NumpyArray(np_results[4])), highlevel=False)
-        E = ak.unflatten(ak.Array(ak.contents.NumpyArray(np_results[3])), ak.Array(ak.contents.NumpyArray(np_results[4])), highlevel=False)
+        px = ak.unflatten(
+            ak.Array(ak.contents.NumpyArray(np_results[0])),
+            ak.Array(ak.contents.NumpyArray(np_results[4])),
+            highlevel=False,
+        )
+        py = ak.unflatten(
+            ak.Array(ak.contents.NumpyArray(np_results[1])),
+            ak.Array(ak.contents.NumpyArray(np_results[4])),
+            highlevel=False,
+        )
+        pz = ak.unflatten(
+            ak.Array(ak.contents.NumpyArray(np_results[2])),
+            ak.Array(ak.contents.NumpyArray(np_results[4])),
+            highlevel=False,
+        )
+        E = ak.unflatten(
+            ak.Array(ak.contents.NumpyArray(np_results[3])),
+            ak.Array(ak.contents.NumpyArray(np_results[4])),
+            highlevel=False,
+        )
         jetpt = ak.Array(ak.contents.NumpyArray(np_results[5]))
         jeteta = ak.Array(ak.contents.NumpyArray(np_results[6]))
         jetphi = ak.Array(ak.contents.NumpyArray(np_results[7]))
@@ -466,25 +493,34 @@ class _classgeneralevent:
         jetE = ak.Array(ak.contents.NumpyArray(np_results[9]))
         jetpz = ak.Array(ak.contents.NumpyArray(np_results[10]))
 
-        self._out.append(ak.zip({
-            "constituents":
-                ak.zip(
-                    {"px": px, "py": py, "pz": pz, "E": E}, depth_limit=2),
-            "msoftdrop": jetmass,
-            "ptsoftdrop": jetpt,
-            "etasoftdrop": jeteta,
-            "phisoftdrop": jetphi,
-            "Esoftdrop": jetE,
-            "pzsoftdrop": jetpz,},
-            depth_limit=1
+        self._out.append(
+            ak.zip(
+                {
+                    "constituents": ak.zip(
+                        {"px": px, "py": py, "pz": pz, "E": E}, depth_limit=2
+                    ),
+                    "msoftdrop": jetmass,
+                    "ptsoftdrop": jetpt,
+                    "etasoftdrop": jeteta,
+                    "phisoftdrop": jetphi,
+                    "Esoftdrop": jetE,
+                    "pzsoftdrop": jetpz,
+                },
+                depth_limit=1,
             )
         )
         res = ak.Array(self._replace_multi())
         return res
 
-
     def exclusive_jets_energy_correlator(
-        self, njets=1, n_point=0, angles: int = -1, beta=1, alpha=0, func="generalized", normalized=True,
+        self,
+        njets=1,
+        n_point=0,
+        angles: int = -1,
+        beta=1,
+        alpha=0,
+        func="generalized",
+        normalized=True,
     ):
         if njets <= 0:
             raise ValueError("Njets cannot be <= 0")

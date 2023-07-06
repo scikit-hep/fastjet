@@ -1645,7 +1645,7 @@ PYBIND11_MODULE(_ext, m) {
       [](const output_wrapper ow, const int n_jets = 1, double beta = 0, double symmetry_cut = 0.1,
         std::string symmetry_measure = "scalar_z", double R0 = 0.8, std::string recursion_choice = "larger_pt",
         /*const FunctionOfPseudoJet<PseudoJet> * subtractor = 0,*/ double mu_cut = std::numeric_limits<double>::infinity()){
-        
+
         auto css = ow.cse;
         std::vector<double> consts_groomed_px;
         std::vector<double> consts_groomed_py;
