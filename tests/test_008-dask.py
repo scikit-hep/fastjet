@@ -143,6 +143,7 @@ def test_inclusive_from_file():
 
         assert_eq(dcluseq.inclusive_jets(), cluseq.inclusive_jets())
 
+
 def dask_multi_test_exclusive_jets_softdrop_grooming():
     from distributed import Client
 
