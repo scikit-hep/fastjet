@@ -317,6 +317,7 @@ def test_exclsuive_jets_softdrop_grooming():
 
     assert ak.all(is_close)
 
+
 def dask_multi_test_exclusive_jets_softdrop_grooming():
     array = ak.Array(
         [
@@ -429,6 +430,7 @@ def dask_multi_test_exclusive_jets_softdrop_grooming():
     )
 
     assert ak.all(is_close)
+
 
 def test_exclsuive_jets_softdrop_grooming_multi():
     array = ak.Array(
