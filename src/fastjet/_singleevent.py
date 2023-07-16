@@ -266,7 +266,7 @@ class _classsingleevent:
                 depth_limit=1,
             )
             return out[0]
-        
+
         elif return_as_mask:
             np_results = self._results.to_numpy_softdrop_mask(
                 njets,

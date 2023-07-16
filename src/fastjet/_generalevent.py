@@ -529,7 +529,14 @@ class _classgeneralevent:
 
                 self._out.append(
                     ak.unflatten(
-                        ak.flatten(ak.from_numpy(np.array([ak.Array(ak.contents.NumpyArray(np_results[0]))], dtype=bool))),
+                        ak.flatten(
+                            ak.from_numpy(
+                                np.array(
+                                    [ak.Array(ak.contents.NumpyArray(np_results[0]))],
+                                    dtype=bool,
+                                )
+                            )
+                        ),
                         ak.Array(ak.contents.NumpyArray(np_results[1])),
                     )
                 )
