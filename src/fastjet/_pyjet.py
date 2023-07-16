@@ -147,7 +147,7 @@ class AwkwardClusterSequence(ClusterSequence):
         return self._internalrep.exclusive_jets_constituents(njets)
 
     def exclusive_jets_softdrop_grooming(
-        self, 
+        self,
         njets=1,
         beta=0.0,
         symmetry_cut=0.1,

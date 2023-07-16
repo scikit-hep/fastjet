@@ -528,9 +528,16 @@ class _classgeneralevent:
                 )
 
                 mask = ak.unflatten(
-                ak.flatten(ak.from_numpy(np.array([ak.Array(ak.contents.NumpyArray(np_results[0]))], dtype=bool))),
-                ak.Array(ak.contents.NumpyArray(np_results[1])),
-            )
+                    ak.flatten(
+                        ak.from_numpy(
+                            np.array(
+                                [ak.Array(ak.contents.NumpyArray(np_results[0]))],
+                                dtype=bool,
+                            )
+                        )
+                    ),
+                    ak.Array(ak.contents.NumpyArray(np_results[1])),
+                )
             res = ak.Array(self._replace_multi())
             return res
 

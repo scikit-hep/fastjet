@@ -211,7 +211,7 @@ class _classsingleevent:
         mu_cut=float("inf"),
         return_as_mask=False,
     ):
-        #if njets <= 0:
+        # if njets <= 0:
         #    raise ValueError("Njets cannot be <= 0")
         if return_as_mask == False:
             np_results = self._results.to_numpy_softdrop_grooming(
@@ -266,7 +266,7 @@ class _classsingleevent:
                 depth_limit=1,
             )
             return out[0]
-        
+
         elif return_as_mask == True:
             np_results = self._results.to_numpy_softdrop_mask(
                 njets,
@@ -279,12 +279,18 @@ class _classsingleevent:
             )
 
             mask = ak.unflatten(
-                ak.flatten(ak.from_numpy(np.array([ak.Array(ak.contents.NumpyArray(np_results[0]))], dtype=bool))),
+                ak.flatten(
+                    ak.from_numpy(
+                        np.array(
+                            [ak.Array(ak.contents.NumpyArray(np_results[0]))],
+                            dtype=bool,
+                        )
+                    )
+                ),
                 ak.Array(ak.contents.NumpyArray(np_results[1])),
             )
 
             return mask[0]
-
 
     def exclusive_jets_energy_correlator(
         self,
