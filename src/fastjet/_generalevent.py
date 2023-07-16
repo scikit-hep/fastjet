@@ -453,7 +453,7 @@ class _classgeneralevent:
     ):
         if njets <= 0:
             raise ValueError("Njets cannot be <= 0")
-        if return_as_mask == False:
+        if not return_as_mask:
             self._out = []
             self._input_flag = 0
             for i in range(len(self._clusterable_level)):
@@ -513,7 +513,7 @@ class _classgeneralevent:
             res = ak.Array(self._replace_multi())
             return res
 
-        elif return_as_mask == True:
+        elif return_as_mask:
             self._out = []
             self._input_flag = 0
             for i in range(len(self._clusterable_level)):
@@ -527,10 +527,12 @@ class _classgeneralevent:
                     mu_cut,
                 )
 
-                mask = ak.unflatten(
-                ak.flatten(ak.from_numpy(np.array([ak.Array(ak.contents.NumpyArray(np_results[0]))], dtype=bool))),
-                ak.Array(ak.contents.NumpyArray(np_results[1])),
-            )
+                self._out.append(
+                    ak.unflatten(
+                        ak.flatten(ak.from_numpy(np.array([ak.Array(ak.contents.NumpyArray(np_results[0]))], dtype=bool))),
+                        ak.Array(ak.contents.NumpyArray(np_results[1])),
+                    )
+                )
             res = ak.Array(self._replace_multi())
             return res
 

@@ -213,7 +213,7 @@ class _classsingleevent:
     ):
         #if njets <= 0:
         #    raise ValueError("Njets cannot be <= 0")
-        if return_as_mask == False:
+        if not return_as_mask:
             np_results = self._results.to_numpy_softdrop_grooming(
                 njets,
                 beta,
@@ -267,7 +267,7 @@ class _classsingleevent:
             )
             return out[0]
         
-        elif return_as_mask == True:
+        elif return_as_mask:
             np_results = self._results.to_numpy_softdrop_mask(
                 njets,
                 beta,
