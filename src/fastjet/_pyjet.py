@@ -147,7 +147,7 @@ class AwkwardClusterSequence(ClusterSequence):
         return self._internalrep.exclusive_jets_constituents(njets)
 
     def exclusive_jets_softdrop_grooming(
-        self,
+        self, 
         njets=1,
         beta=0.0,
         symmetry_cut=0.1,
@@ -156,6 +156,7 @@ class AwkwardClusterSequence(ClusterSequence):
         recursion_choice="larger_pt",
         # subtractor = 0,
         mu_cut=float("inf"),
+        return_as_mask=False,
     ):
         return self._internalrep.exclusive_jets_softdrop_grooming(
             njets,
@@ -165,6 +166,7 @@ class AwkwardClusterSequence(ClusterSequence):
             R0,
             recursion_choice,  # subtractor,
             mu_cut,
+            return_as_mask,
         )
 
     def exclusive_jets_energy_correlator(
@@ -478,6 +480,7 @@ class DaskAwkwardClusterSequence(ClusterSequence):
         recursion_choice="larger_pt",
         # subtractor = 0,
         mu_cut=float("inf"),
+        return_as_mask=False,
     ):
         return _dak_dispatch(
             self,
@@ -490,6 +493,7 @@ class DaskAwkwardClusterSequence(ClusterSequence):
             recursion_choice=recursion_choice,
             # subtractor=subtractor,
             mu_cut=mu_cut,
+            return_as_mask=return_as_mask,
         )
 
     def exclusive_jets_energy_correlator(

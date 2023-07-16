@@ -380,6 +380,7 @@ class ClusterSequence:  # The super class
         recursion_choice="larger_pt",
         # subtractor: int = 0,
         mu_cut: float = float("inf"),
+        return_as_mask: bool = False,
     ) -> ak.Array:
         """Performs softdrop pruning on jets.
         Args:
