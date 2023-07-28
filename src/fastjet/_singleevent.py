@@ -209,88 +209,61 @@ class _classsingleevent:
         recursion_choice="larger_pt",
         # subtractor = 0,
         mu_cut=float("inf"),
-        return_as_mask=False,
     ):
         # if njets <= 0:
         #    raise ValueError("Njets cannot be <= 0")
-        if not return_as_mask:
-            np_results = self._results.to_numpy_softdrop_grooming(
-                njets,
-                beta,
-                symmetry_cut,
-                symmetry_measure,
-                R0,
-                recursion_choice,  # subtractor,
-                mu_cut,
-            )
+        np_results = self._results.to_numpy_softdrop_grooming(
+            njets,
+            beta,
+            symmetry_cut,
+            symmetry_measure,
+            R0,
+            recursion_choice,  # subtractor,
+            mu_cut,
+        )
 
-            px = ak.unflatten(
-                ak.Array(ak.contents.NumpyArray(np_results[0])),
-                ak.Array(ak.contents.NumpyArray(np_results[4])),
-                highlevel=False,
-            )
-            py = ak.unflatten(
-                ak.Array(ak.contents.NumpyArray(np_results[1])),
-                ak.Array(ak.contents.NumpyArray(np_results[4])),
-                highlevel=False,
-            )
-            pz = ak.unflatten(
-                ak.Array(ak.contents.NumpyArray(np_results[2])),
-                ak.Array(ak.contents.NumpyArray(np_results[4])),
-                highlevel=False,
-            )
-            E = ak.unflatten(
-                ak.Array(ak.contents.NumpyArray(np_results[3])),
-                ak.Array(ak.contents.NumpyArray(np_results[4])),
-                highlevel=False,
-            )
-            jetpt = ak.Array(ak.contents.NumpyArray(np_results[5]))
-            jeteta = ak.Array(ak.contents.NumpyArray(np_results[6]))
-            jetphi = ak.Array(ak.contents.NumpyArray(np_results[7]))
-            jetmass = ak.Array(ak.contents.NumpyArray(np_results[8]))
-            jetE = ak.Array(ak.contents.NumpyArray(np_results[9]))
-            jetpz = ak.Array(ak.contents.NumpyArray(np_results[10]))
+        px = ak.unflatten(
+            ak.Array(ak.contents.NumpyArray(np_results[0])),
+            ak.Array(ak.contents.NumpyArray(np_results[4])),
+            highlevel=False,
+        )
+        py = ak.unflatten(
+            ak.Array(ak.contents.NumpyArray(np_results[1])),
+            ak.Array(ak.contents.NumpyArray(np_results[4])),
+            highlevel=False,
+        )
+        pz = ak.unflatten(
+            ak.Array(ak.contents.NumpyArray(np_results[2])),
+            ak.Array(ak.contents.NumpyArray(np_results[4])),
+            highlevel=False,
+        )
+        E = ak.unflatten(
+            ak.Array(ak.contents.NumpyArray(np_results[3])),
+            ak.Array(ak.contents.NumpyArray(np_results[4])),
+            highlevel=False,
+        )
+        jetpt = ak.Array(ak.contents.NumpyArray(np_results[5]))
+        jeteta = ak.Array(ak.contents.NumpyArray(np_results[6]))
+        jetphi = ak.Array(ak.contents.NumpyArray(np_results[7]))
+        jetmass = ak.Array(ak.contents.NumpyArray(np_results[8]))
+        jetE = ak.Array(ak.contents.NumpyArray(np_results[9]))
+        jetpz = ak.Array(ak.contents.NumpyArray(np_results[10]))
 
-            out = ak.zip(
-                {
-                    "constituents": ak.zip(
-                        {"px": px, "py": py, "pz": pz, "E": E}, depth_limit=2
-                    ),
-                    "msoftdrop": jetmass,
-                    "ptsoftdrop": jetpt,
-                    "etasoftdrop": jeteta,
-                    "phisoftdrop": jetphi,
-                    "Esoftdrop": jetE,
-                    "pzsoftdrop": jetpz,
-                },
-                depth_limit=1,
-            )
-            return out[0]
-
-        elif return_as_mask:
-            np_results = self._results.to_numpy_softdrop_mask(
-                njets,
-                beta,
-                symmetry_cut,
-                symmetry_measure,
-                R0,
-                recursion_choice,  # subtractor,
-                mu_cut,
-            )
-
-            mask = ak.unflatten(
-                ak.flatten(
-                    ak.from_numpy(
-                        np.array(
-                            [ak.Array(ak.contents.NumpyArray(np_results[0]))],
-                            dtype=bool,
-                        )
-                    )
+        out = ak.zip(
+            {
+                "constituents": ak.zip(
+                    {"px": px, "py": py, "pz": pz, "E": E}, depth_limit=2
                 ),
-                ak.Array(ak.contents.NumpyArray(np_results[1])),
-            )
-
-            return mask[0]
+                "msoftdrop": jetmass,
+                "ptsoftdrop": jetpt,
+                "etasoftdrop": jeteta,
+                "phisoftdrop": jetphi,
+                "Esoftdrop": jetE,
+                "pzsoftdrop": jetpz,
+            },
+            depth_limit=1,
+        )
+        return out[0]
 
     def exclusive_jets_energy_correlator(
         self,
