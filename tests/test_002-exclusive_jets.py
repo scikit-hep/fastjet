@@ -211,7 +211,7 @@ def test_exclusive_lund_declustering_multi():
     assert ak.all(is_close)
 
 
-def test_exclsuive_jets_softdrop_grooming():
+def test_exclusive_jets_softdrop_grooming():
     array = ak.Array(
         [
             {"px": 1.2, "py": 3.2, "pz": 5.4, "E": 2.5, "ex": 0.78},
@@ -316,7 +316,7 @@ def test_exclsuive_jets_softdrop_grooming():
     assert ak.all(is_close)
 
 
-def test_exclsuive_jets_softdrop_grooming_multi():
+def test_exclusive_jets_softdrop_grooming_multi():
     array = ak.Array(
         [
             [
