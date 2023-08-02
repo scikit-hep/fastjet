@@ -211,6 +211,225 @@ def test_exclusive_lund_declustering_multi():
     assert ak.all(is_close)
 
 
+def test_exclusive_jets_softdrop_grooming():
+    array = ak.Array(
+        [
+            {"px": 1.2, "py": 3.2, "pz": 5.4, "E": 2.5, "ex": 0.78},
+            {"px": 1.25, "py": 3.15, "pz": 5.4, "E": 2.4, "ex": 0.78},
+            {"px": 1.4, "py": 3.15, "pz": 5.4, "E": 2.0, "ex": 0.78},
+            {"px": 32.2, "py": 64.21, "pz": 543.34, "E": 600.12, "ex": 0.35},
+            {"px": 32.45, "py": 63.21, "pz": 543.14, "E": 599.56, "ex": 0.0},
+        ],
+        with_name="Momentum4D",
+    )
+
+    jetdef = fastjet.JetDefinition(fastjet.cambridge_algorithm, 0.8)
+    cluster = fastjet._pyjet.AwkwardClusterSequence(array, jetdef)
+    softdrop = cluster.exclusive_jets_softdrop_grooming()
+
+    softdrop_output = ak.zip(
+        {
+            "constituents": ak.Record(
+                {
+                    "px": [32.2, 32.45],
+                    "py": [64.21, 63.21],
+                    "pz": [543.34, 543.14],
+                    "E": [600.12, 599.56],
+                }
+            ),
+            "msoftdrop": 488.2395243115817,
+            "ptsoftdrop": 142.88274528437645,
+            "etasoftdrop": 2.726117171791057,
+            "phisoftdrop": 1.1012644074821902,
+            "Esoftdrop": 1199.6799999999998,
+            "pzsoftdrop": 1086.48,
+        },
+    )
+
+    is_close = ak.ravel(
+        ak.Array(
+            [
+                ak.isclose(
+                    softdrop_output.constituents.px,
+                    softdrop.constituents.px,
+                    rtol=1e-12,
+                    atol=0,
+                ),
+                ak.isclose(
+                    softdrop_output.constituents.py,
+                    softdrop.constituents.py,
+                    rtol=1e-12,
+                    atol=0,
+                ),
+                ak.isclose(
+                    softdrop_output.constituents.pz,
+                    softdrop.constituents.pz,
+                    rtol=1e-12,
+                    atol=0,
+                ),
+                ak.isclose(
+                    softdrop_output.constituents.E,
+                    softdrop.constituents.E,
+                    rtol=1e-12,
+                    atol=0,
+                ),
+                ak.isclose(
+                    ak.Array([softdrop_output.msoftdrop]),
+                    ak.Array([softdrop.msoftdrop]),
+                    rtol=1e-12,
+                    atol=0,
+                ),
+                ak.isclose(
+                    ak.Array([softdrop_output.ptsoftdrop]),
+                    ak.Array([softdrop.ptsoftdrop]),
+                    rtol=1e-12,
+                    atol=0,
+                ),
+                ak.isclose(
+                    ak.Array([softdrop_output.etasoftdrop]),
+                    ak.Array([softdrop.etasoftdrop]),
+                    rtol=1e-12,
+                    atol=0,
+                ),
+                ak.isclose(
+                    ak.Array([softdrop_output.phisoftdrop]),
+                    ak.Array([softdrop.phisoftdrop]),
+                    rtol=1e-12,
+                    atol=0,
+                ),
+                ak.isclose(
+                    ak.Array([softdrop_output.Esoftdrop]),
+                    ak.Array([softdrop.Esoftdrop]),
+                    rtol=1e-12,
+                    atol=0,
+                ),
+                ak.isclose(
+                    ak.Array([softdrop_output.pzsoftdrop]),
+                    ak.Array([softdrop.pzsoftdrop]),
+                    rtol=1e-12,
+                    atol=0,
+                ),
+            ]
+        )
+    )
+
+    assert ak.all(is_close)
+
+
+def test_exclusive_jets_softdrop_grooming_multi():
+    array = ak.Array(
+        [
+            [
+                {"px": 1.2, "py": 3.2, "pz": 5.4, "E": 2.5, "ex": 0.78},
+                {"px": 1.25, "py": 3.15, "pz": 5.4, "E": 2.4, "ex": 0.78},
+                {"px": 1.4, "py": 3.15, "pz": 5.4, "E": 2.0, "ex": 0.78},
+                {"px": 32.2, "py": 64.21, "pz": 543.34, "E": 600.12, "ex": 0.35},
+                {"px": 32.45, "py": 63.21, "pz": 543.14, "E": 599.56, "ex": 0.0},
+            ],
+            [
+                {"px": 1.2, "py": 3.2, "pz": 5.4, "E": 2.5, "ex": 0.78},
+                {"px": 1.25, "py": 3.15, "pz": 5.4, "E": 2.4, "ex": 0.78},
+                {"px": 1.4, "py": 3.15, "pz": 5.4, "E": 2.0, "ex": 0.78},
+                {"px": 32.2, "py": 64.21, "pz": 543.34, "E": 600.12, "ex": 0.35},
+                {"px": 32.45, "py": 63.21, "pz": 543.14, "E": 599.56, "ex": 0.0},
+            ],
+        ],
+        with_name="Momentum4D",
+    )
+
+    jetdef = fastjet.JetDefinition(fastjet.cambridge_algorithm, 0.8)
+    cluster = fastjet._pyjet.AwkwardClusterSequence(array, jetdef)
+    softdrop = cluster.exclusive_jets_softdrop_grooming()
+
+    softdrop_output = ak.zip(
+        {
+            "constituents": ak.Record(
+                {
+                    "px": [32.2, 32.45],
+                    "py": [64.21, 63.21],
+                    "pz": [543.34, 543.14],
+                    "E": [600.12, 599.56],
+                }
+            ),
+            "msoftdrop": ak.Array([488.2395243115817, 488.2395243115817]),
+            "ptsoftdrop": ak.Array([142.88274528437645, 142.88274528437645]),
+            "etasoftdrop": ak.Array([2.726117171791057, 2.726117171791057]),
+            "phisoftdrop": ak.Array([1.1012644074821902, 1.1012644074821902]),
+            "Esoftdrop": ak.Array([1199.6799999999998, 1199.6799999999998]),
+            "pzsoftdrop": ak.Array([1086.48, 1086.48]),
+        }
+    )
+
+    is_close = ak.ravel(
+        ak.Array(
+            [
+                ak.isclose(
+                    softdrop_output.constituents.px,
+                    softdrop.constituents.px,
+                    rtol=1e-12,
+                    atol=0,
+                ),
+                ak.isclose(
+                    softdrop_output.constituents.py,
+                    softdrop.constituents.py,
+                    rtol=1e-12,
+                    atol=0,
+                ),
+                ak.isclose(
+                    softdrop_output.constituents.pz,
+                    softdrop.constituents.pz,
+                    rtol=1e-12,
+                    atol=0,
+                ),
+                ak.isclose(
+                    softdrop_output.constituents.E,
+                    softdrop.constituents.E,
+                    rtol=1e-12,
+                    atol=0,
+                ),
+                ak.isclose(
+                    ak.Array([softdrop_output.msoftdrop]),
+                    ak.Array([softdrop.msoftdrop]),
+                    rtol=1e-12,
+                    atol=0,
+                ),
+                ak.isclose(
+                    ak.Array([softdrop_output.ptsoftdrop]),
+                    ak.Array([softdrop.ptsoftdrop]),
+                    rtol=1e-12,
+                    atol=0,
+                ),
+                ak.isclose(
+                    ak.Array([softdrop_output.etasoftdrop]),
+                    ak.Array([softdrop.etasoftdrop]),
+                    rtol=1e-12,
+                    atol=0,
+                ),
+                ak.isclose(
+                    ak.Array([softdrop_output.phisoftdrop]),
+                    ak.Array([softdrop.phisoftdrop]),
+                    rtol=1e-12,
+                    atol=0,
+                ),
+                ak.isclose(
+                    ak.Array([softdrop_output.Esoftdrop]),
+                    ak.Array([softdrop.Esoftdrop]),
+                    rtol=1e-12,
+                    atol=0,
+                ),
+                ak.isclose(
+                    ak.Array([softdrop_output.pzsoftdrop]),
+                    ak.Array([softdrop.pzsoftdrop]),
+                    rtol=1e-12,
+                    atol=0,
+                ),
+            ]
+        )
+    )
+
+    assert ak.all(is_close)
+
+
 def test_exclusive_energy_correlator():
     array = ak.Array(
         [

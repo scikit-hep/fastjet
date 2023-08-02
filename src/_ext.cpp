@@ -15,6 +15,7 @@
 #include <fastjet/PseudoJet.hh>
 #include <fastjet/contrib/EnergyCorrelator.hh>
 #include <fastjet/contrib/LundGenerator.hh>
+#include <fastjet/contrib/SoftDrop.hh>
 
 #include <pybind11/numpy.h>
 #include <pybind11/operators.h>
@@ -1640,8 +1641,117 @@ PYBIND11_MODULE(_ext, m) {
         Returns:
           pt, eta, phi, m of inclusive jets.
       )pbdoc")
+      .def("to_numpy_softdrop_grooming",
+      [](const output_wrapper ow, const int n_jets = 1, double beta = 0, double symmetry_cut = 0.1,
+        std::string symmetry_measure = "scalar_z", double R0 = 0.8, std::string recursion_choice = "larger_pt",
+        /*const FunctionOfPseudoJet<PseudoJet> * subtractor = 0,*/ double mu_cut = std::numeric_limits<double>::infinity()){
+
+        auto css = ow.cse;
+        std::vector<double> consts_groomed_px;
+        std::vector<double> consts_groomed_py;
+        std::vector<double> consts_groomed_pz;
+        std::vector<double> consts_groomed_E;
+        std::vector<int> nconstituents;
+        std::vector<double> jet_groomed_pt;
+        std::vector<double> jet_groomed_eta;
+        std::vector<double> jet_groomed_phi;
+        std::vector<double> jet_groomed_m;
+        std::vector<double> jet_groomed_E;
+        std::vector<double> jet_groomed_pz;
+
+        fastjet::contrib::RecursiveSymmetryCutBase::SymmetryMeasure sym_meas = fastjet::contrib::RecursiveSymmetryCutBase::SymmetryMeasure::scalar_z;
+        if (symmetry_measure == "scalar_z") {
+          sym_meas = fastjet::contrib::RecursiveSymmetryCutBase::SymmetryMeasure::scalar_z;
+        }
+        else if (symmetry_measure == "vector_z") {
+          sym_meas = fastjet::contrib::RecursiveSymmetryCutBase::SymmetryMeasure::vector_z;
+        }
+        else if (symmetry_measure == "y") {
+          sym_meas = fastjet::contrib::RecursiveSymmetryCutBase::SymmetryMeasure::y;
+        }
+        else if (symmetry_measure == "theta_E") {
+          sym_meas = fastjet::contrib::RecursiveSymmetryCutBase::SymmetryMeasure::theta_E;
+        }
+        else if (symmetry_measure == "cos_theta_E") {
+          sym_meas = fastjet::contrib::RecursiveSymmetryCutBase::SymmetryMeasure::cos_theta_E;
+        }
+
+        fastjet::contrib::RecursiveSymmetryCutBase::RecursionChoice rec_choice = fastjet::contrib::RecursiveSymmetryCutBase::RecursionChoice::larger_pt;
+        if (recursion_choice == "larger_pt") {
+          rec_choice = fastjet::contrib::RecursiveSymmetryCutBase::RecursionChoice::larger_pt;
+        }
+        else if (recursion_choice == "larger_mt") {
+          rec_choice = fastjet::contrib::RecursiveSymmetryCutBase::RecursionChoice::larger_mt;
+        }
+        else if (recursion_choice == "larger_m") {
+          rec_choice = fastjet::contrib::RecursiveSymmetryCutBase::RecursionChoice::larger_m;
+        }
+        else if (recursion_choice == "larger_E") {
+          rec_choice = fastjet::contrib::RecursiveSymmetryCutBase::RecursionChoice::larger_E;
+        }
+
+        fastjet::contrib::SoftDrop* sd = new fastjet::contrib::SoftDrop(beta, symmetry_cut, sym_meas, R0, mu_cut, rec_choice/*, subtractor*/);
+
+        for (unsigned int i = 0; i < css.size(); i++){  // iterate through events
+          auto jets = css[i]->exclusive_jets(n_jets);
+          for (unsigned int j = 0; j < jets.size(); j++){
+            auto soft = sd->result(jets[j]);
+            nconstituents.push_back(soft.constituents().size());
+            jet_groomed_pt.push_back(soft.pt());
+            jet_groomed_eta.push_back(soft.eta());
+            jet_groomed_phi.push_back(soft.phi());
+            jet_groomed_m.push_back(soft.m());
+            jet_groomed_E.push_back(soft.E());
+            jet_groomed_pz.push_back(soft.pz());
+            for (unsigned int k = 0; k < soft.constituents().size(); k++){
+              consts_groomed_px.push_back(soft.constituents()[k].px());
+              consts_groomed_py.push_back(soft.constituents()[k].py());
+              consts_groomed_pz.push_back(soft.constituents()[k].pz());
+              consts_groomed_E.push_back(soft.constituents()[k].E());
+            }
+          }
+        }
+
+        auto consts_px = py::array(consts_groomed_px.size(), consts_groomed_px.data());
+        auto consts_py = py::array(consts_groomed_py.size(), consts_groomed_py.data());
+        auto consts_pz = py::array(consts_groomed_pz.size(), consts_groomed_pz.data());
+        auto consts_E = py::array(consts_groomed_E.size(), consts_groomed_E.data());
+        auto eventsize = py::array(nconstituents.size(), nconstituents.data());
+        auto jet_pt = py::array(jet_groomed_pt.size(), jet_groomed_pt.data());
+        auto jet_eta = py::array(jet_groomed_eta.size(), jet_groomed_eta.data());
+        auto jet_phi = py::array(jet_groomed_phi.size(), jet_groomed_phi.data());
+        auto jet_m = py::array(jet_groomed_m.size(), jet_groomed_m.data());
+        auto jet_E = py::array(jet_groomed_E.size(), jet_groomed_E.data());
+        auto jet_pz = py::array(jet_groomed_pz.size(), jet_groomed_pz.data());
+
+        return std::make_tuple(
+            consts_px,
+            consts_py,
+            consts_pz,
+            consts_E,
+            eventsize,
+            jet_pt,
+            jet_eta,
+            jet_phi,
+            jet_m,
+            jet_E,
+            jet_pz
+          );
+      }, R"pbdoc(
+        Performs softdrop pruning on jets.
+        Args:
+          n_jets: number of exclusive subjets.
+          beta: softdrop beta parameter.
+          symmetry_cut: softdrop symmetry cut value.
+          symmetry_measure: Which symmetry measure to use, found in RecursiveSymmetryCutBase.hh
+          R0: softdrop R0 parameter.
+          recursion_choice: Which recursion choice to use, found in RecursiveSymmetryCutBase.hh
+          subtractor: an optional pointer to a pileup subtractor (ignored if zero)
+        Returns:
+          Returns an array of values from the jet after it has been groomed by softdrop.
+      )pbdoc")
       .def("to_numpy_energy_correlators",
-      [](const output_wrapper ow, const int n_jets = 1, const double beta = 1, double npoint = 0, int angles = 0, double alpha = 0, std::string func = "generalized") {
+      [](const output_wrapper ow, const int n_jets = 1, const double beta = 1, double npoint = 0, int angles = 0, double alpha = 0, std::string func = "generalized", bool normalized = true) {
         auto css = ow.cse;
 
         std::transform(func.begin(), func.end(), func.begin(),
@@ -1681,8 +1791,10 @@ PYBIND11_MODULE(_ext, m) {
           energy_correlator = std::make_shared<fastjet::contrib::EnergyCorrelatorU2>(beta);}
         else if (func == "u3") {
           energy_correlator = std::make_shared<fastjet::contrib::EnergyCorrelatorU3>(beta);}
-        else if (func == "generic") {
+        else if (func == "generic" && normalized == false) {
           energy_correlator = std::make_shared<fastjet::contrib::EnergyCorrelator>(npoint, beta);} // The generic energy correlator is not normalized; i.e. does not use a momentum fraction when being calculated.
+        else if (func == "generic" && normalized == true) {
+          energy_correlator = std::make_shared<fastjet::contrib::EnergyCorrelatorGeneralized>(angles, npoint, beta);} //Using the Generalized class with angles=-1 returns a generic ECF that has been normalized
 
         std::vector<double> ECF_vec;
 
