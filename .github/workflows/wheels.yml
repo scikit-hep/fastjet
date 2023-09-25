@@ -46,7 +46,7 @@ jobs:
             arch: aarch64
 
     steps:
-      - uses: docker/setup-qemu-action@v3.0.0
+      - uses: docker/setup-qemu-action@v3.0
         if: matrix.arch != 'auto64'
         with:
          platforms: arm64
@@ -61,7 +61,7 @@ jobs:
           brew install make gcc automake swig gmp mpfr boost
           export PATH="/usr/local/opt/make/libexec/gnubin:$PATH"
 
-      - uses: pypa/cibuildwheel@v2.15.0
+      - uses: pypa/cibuildwheel@v2.15
         env:
           CIBW_ARCHS: ${{ matrix.arch }}
           CIBW_BUILD: cp${{ matrix.python }}-*
@@ -99,7 +99,7 @@ jobs:
           name: artifact
           path: dist
 
-      - uses: pypa/gh-action-pypi-publish@v1.8.10
+      - uses: pypa/gh-action-pypi-publish@v1.8
         with:
           user: __token__
           # Remember to generate this and set it in "GitHub Secrets"
