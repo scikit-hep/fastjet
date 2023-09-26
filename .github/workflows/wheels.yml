@@ -46,7 +46,7 @@ jobs:
             arch: aarch64
 
     steps:
-      - uses: docker/setup-qemu-action@v3.0
+      - uses: docker/setup-qemu-action@v3
         if: matrix.arch != 'auto64'
         with:
          platforms: arm64
