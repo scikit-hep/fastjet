@@ -1,3 +1,10 @@
+ci:
+    autofix_commit_msg: |
+        [pre-commit.ci] auto fixes from pre-commit.com hooks
+
+        for more information, see https://pre-commit.ci
+    autoupdate_commit_msg: 'ci(pre-commit): pre-commit autoupdate'
+
 repos:
 - repo: https://github.com/psf/black-pre-commit-mirror
   rev: 23.10.1
