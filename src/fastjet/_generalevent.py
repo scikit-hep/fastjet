@@ -214,7 +214,7 @@ class _classgeneralevent:
         px = ak.to_numpy(array.px.layout.content)
         py = ak.to_numpy(array.py.layout.content)
         pz = ak.to_numpy(array.pz.layout.content)
-        E = ak.to_numpy(array.E.layout.content)        
+        E = ak.to_numpy(array.E.layout.content)
         off = np.asarray(array.layout.stops)
         off = np.insert(off, 0, 0)
         return px, py, pz, E, off
