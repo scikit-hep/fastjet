@@ -211,7 +211,7 @@ class _classgeneralevent:
             return False
 
     def extract_cons(self, array):
-        packed_flattened = ak.to_packed(ak.flatten(array))
+        packed_flattened = ak.flatten(array)
         px = packed_flattened.px
         py = packed_flattened.py
         pz = packed_flattened.pz
