@@ -211,10 +211,11 @@ class _classgeneralevent:
             return False
 
     def extract_cons(self, array):
-        px = np.asarray(ak.Array(array.layout.content, behavior=array.behavior).px)
-        py = np.asarray(ak.Array(array.layout.content, behavior=array.behavior).py)
-        pz = np.asarray(ak.Array(array.layout.content, behavior=array.behavior).pz)
-        E = np.asarray(ak.Array(array.layout.content, behavior=array.behavior).E)
+        packed_flattened = ak.to_packed(ak.flatten(array))
+        px = packed_flattened.px
+        py = packed_flattened.py
+        pz = packed_flattened.pz
+        E = packed_flattened.E
         off = np.asarray(array.layout.stops)
         off = np.insert(off, 0, 0)
         return px, py, pz, E, off
