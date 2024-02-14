@@ -23,7 +23,7 @@ jobs:
           submodules: recursive
 
       - uses: actions/setup-python@v5
-      - uses: pre-commit/action@v3.0.0
+      - uses: pre-commit/action@v3.0.1
         with:
           extra_args: --hook-stage manual --all-files
 
@@ -48,7 +48,7 @@ jobs:
       - name: Install compiler tools on macOS
         if: runner.os == 'macOS'
         run: |
-          brew install make gcc automake swig gmp mpfr boost
+          brew install make automake swig gmp mpfr boost
           export PATH="/usr/local/opt/make/libexec/gnubin:$PATH"
 
       - name: Install extra deps on Linux
@@ -81,12 +81,12 @@ jobs:
       - uses: docker/setup-qemu-action@v3
         if: matrix.arch != 'auto64'
         with:
-         platforms: all
+          platforms: all
 
       - name: Install compiler tools on macOS
         if: runner.os == 'macOS'
         run: |
-          brew install make gcc automake swig gmp mpfr boost
+          brew install make automake swig gmp mpfr boost
           export PATH="/usr/local/opt/make/libexec/gnubin:$PATH"
 
       - uses: pypa/cibuildwheel@v2.16
@@ -96,7 +96,7 @@ jobs:
           CIBW_BUILD_VERBOSITY: 2
 
       - name: Upload wheels
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           path: wheelhouse/*.whl
 
