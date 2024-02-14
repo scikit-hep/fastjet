@@ -227,16 +227,12 @@ def test_exclusive_jets_softdrop_grooming():
     cluster = fastjet._pyjet.AwkwardClusterSequence(array, jetdef)
     softdrop = cluster.exclusive_jets_softdrop_grooming()
 
-    softdrop_output = ak.zip(
+    softdrop_output = ak.from_iter(
         {
-            "constituents": ak.Record(
-                {
-                    "px": [32.2, 32.45],
-                    "py": [64.21, 63.21],
-                    "pz": [543.34, 543.14],
-                    "E": [600.12, 599.56],
-                }
-            ),
+            "constituents": [
+                {"px": 32.2, "py": 64.21, "pz": 543.34, "E": 600.12},
+                {"px": 32.45, "py": 63.21, "pz": 543.14, "E": 599.56},
+            ],
             "msoftdrop": 488.2395243115817,
             "ptsoftdrop": 142.88274528437645,
             "etasoftdrop": 2.726117171791057,
@@ -341,15 +337,19 @@ def test_exclusive_jets_softdrop_grooming_multi():
     cluster = fastjet._pyjet.AwkwardClusterSequence(array, jetdef)
     softdrop = cluster.exclusive_jets_softdrop_grooming()
 
-    softdrop_output = ak.zip(
+    softdrop_output = ak.from_iter(
         {
-            "constituents": ak.Record(
-                {
-                    "px": [32.2, 32.45],
-                    "py": [64.21, 63.21],
-                    "pz": [543.34, 543.14],
-                    "E": [600.12, 599.56],
-                }
+            "constituents": ak.Array(
+                [
+                    [
+                        {"px": 32.2, "py": 64.21, "pz": 543.34, "E": 600.12},
+                        {"px": 32.45, "py": 63.21, "pz": 543.14, "E": 599.56},
+                    ],
+                    [
+                        {"px": 32.2, "py": 64.21, "pz": 543.34, "E": 600.12},
+                        {"px": 32.45, "py": 63.21, "pz": 543.14, "E": 599.56},
+                    ],
+                ],
             ),
             "msoftdrop": ak.Array([488.2395243115817, 488.2395243115817]),
             "ptsoftdrop": ak.Array([142.88274528437645, 142.88274528437645]),
