@@ -70,7 +70,8 @@ jobs:
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
-          path: wheelhouse/*.whl
+          name: wheelhouse-${{ matrix.os }}-${{ matrix.python }}-${{ matrix.arch }}
+          path: wheel-${{ matrix.os }}-${{ matrix.python }}-${{ matrix.arch }}.whl
 
   test_sdist:
     needs: [make_sdist]
