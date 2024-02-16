@@ -20,6 +20,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
+          name: cibw-sdist
           path: dist/*.tar.gz
 
   build_wheels:
@@ -70,8 +71,8 @@ jobs:
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
-          name: wheelhouse-${{ matrix.os }}-${{ matrix.python }}-${{ matrix.arch }}
-          path: wheel-${{ matrix.os }}-${{ matrix.python }}-${{ matrix.arch }}.whl
+          name: cibw-wheels-${{ matrix.os }}-${{ matrix.python }}-${{ matrix.arch }}
+          path: wheelhouse/*.whl
 
   test_sdist:
     needs: [make_sdist]
@@ -79,8 +80,9 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: artifact
-          path: dist/
+          pattern: cibw-*
+          path: dist
+          merge-multiple: true
 
       - name: Install extra deps on Linux
         if: runner.os == 'Linux'
@@ -97,8 +99,9 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: artifact
+          pattern: cibw-*
           path: dist
+          merge-multiple: true
 
       - uses: pypa/gh-action-pypi-publish@release/v1
         with:
