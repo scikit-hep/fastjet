@@ -102,7 +102,7 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
             subprocess.run(["make", "install"], cwd=FASTJET, env=env, check=True)
 
             subprocess.run(
-                ["patch", "./Makefile.in", DIR / "patch_makefilein.txt"],
+                ["patch", "./.Makefile.inc", DIR / "patch_makefileinc.txt"],
                 cwd=FASTJET_CONTRIB,
                 env=env,
                 check=True,
