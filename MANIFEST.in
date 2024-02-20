@@ -4,5 +4,5 @@ graft fastjet-core
 graft fastjet-contrib
 graft pybind11
 global-exclude .git .gitmodules
-include LICENSE README.md pyproject.toml setup.py setup.cfg patch_fastjet_i.txt patch_clustersequence.txt patch_makefileinc.txt
+include LICENSE README.md pyproject.toml setup.py setup.cfg patch_fastjet_i.txt patch_clustersequence.txt
 exclude .cirrus.yml
