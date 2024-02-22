@@ -66,10 +66,16 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
                 cwd=FASTJET,
             )
 
+            # RPATH is set for shared libraries in the following locations:
+            # * fastjet/
+            # * fastjet/_fastjet_core/lib/
+            # * fastjet/_fastjet_core/lib/python*/site-packages/
+            _rpath = "'$$ORIGIN/_fastjet_core/lib:$$ORIGIN:$$ORIGIN/../..'"
             env = os.environ.copy()
             env["PYTHON"] = sys.executable
             env["PYTHON_INCLUDE"] = f'-I{sysconfig.get_path("include")}'
             env["CXXFLAGS"] = "-O3 -Bstatic -lgmp -Bdynamic -std=c++17"
+            env["LDFLAGS"] = env.get("LDFLAGS", "") + f" -Wl,-rpath,{_rpath}"
             env["ORIGIN"] = "$ORIGIN"  # if evaluated, it will still be '$ORIGIN'
 
             args = [
@@ -82,7 +88,7 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
                 f"--with-cgaldir={cgal_dir}",
                 "--enable-swig",
                 "--enable-pyext",
-                "LDFLAGS=-Wl,-rpath,$$ORIGIN/_fastjet_core/lib:$$ORIGIN",
+                f'LDFLAGS={env["LDFLAGS"]}',
             ]
 
             try:
@@ -98,6 +104,7 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
 
             env = os.environ.copy()
             env["CXX"] = env.get("CXX", "g++")
+            env["LDFLAGS"] = env.get("LDFLAGS", "") + f" -Wl,-rpath,{_rpath}"
             env["ORIGIN"] = "$ORIGIN"  # if evaluated, it will still be '$ORIGIN'
             subprocess.run(["make", "-j"], cwd=FASTJET, env=env, check=True)
             subprocess.run(["make", "install"], cwd=FASTJET, env=env, check=True)
@@ -108,6 +115,7 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
                     f"--fastjet-config={FASTJET}/fastjet-config",
                     f'CXX={env["CXX"]}',
                     "CXXFLAGS=-O3 -Bstatic -Bdynamic -std=c++17",
+                    f'LDFLAGS={env["LDFLAGS"]}',
                 ],
                 cwd=FASTJET_CONTRIB,
                 env=env,
