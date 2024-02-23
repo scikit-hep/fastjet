@@ -13,6 +13,7 @@ task:
         matrix:
           - image: python:3.8
           - image: python:3.11
+          - image: python:3.12
 
       install_build_dependencies_script: |
         apt-get update
