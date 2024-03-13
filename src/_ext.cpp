@@ -83,7 +83,7 @@ output_wrapper interfacemulti(
   std::vector<double> idx;
   for (int i = 0; i < dimoff - 1; i++) {
     std::vector<fj::PseudoJet> particles;
-    for (int j = *starts; j < *stops; j++) {
+    for (int j = *startsptr; j < *stopsptr; j++) {
       particles.push_back(fj::PseudoJet(*pxptr, *pyptr, *pzptr, *Eptr));
       pxptr++;
       pyptr++;
@@ -97,8 +97,8 @@ output_wrapper interfacemulti(
     std::shared_ptr<fastjet::ClusterSequence> cs =
         std::make_shared<fastjet::ClusterSequence>(*pj, *jet_def);
     auto j = cs->inclusive_jets();
-    starts++;
-    stops++;
+    startsptr++;
+    stopsptr++;
     ow.cse.push_back(cs);
     ow.parts.push_back(pj);
   }
