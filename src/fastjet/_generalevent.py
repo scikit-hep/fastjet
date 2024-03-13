@@ -21,14 +21,15 @@ class _classgeneralevent:
             self._clusterable_level[i] = ak.Array(
                 self._clusterable_level[i].layout.to_ListOffsetArray64(True)
             )
-            px, py, pz, E, offsets = self.extract_cons(self._clusterable_level[i])
+            px, py, pz, E, starts, stops = self.extract_cons(self._clusterable_level[i])
             px = self.correct_byteorder(px)
             py = self.correct_byteorder(py)
             pz = self.correct_byteorder(pz)
             E = self.correct_byteorder(E)
-            offsets = self.correct_byteorder(offsets)
+            starts = self.correct_byteorder(starts)
+            stops = self.correct_byteorder(stops)
             self._results.append(
-                fastjet._ext.interfacemulti(px, py, pz, E, offsets, jetdef)
+                fastjet._ext.interfacemulti(px, py, pz, E, starts, stops, jetdef)
             )
 
     def _check_listoffset_subtree(self, data):
@@ -215,9 +216,11 @@ class _classgeneralevent:
         py = np.asarray(ak.Array(array.layout.content, behavior=array.behavior).py)
         pz = np.asarray(ak.Array(array.layout.content, behavior=array.behavior).pz)
         E = np.asarray(ak.Array(array.layout.content, behavior=array.behavior).E)
-        off = np.asarray(array.layout.stops)
-        off = np.insert(off, 0, 0)
-        return px, py, pz, E, off
+        starts = np.asarray(array.layout.starts)
+        stops = np.asarray(array.layout.stops)
+        starts = np.insert(starts, 0, 0)
+        stops = np.insert(stops, 0, 0)
+        return px, py, pz, E, starts, stops
 
     def _replace_multi(self):
         self._mod_data = self.data

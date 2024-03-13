@@ -9,15 +9,17 @@ import fastjet._ext  # noqa: F401, E402
 class _classmultievent:
     def __init__(self, data, jetdef):
         self.jetdef = jetdef
-        # data = ak.Array(data.layout.to_ListOffsetArray64(True)) If I do this vector can't convert the coordinates
         self.data = data
-        px, py, pz, E, offsets = self.extract_cons(self.data)
+        px, py, pz, E, starts, stops = self.extract_cons(self.data)
         px = self.correct_byteorder(px)
         py = self.correct_byteorder(py)
         pz = self.correct_byteorder(pz)
         E = self.correct_byteorder(E)
-        offsets = self.correct_byteorder(offsets)
-        self._results = fastjet._ext.interfacemulti(px, py, pz, E, offsets, jetdef)
+        starts = self.correct_byteorder(starts)
+        stops = self.correct_byteorder(stops)
+        self._results = fastjet._ext.interfacemulti(
+            px, py, pz, E, starts, stops, jetdef
+        )
 
     def _check_record(self, data):
         return data.layout.is_record or data.layout.is_numpy
@@ -34,9 +36,11 @@ class _classmultievent:
         py = np.asarray(ak.Array(array.layout.content, behavior=array.behavior).py)
         pz = np.asarray(ak.Array(array.layout.content, behavior=array.behavior).pz)
         E = np.asarray(ak.Array(array.layout.content, behavior=array.behavior).E)
-        off = np.asarray(array.layout.stops)
-        off = np.insert(off, 0, 0)
-        return px, py, pz, E, off
+        starts = np.asarray(array.layout.starts)
+        stops = np.asarray(array.layout.stops)
+        starts = np.insert(starts, 0, 0)
+        stops = np.insert(stops, 0, 0)
+        return px, py, pz, E, starts, stops
 
     def single_to_jagged(self, array):
         single = ak.Array(

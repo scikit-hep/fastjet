@@ -33,9 +33,9 @@ typedef struct {
   PyObject *next;
 } SwigPyObject;
 
-template <typename T>
-T swigtocpp(py::object obj) { // unwraps python object to get the cpp pointer
-                              // from the swig bindings
+template <typename T> T swigtocpp(py::object obj) {
+  // unwraps python object to get the cpp pointer
+  // from the swig bindings
   auto upointer = obj.attr("this").ptr();
   auto swigpointer = reinterpret_cast<SwigPyObject *>(upointer);
   auto objpointervoid = swigpointer->ptr;
@@ -59,39 +59,37 @@ output_wrapper interfacemulti(
     py::array_t<double, py::array::c_style | py::array::forcecast> pyi,
     py::array_t<double, py::array::c_style | py::array::forcecast> pzi,
     py::array_t<double, py::array::c_style | py::array::forcecast> Ei,
-    py::array_t<int, py::array::c_style | py::array::forcecast> offsets,
+    py::array_t<int, py::array::c_style | py::array::forcecast> starts,
+    py::array_t<int, py::array::c_style | py::array::forcecast> stops,
     py::object jetdef) {
-  py::buffer_info infooff = offsets.request();
+  // requesting buffer information of the input
+  py::buffer_info infostarts = starts.request();
+  py::buffer_info infostops = stops.request();
   py::buffer_info infopx = pxi.request();
-  py::buffer_info infopy =
-      pyi.request(); // requesting buffer information of the input
+  py::buffer_info infopy = pyi.request();
   py::buffer_info infopz = pzi.request();
   py::buffer_info infoE = Ei.request();
 
-  auto offptr = static_cast<int *>(infooff.ptr);
+  // pointers to the initial values
+  auto startsptr = static_cast<int *>(infostarts.ptr);
+  auto stopsptr = static_cast<int *>(infostops.ptr);
   auto pxptr = static_cast<double *>(infopx.ptr);
-  auto pyptr =
-      static_cast<double *>(infopy.ptr); // pointer to the initial value
+  auto pyptr = static_cast<double *>(infopy.ptr);
   auto pzptr = static_cast<double *>(infopz.ptr);
   auto Eptr = static_cast<double *>(infoE.ptr);
 
-  int dimoff = infooff.shape[0];
+  int dimoff = infostarts.shape[0];
   output_wrapper ow;
-  std::vector<double> nevents;
-  std::vector<double> offidx;
-  std::vector<double> constphi;
   std::vector<double> idx;
-  std::vector<double> idxo;
   for (int i = 0; i < dimoff - 1; i++) {
     std::vector<fj::PseudoJet> particles;
-    for (int j = *offptr; j < *(offptr + 1); j++) {
+    for (int j = *starts; j < *stops; j++) {
       particles.push_back(fj::PseudoJet(*pxptr, *pyptr, *pzptr, *Eptr));
       pxptr++;
       pyptr++;
       pzptr++;
       Eptr++;
     }
-
     std::vector<fj::PseudoJet> jets;
     auto jet_def = swigtocpp<fj::JetDefinition *>(jetdef);
     std::shared_ptr<std::vector<fj::PseudoJet>> pj =
@@ -99,7 +97,8 @@ output_wrapper interfacemulti(
     std::shared_ptr<fastjet::ClusterSequence> cs =
         std::make_shared<fastjet::ClusterSequence>(*pj, *jet_def);
     auto j = cs->inclusive_jets();
-    offptr++;
+    starts++;
+    stops++;
     ow.cse.push_back(cs);
     ow.parts.push_back(pj);
   }
