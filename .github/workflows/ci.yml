@@ -89,7 +89,7 @@ jobs:
           brew install make automake swig gmp mpfr boost
           export PATH="/usr/local/opt/make/libexec/gnubin:$PATH"
 
-      - uses: pypa/cibuildwheel@v2.16
+      - uses: pypa/cibuildwheel@v2.17
         env:
           CIBW_ARCHS: ${{ matrix.arch }}
           CIBW_BUILD: cp${{ matrix.python }}-*
