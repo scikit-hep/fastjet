@@ -97,6 +97,13 @@ jobs:
   upload_all:
     needs: [build_wheels, make_sdist]
     runs-on: ubuntu-latest
+    # Restrict to the environment set for the trusted publisher
+    environment:
+      name: publish
+    # Mandatory for publishing with a trusted publisher
+    # c.f. https://docs.pypi.org/trusted-publishers/using-a-publisher/
+    permissions:
+      id-token: write
     if: github.event_name == 'release' && github.event.action == 'published'
 
     steps:
@@ -108,6 +115,4 @@ jobs:
 
       - uses: pypa/gh-action-pypi-publish@release/v1
         with:
-          user: __token__
-          # Remember to generate this and set it in "GitHub Secrets"
-          password: ${{ secrets.pypi_password }}
+          print-hash: true
