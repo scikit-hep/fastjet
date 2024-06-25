@@ -34,7 +34,7 @@ jobs:
       fail-fast: false
       matrix:
         python-version: ["3.8", "3.12"]
-        runs-on: [ubuntu-latest, macos-13]
+        runs-on: [ubuntu-latest, macos-13, macos-latest]
         arch: [auto64]
     steps:
       - uses: actions/checkout@v4
@@ -48,8 +48,9 @@ jobs:
       - name: Install compiler tools on macOS
         if: runner.os == 'macOS'
         run: |
-          brew install make automake swig gmp mpfr boost
+          brew reinstall make automake swig gmp mpfr boost libtool
           export PATH="/usr/local/opt/make/libexec/gnubin:$PATH"
+          eval "$(/opt/homebrew/bin/brew shellenv)"
 
       - name: Install extra deps on Linux
         if: runner.os == 'Linux'
@@ -69,7 +70,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-13]
+        os: [ubuntu-latest, macos-13, macos-latest]
         python: [312]
         arch: [auto64]
 
@@ -86,8 +87,9 @@ jobs:
       - name: Install compiler tools on macOS
         if: runner.os == 'macOS'
         run: |
-          brew install make automake swig gmp mpfr boost
+          brew reinstall make automake swig gmp mpfr boost libtool
           export PATH="/usr/local/opt/make/libexec/gnubin:$PATH"
+          eval "$(/opt/homebrew/bin/brew shellenv)"
 
       - uses: pypa/cibuildwheel@v2.17
         env:
