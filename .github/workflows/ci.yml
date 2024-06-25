@@ -50,6 +50,7 @@ jobs:
         run: |
           brew reinstall make automake swig gmp mpfr boost libtool
           export PATH="/usr/local/opt/make/libexec/gnubin:$PATH"
+          eval "$(/opt/homebrew/bin/brew shellenv)"
 
       - name: Install extra deps on Linux
         if: runner.os == 'Linux'
@@ -88,6 +89,7 @@ jobs:
         run: |
           brew reinstall make automake swig gmp mpfr boost libtool
           export PATH="/usr/local/opt/make/libexec/gnubin:$PATH"
+          eval "$(/opt/homebrew/bin/brew shellenv)"
 
       - uses: pypa/cibuildwheel@v2.17
         env:
