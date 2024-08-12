@@ -7,7 +7,7 @@ ci:
 
 repos:
 - repo: https://github.com/psf/black-pre-commit-mirror
-  rev: 24.4.2
+  rev: 24.8.0
   hooks:
   - id: black
 
@@ -31,7 +31,7 @@ repos:
   - id: isort
 
 - repo: https://github.com/asottile/pyupgrade
-  rev: v3.16.0
+  rev: v3.17.0
   hooks:
   - id: pyupgrade
     args: ["--py36-plus"]
@@ -42,7 +42,7 @@ repos:
   - id: setup-cfg-fmt
 
 - repo: https://github.com/pycqa/flake8
-  rev: 7.1.0
+  rev: 7.1.1
   hooks:
   - id: flake8
     exclude: docs/conf.py
@@ -55,7 +55,7 @@ repos:
     stages: [manual]
 
 - repo: https://github.com/pre-commit/mirrors-clang-format
-  rev: "v18.1.7"
+  rev: "v18.1.8"
   hooks:
     - id: clang-format
       types_or: [c++, c, cuda]
