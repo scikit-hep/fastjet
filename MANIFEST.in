@@ -1,7 +1,6 @@
 graft src
 graft tests
 graft extern
-graft pybind11
 global-exclude .git .gitmodules
 include LICENSE README.md pyproject.toml setup.py setup.cfg patch_clustersequence.txt
 exclude .cirrus.yml
