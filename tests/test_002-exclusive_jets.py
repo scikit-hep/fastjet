@@ -234,6 +234,8 @@ def test_exclusive_jets_softdrop_grooming():
                 {"px": 32.45, "py": 63.21, "pz": 543.14, "E": 599.56},
             ],
             "msoftdrop": 488.2395243115817,
+            "deltaRsoftdrop": 0.009873899817126915,
+            "symmetrysoftdrop": 0.49727522889673303,
             "ptsoftdrop": 142.88274528437645,
             "etasoftdrop": 2.726117171791057,
             "phisoftdrop": 1.1012644074821902,
@@ -272,6 +274,18 @@ def test_exclusive_jets_softdrop_grooming():
                 ak.isclose(
                     ak.Array([softdrop_output.msoftdrop]),
                     ak.Array([softdrop.msoftdrop]),
+                    rtol=1e-12,
+                    atol=0,
+                ),
+                ak.isclose(
+                    ak.Array([softdrop_output.deltaRsoftdrop]),
+                    ak.Array([softdrop.deltaRsoftdrop]),
+                    rtol=1e-12,
+                    atol=0,
+                ),
+                ak.isclose(
+                    ak.Array([softdrop_output.symmetrysoftdrop]),
+                    ak.Array([softdrop.symmetrysoftdrop]),
                     rtol=1e-12,
                     atol=0,
                 ),
