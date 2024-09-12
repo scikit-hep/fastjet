@@ -29,6 +29,13 @@ FASTJET_CONTRIB = DIR / "fastjet-contrib"
 PYTHON = DIR / "src/fastjet"
 OUTPUT = PYTHON / "_fastjet_core"
 
+
+# Clean up transient directories to allow for rebuilds during development
+if (DIR / "build").exists():
+    shutil.rmtree(DIR / "build")
+if OUTPUT.exists():
+    shutil.rmtree(OUTPUT)
+
 LIBS = [
     "fastjet",
     "fastjettools",
