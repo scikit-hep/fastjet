@@ -17,7 +17,7 @@ manylinux-i686-image = "manylinux2014"
 before-all = [
     "yum update -y",
     "yum install -y mpfr-devel",
-    "curl -L https://boostorg.jfrog.io/artifactory/main/release/1.84.0/source/boost_1_84_0.tar.bz2 -o boost_1_84_0.tar.bz2",
+    "curl -LO https://boostorg.jfrog.io/artifactory/main/release/1.84.0/source/boost_1_84_0.tar.bz2",
     "tar --bzip2 -xf boost_1_84_0.tar.bz2",
     "mv boost_1_84_0/boost /usr/include/boost",
     "curl -LO https://github.com/CGAL/cgal/releases/download/v5.6.1/CGAL-5.6.1-library.zip",
