@@ -20,6 +20,7 @@ task:
           gcc \
           g++ \
           libboost-dev \
+          libcgal-dev \
           libmpfr-dev \
           libgmp-dev \
           swig \

@@ -62,7 +62,7 @@ jobs:
       - name: Install compiler tools on macOS
         if: runner.os == 'macOS'
         run: |
-          brew install make automake swig mpfr boost
+          brew install make automake swig mpfr boost cgal
           export PATH="/usr/local/opt/make/libexec/gnubin:$PATH"
 
       - name: Clone gmp
@@ -112,7 +112,9 @@ jobs:
 
       - name: Install extra deps on Linux
         if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y libboost-dev swig autoconf libtool
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libboost-dev libcgal-dev swig autoconf libtool
 
       - name: test sdist
         run: python -m pip install dist/*.tar.gz
