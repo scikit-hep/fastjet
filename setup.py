@@ -15,13 +15,9 @@ import shutil
 import subprocess
 import sys
 import sysconfig
-import urllib.request
-import zipfile
 
 import setuptools.command.build_ext
 import setuptools.command.install
-
-CGAL_ZIP = "https://github.com/CGAL/cgal/releases/download/v5.6/CGAL-5.6-library.zip"
 
 DIR = pathlib.Path(__file__).parent.resolve()
 FASTJET = DIR / "extern" / "fastjet-core"
@@ -56,16 +52,6 @@ def get_version() -> str:
 class FastJetBuild(setuptools.command.build_ext.build_ext):
     def build_extensions(self):
         if not OUTPUT.exists():
-            zip_filename = DIR / pathlib.Path(CGAL_ZIP).parts[-1]
-
-            with urllib.request.urlopen(CGAL_ZIP) as http_obj:
-                with open(zip_filename, "wb") as file_obj:
-                    shutil.copyfileobj(http_obj, file_obj)
-
-            with zipfile.ZipFile(zip_filename) as zip_obj:
-                cgal_dir = DIR / zip_obj.namelist()[0]
-                zip_obj.extractall(DIR)
-
             # Patch for segfault of LimitedWarning
             # For more info see https://github.com/scikit-hep/fastjet/pull/131
             subprocess.run(
@@ -92,7 +78,6 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
                 "--enable-allcxxplugins",
                 "--enable-cgal-header-only",
                 "--enable-cgal",
-                f"--with-cgaldir={cgal_dir}",
                 "--enable-swig",
                 "--enable-pyext",
                 f'LDFLAGS={env["LDFLAGS"]}',
