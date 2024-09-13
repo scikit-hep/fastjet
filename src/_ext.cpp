@@ -1705,8 +1705,11 @@ PYBIND11_MODULE(_ext, m) {
             jet_groomed_m.push_back(soft.m());
             jet_groomed_E.push_back(soft.E());
             jet_groomed_pz.push_back(soft.pz());
-            jet_groomed_delta_R.push_back(soft.structure_of<fastjet::contrib::SoftDrop>().delta_R());
-            jet_groomed_symmetry.push_back(soft.structure_of<fastjet::contrib::SoftDrop>().symmetry());
+
+            auto sd_struct = soft.structure_of<fastjet::contrib::SoftDrop>();
+            jet_groomed_delta_R.push_back(sd_struct.delta_R());
+            jet_groomed_symmetry.push_back(sd_struct.symmetry());
+
             for (unsigned int k = 0; k < soft.constituents().size(); k++){
               consts_groomed_px.push_back(soft.constituents()[k].px());
               consts_groomed_py.push_back(soft.constituents()[k].py());
