@@ -24,9 +24,9 @@ import setuptools.command.install
 CGAL_ZIP = "https://github.com/CGAL/cgal/releases/download/v5.6/CGAL-5.6-library.zip"
 
 DIR = pathlib.Path(__file__).parent.resolve()
-FASTJET = DIR / "fastjet-core"
-FASTJET_CONTRIB = DIR / "fastjet-contrib"
-PYTHON = DIR / "src/fastjet"
+FASTJET = DIR / "extern" / "fastjet-core"
+FASTJET_CONTRIB = DIR / "extern" / "fastjet-contrib"
+PYTHON = DIR / "src" / "fastjet"
 OUTPUT = PYTHON / "_fastjet_core"
 
 
