@@ -77,7 +77,6 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
                 "--disable-auto-ptr",
                 "--enable-allcxxplugins",
                 "--enable-cgal-header-only",
-                "--enable-cgal",
                 "--enable-swig",
                 "--enable-pyext",
                 f'LDFLAGS={env["LDFLAGS"]}',
