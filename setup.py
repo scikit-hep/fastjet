@@ -104,6 +104,7 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
             env = os.environ.copy()
             env["PYTHON"] = sys.executable
             env["PYTHON_INCLUDE"] = f'-I{sysconfig.get_path("include")}'
+            env["CXX"] = env.get("CXX", "g++")
             env["CXXFLAGS"] = "-O3 -Bstatic -Bdynamic -std=c++17 " + env.get(
                 "CXXFLAGS", ""
             )
@@ -133,17 +134,8 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
                 subprocess.run(["cat", "config.log"], cwd=FASTJET, check=True)
                 raise
 
-            env["ORIGIN"] = "$ORIGIN"  # if evaluated, it will still be '$ORIGIN'
             subprocess.run(["make", "-j"], cwd=FASTJET, env=env, check=True)
             subprocess.run(["make", "install"], cwd=FASTJET, env=env, check=True)
-
-            # Update the environment for fastjet-contrib build
-            env = os.environ.copy()
-            env["CXX"] = env.get("CXX", "g++")
-            env["CXXFLAGS"] = "-O3 -Bstatic -Bdynamic -std=c++17 " + env.get(
-                "CXXFLAGS", ""
-            )
-            env["LDFLAGS"] = env.get("LDFLAGS", "")
 
             # For aarch64 macOS need to set the LDFLAGS for Homebrew installed
             # dependencies to be found. However, fastjet-contrib's configure
