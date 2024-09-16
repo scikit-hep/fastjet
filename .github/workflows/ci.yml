@@ -60,6 +60,9 @@ jobs:
           echo $PATH
           python -m pip install '.[test]' -v
 
+      - name: List installed Python packages
+        run: python -m pip list
+
       - name: Test package
         run: python -m pytest -vv -rs -Wd
 
