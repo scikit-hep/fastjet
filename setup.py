@@ -11,6 +11,7 @@ from pybind11.setup_helpers import Pybind11Extension  # isort:skip
 
 import os
 import pathlib
+import platform
 import shutil
 import subprocess
 import sys
@@ -73,6 +74,28 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
                 cwd=FASTJET,
             )
 
+            # Inject the required CXXFLAGS and LDFLAGS for building on
+            # aarch64 macOS. As Homebrew can not be used at any part in a
+            # conda-forge build, guard against this by checking for the
+            # conda-build environment variable.
+            # This is a bad hack, and will be alleviated if CMake can be used
+            # by FastJet and FastJet-contrib.
+            # c.f. https://github.com/scikit-hep/fastjet/issues/310
+            if (
+                sys.platform == "darwin"
+                and platform.processor() == "arm"
+                and "HOMEBREW_PREFIX" in os.environ
+                and "CONDA_BUILD" not in os.environ
+            ):
+                os.environ["CXXFLAGS"] = (
+                    os.environ.get("CXXFLAGS", "")
+                    + f" -I{os.environ['HOMEBREW_PREFIX']}/include"
+                )
+                os.environ["LDFLAGS"] = (
+                    os.environ.get("LDFLAGS", "")
+                    + f" -L{os.environ['HOMEBREW_PREFIX']}/lib"
+                )
+
             # RPATH is set for shared libraries in the following locations:
             # * fastjet/
             # * fastjet/_fastjet_core/lib/
@@ -81,7 +104,9 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
             env = os.environ.copy()
             env["PYTHON"] = sys.executable
             env["PYTHON_INCLUDE"] = f'-I{sysconfig.get_path("include")}'
-            env["CXXFLAGS"] = "-O3 -Bstatic -lgmp -Bdynamic -std=c++17"
+            env["CXXFLAGS"] = "-O3 -Bstatic -Bdynamic -std=c++17 " + env.get(
+                "CXXFLAGS", ""
+            )
             env["LDFLAGS"] = env.get("LDFLAGS", "") + f" -Wl,-rpath,{_rpath}"
             env["ORIGIN"] = "$ORIGIN"  # if evaluated, it will still be '$ORIGIN'
 
@@ -109,20 +134,32 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
                 subprocess.run(["cat", "config.log"], cwd=FASTJET, check=True)
                 raise
 
-            env = os.environ.copy()
-            env["CXX"] = env.get("CXX", "g++")
-            env["LDFLAGS"] = env.get("LDFLAGS", "") + f" -Wl,-rpath,{_rpath}"
             env["ORIGIN"] = "$ORIGIN"  # if evaluated, it will still be '$ORIGIN'
             subprocess.run(["make", "-j"], cwd=FASTJET, env=env, check=True)
             subprocess.run(["make", "install"], cwd=FASTJET, env=env, check=True)
 
+            # Update the environment for fastjet-contrib build
+            env = os.environ.copy()
+            env["CXX"] = env.get("CXX", "g++")
+            env["CXXFLAGS"] = "-O3 -Bstatic -Bdynamic -std=c++17 " + env.get(
+                "CXXFLAGS", ""
+            )
+            env["LDFLAGS"] = env.get("LDFLAGS", "")
+
+            # For aarch64 macOS need to set the LDFLAGS for Homebrew installed
+            # dependencies to be found. However, fastjet-contrib's configure
+            # script does not use/accept LDFLAGS as an argument, and so to get
+            # the library search path options passed to the linker it is necessary
+            # to improperly inject them into the CXXFLAGS (which are used).
+            # This is a bad hack, and will be alleviated if CMake can be used
+            # by FastJet and FastJet-contrib.
+            # c.f. https://github.com/scikit-hep/fastjet/issues/310
             subprocess.run(
                 [
                     "./configure",
                     f"--fastjet-config={FASTJET}/fastjet-config",
                     f'CXX={env["CXX"]}',
-                    "CXXFLAGS=-O3 -Bstatic -Bdynamic -std=c++17",
-                    f'LDFLAGS={env["LDFLAGS"]}',
+                    f'CXXFLAGS={env["CXXFLAGS"]}{" "+env["LDFLAGS"] if sys.platform == "darwin" else ""}',
                 ],
                 cwd=FASTJET_CONTRIB,
                 env=env,
@@ -151,10 +188,7 @@ class FastJetInstall(setuptools.command.install.install):
 
         shutil.copytree(OUTPUT, fastjetdir / "_fastjet_core", symlinks=True)
 
-        make = "make"
-        if sys.platform == "darwin":
-            make = "gmake"
-
+        make = "gmake" if sys.platform == "darwin" else "make"
         pythondir = pathlib.Path(
             subprocess.check_output(
                 f"""{make} -f Makefile --eval='print-pythondir:
