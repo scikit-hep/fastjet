@@ -347,7 +347,7 @@ class ClusterSequence:  # The super class
 
         raise AssertionError()
 
-    def constituents(self, min_p: float = 0) -> ak.Array:
+    def constituents(self, min_pt: float = 0) -> ak.Array:
         """Returns the particles that make up each Jet.
 
         Args:
