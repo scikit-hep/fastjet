@@ -172,6 +172,3 @@ cython_debug/
 *.exe
 *.out
 *.app
-
-# Build dependencies
-CGAL*
