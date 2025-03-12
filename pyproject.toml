@@ -19,7 +19,7 @@ before-all = [
     "yum install -y mpfr-devel",
     "curl -L https://archives.boost.io/release/1.87.0/source/boost_1_87_0.tar.bz2 -o boost_1_87_0.tar.bz2",
     "tar --bzip2 -xf boost_1_87_0.tar.bz2",
-    "mv boost_1_84_0/boost /usr/include/boost",
+    "mv boost_1_87_0/boost /usr/include/boost",
 ]
 # Skip musllinux builds for the moment
 skip = "*-musllinux_*"
