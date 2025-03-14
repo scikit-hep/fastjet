@@ -34,7 +34,7 @@ jobs:
       fail-fast: false
       matrix:
         python-version: ["3.9", "3.13"]
-        runs-on: [ubuntu-latest, macos-latest]
+        runs-on: [ubuntu-latest] #, macos-latest]
         arch: [auto64]
     steps:
       - uses: actions/checkout@v4
@@ -72,7 +72,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest] #, macos-latest]
         python: [313]
         arch: [auto64]
 
@@ -115,7 +115,7 @@ jobs:
           make --jobs
           make install
 
-      - uses: pypa/cibuildwheel@v2.22
+      - uses: pypa/cibuildwheel@v2.23
         env:
           CIBW_ARCHS: ${{ matrix.arch }}
           CIBW_BUILD: cp${{ matrix.python }}-*
