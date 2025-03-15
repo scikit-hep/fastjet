@@ -81,7 +81,10 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
             env = os.environ.copy()
             env["PYTHON"] = sys.executable
             env["PYTHON_INCLUDE"] = f'-I{sysconfig.get_path("include")}'
-            env["CXXFLAGS"] = "-O3 -Bstatic -lgmp -Bdynamic -std=c++17"
+            env["CXX"] = env.get("CXX", "g++")
+            env["CXXFLAGS"] = "-O3 -Bstatic -Bdynamic -std=c++17 " + env.get(
+                "CXXFLAGS", ""
+            )
             env["LDFLAGS"] = env.get("LDFLAGS", "") + f" -Wl,-rpath,{_rpath}"
             env["ORIGIN"] = "$ORIGIN"  # if evaluated, it will still be '$ORIGIN'
 
@@ -109,10 +112,6 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
                 subprocess.run(["cat", "config.log"], cwd=FASTJET, check=True)
                 raise
 
-            env = os.environ.copy()
-            env["CXX"] = env.get("CXX", "g++")
-            env["LDFLAGS"] = env.get("LDFLAGS", "") + f" -Wl,-rpath,{_rpath}"
-            env["ORIGIN"] = "$ORIGIN"  # if evaluated, it will still be '$ORIGIN'
             subprocess.run(["make", "-j"], cwd=FASTJET, env=env, check=True)
             subprocess.run(["make", "install"], cwd=FASTJET, env=env, check=True)
 
@@ -121,8 +120,7 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
                     "./configure",
                     f"--fastjet-config={FASTJET}/fastjet-config",
                     f'CXX={env["CXX"]}',
-                    "CXXFLAGS=-O3 -Bstatic -Bdynamic -std=c++17",
-                    f'LDFLAGS={env["LDFLAGS"]}',
+                    f'CXXFLAGS={env["CXXFLAGS"]}',
                 ],
                 cwd=FASTJET_CONTRIB,
                 env=env,
@@ -151,10 +149,7 @@ class FastJetInstall(setuptools.command.install.install):
 
         shutil.copytree(OUTPUT, fastjetdir / "_fastjet_core", symlinks=True)
 
-        make = "make"
-        if sys.platform == "darwin":
-            make = "gmake"
-
+        make = "gmake" if sys.platform == "darwin" else "make"
         pythondir = pathlib.Path(
             subprocess.check_output(
                 f"""{make} -f Makefile --eval='print-pythondir:
