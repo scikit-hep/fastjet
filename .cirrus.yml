@@ -11,8 +11,8 @@ task:
         cpu: 4
         memory: 6G
         matrix:
-          - image: python:3.8
-          - image: python:3.12
+          - image: python:3.9
+          - image: python:3.13
 
       install_build_dependencies_script: |
         apt-get update

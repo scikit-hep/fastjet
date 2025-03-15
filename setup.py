@@ -162,7 +162,7 @@ class FastJetInstall(setuptools.command.install.install):
 ' print-pythondir""",
                 shell=True,
                 cwd=FASTJET / "pyinterface",
-                universal_newlines=True,
+                text=True,
             ).strip()
         )
 
@@ -173,7 +173,7 @@ class FastJetInstall(setuptools.command.install.install):
 ' print-pyexecdir""",
                 shell=True,
                 cwd=FASTJET / "pyinterface",
-                universal_newlines=True,
+                text=True,
             ).strip()
         )
 

@@ -29,8 +29,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python: [38, 39, 310, 311, 312]
-        os: [ubuntu-latest, ubuntu-24.04-arm, macos-13]
+        python: [39, 310, 311, 312, 313]
+        os: [ubuntu-latest, ubuntu-24.04-arm] #, macos-latest]
         arch: [auto64]
 
     steps:
@@ -67,7 +67,7 @@ jobs:
           make --jobs
           make install
 
-      - uses: pypa/cibuildwheel@v2.22
+      - uses: pypa/cibuildwheel@v2.23
         env:
           CIBW_ARCHS: ${{ matrix.arch }}
           CIBW_BUILD: cp${{ matrix.python }}-*
