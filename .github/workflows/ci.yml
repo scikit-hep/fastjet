@@ -96,11 +96,11 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           brew install make automake swig mpfr gmp boost libtool
-          echo 'PATH="/opt/homebrew/opt/make/libexec/gnubin:/opt/homebrew/opt/libtool/libexec/gnubin:$PATH"' >> .bashrc
-          echo 'CPPFLAGS+="-I/opt/homebrew/include -L/opt/homebrew/lib"' >> .bashrc
-          echo 'CXXFLAGS+="-I/opt/homebrew/include -L/opt/homebrew/lib"' >> .bashrc
-          echo 'CFLAGS+="-I/opt/homebrew/include -L/opt/homebrew/lib"' >> .bashrc
-          echo 'LDFLAGS+="-L/opt/homebrew/lib"' >> .bashrc
+          echo 'PATH="/opt/homebrew/opt/make/libexec/gnubin:/opt/homebrew/opt/libtool/libexec/gnubin:$PATH"' >> .profile
+          echo 'CPPFLAGS+="-I/opt/homebrew/include -L/opt/homebrew/lib"' >> .profile
+          echo 'CXXFLAGS+="-I/opt/homebrew/include -L/opt/homebrew/lib"' >> .profile
+          echo 'CFLAGS+="-I/opt/homebrew/include -L/opt/homebrew/lib"' >> .profile
+          echo 'LDFLAGS+="-L/opt/homebrew/lib"' >> .profile
 
       - uses: pypa/cibuildwheel@v2.23
         env:
