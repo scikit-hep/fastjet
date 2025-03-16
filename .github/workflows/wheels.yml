@@ -36,7 +36,20 @@ jobs:
         os: [ubuntu-latest, ubuntu-24.04-arm]
         arch: [auto64]
         include:
-          - os: macos-latest
+          - python: 39
+            os: macos-latest
+            arch: universal2
+          - python: 310
+            os: macos-latest
+            arch: universal2
+          - python: 311
+            os: macos-latest
+            arch: universal2
+          - python: 312
+            os: macos-latest
+            arch: universal2
+          - python: 313
+            os: macos-latest
             arch: universal2
 
     steps:
