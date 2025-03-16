@@ -104,6 +104,7 @@ jobs:
           CIBW_ARCHS: ${{ matrix.arch }}
           CIBW_BUILD: cp${{ matrix.python }}-*
           CIBW_BUILD_VERBOSITY: 2
+          MACOSX_DEPLOYMENT_TARGET: 14.0
           CPPFLAGS: -I/opt/homebrew/include -L/opt/homebrew/lib
           CXXFLAGS: -I/opt/homebrew/include -L/opt/homebrew/lib
           CFLAGS: -I/opt/homebrew/include -L/opt/homebrew/lib
