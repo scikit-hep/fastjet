@@ -33,24 +33,8 @@ jobs:
       fail-fast: false
       matrix:
         python: [39, 310, 311, 312, 313]
-        os: [ubuntu-latest, ubuntu-24.04-arm]
+        os: [ubuntu-latest, ubuntu-24.04-arm, macos-latest]
         arch: [auto64]
-        include:
-          - python: 39
-            os: macos-latest
-            arch: universal2
-          - python: 310
-            os: macos-latest
-            arch: universal2
-          - python: 311
-            os: macos-latest
-            arch: universal2
-          - python: 312
-            os: macos-latest
-            arch: universal2
-          - python: 313
-            os: macos-latest
-            arch: universal2
 
     steps:
       - uses: actions/checkout@v4
@@ -81,8 +65,7 @@ jobs:
           ./configure --help
           ./configure \
             --prefix=$(brew --prefix) \
-            --enable-cxx \
-            --with-universal-archs
+            --enable-cxx 
           touch ./doc/version.texi
           make --jobs
           make install
