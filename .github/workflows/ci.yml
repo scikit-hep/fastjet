@@ -95,7 +95,7 @@ jobs:
       - name: Install compiler tools on macOS
         if: runner.os == 'macOS'
         run: |
-          brew install make automake swig mpfr gmp boost libtool          
+          brew install make automake swig mpfr gmp boost libtool
 
       - uses: pypa/cibuildwheel@2.23
         if: runner.os == 'macOS'
