@@ -81,7 +81,8 @@ jobs:
           ./configure --help
           ./configure \
             --prefix=$(brew --prefix) \
-            --enable-cxx
+            --enable-cxx \
+            --with-universal-archs
           touch ./doc/version.texi
           make --jobs
           make install
