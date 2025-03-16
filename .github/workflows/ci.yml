@@ -58,7 +58,7 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           export PATH="/opt/homebrew/opt/make/libexec/gnubin:/opt/homebrew/opt/libtool/libexec/gnubin:$PATH"
-          export LD_LIBRARY_PATH="/opt/homebrew/lib:$LD_LIBRARY_PATH"
+          export LDFLAGS+="-L/opt/homebrew/lib"
           echo $PATH
           which libtool
           which libtoolize
