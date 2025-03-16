@@ -63,6 +63,7 @@ jobs:
           export CXXFLAGS+="-I/opt/homebrew/include -L/opt/homebrew/lib"
           export CFLAGS+="-I/opt/homebrew/include -L/opt/homebrew/lib"
           export LDFLAGS+="-L/opt/homebrew/lib"
+          sed -i.bak '/CXXFLAGS=/d' extern/fastjet-contrib/Makefile.in
           echo $PATH
           which libtool
           which libtoolize
