@@ -63,9 +63,6 @@ jobs:
           export CXXFLAGS+="-I/opt/homebrew/include -L/opt/homebrew/lib"
           export CFLAGS+="-I/opt/homebrew/include -L/opt/homebrew/lib"
           export LDFLAGS+="-L/opt/homebrew/lib"
-          echo $PATH
-          which libtool
-          which libtoolize
           python -m pip install '.[test]' -v
 
       - name: Install package (Linux)
@@ -86,7 +83,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, ubuntu-24.04-arm] #, macos-latest]
+        os: [ubuntu-latest, ubuntu-24.04-arm, macos-latest]
         python: [313]
         arch: [auto64]
 
@@ -95,39 +92,15 @@ jobs:
         with:
           submodules: recursive
 
-      - uses: docker/setup-qemu-action@v3
-        if: matrix.arch != 'auto64'
-        with:
-          platforms: all
-
       - name: Install compiler tools on macOS
         if: runner.os == 'macOS'
         run: |
-          brew install make automake swig mpfr boost
-          export PATH="/usr/local/opt/make/libexec/gnubin:$PATH"
-
-      - name: Clone gmp
-        if: runner.os == 'macOS'
-        uses: actions/checkout@v4
-        with:
-          repository: gmp-mirror/gmp-6.3
-          path: gmp-6.3
-
-      - name: Build gmp from source for MACOSX_DEPLOYMENT_TARGET
-        if: runner.os == 'macOS'
-        env:
-          MACOSX_DEPLOYMENT_TARGET: "10.9"
-        working-directory: gmp-6.3
-        run: |
-          brew install texinfo
-          autoreconf -i -f
-          ./configure --help
-          ./configure \
-            --prefix=$(brew --prefix) \
-            --enable-cxx
-          touch ./doc/version.texi
-          make --jobs
-          make install
+          brew install make automake swig mpfr gmp boost libtool
+          echo 'PATH="/opt/homebrew/opt/make/libexec/gnubin:/opt/homebrew/opt/libtool/libexec/gnubin:$PATH"' >> .bashrc
+          echo 'CPPFLAGS+="-I/opt/homebrew/include -L/opt/homebrew/lib"' >> .bashrc
+          echo 'CXXFLAGS+="-I/opt/homebrew/include -L/opt/homebrew/lib"' >> .bashrc
+          echo 'CFLAGS+="-I/opt/homebrew/include -L/opt/homebrew/lib"' >> .bashrc
+          echo 'LDFLAGS+="-L/opt/homebrew/lib"' >> .bashrc
 
       - uses: pypa/cibuildwheel@v2.23
         env:
