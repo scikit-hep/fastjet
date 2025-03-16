@@ -60,8 +60,7 @@ jobs:
       - name: Install compiler tools on macOS
         if: runner.os == 'macOS'
         run: |
-          brew install make automake swig mpfr boost
-          export PATH="/usr/local/opt/make/libexec/gnubin:$PATH"
+          brew install make automake swig mpfr boost libtool
 
       - name: Clone gmp
         if: runner.os == 'macOS'
@@ -76,6 +75,7 @@ jobs:
           MACOSX_DEPLOYMENT_TARGET: 10.14
         working-directory: gmp-6.3
         run: |
+          export PATH="/opt/homebrew/opt/make/libexec/gnubin:/opt/homebrew/opt/libtool/libexec/gnubin:$PATH"
           brew install texinfo
           autoreconf -i -f
           ./configure --help
