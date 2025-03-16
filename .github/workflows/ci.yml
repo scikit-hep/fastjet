@@ -59,6 +59,7 @@ jobs:
         run: |
           export PATH="/opt/homebrew/opt/make/libexec/gnubin:/opt/homebrew/opt/libtool/libexec/gnubin:$PATH"
           export CXXFLAGS+="-I/opt/homebrew/include"
+          export CFLAGS+="-I/opt/homebrew/include"
           export LDFLAGS+="-L/opt/homebrew/lib"
           echo $PATH
           which libtool
