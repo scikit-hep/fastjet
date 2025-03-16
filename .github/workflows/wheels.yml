@@ -5,6 +5,9 @@ on:
   release:
     types:
       - published
+  pull_request:
+    paths:
+      - ".github/workflows/wheels.yml"
 
 jobs:
   make_sdist:
@@ -30,8 +33,11 @@ jobs:
       fail-fast: false
       matrix:
         python: [39, 310, 311, 312, 313]
-        os: [ubuntu-latest, ubuntu-24.04-arm] #, macos-latest]
+        os: [ubuntu-latest, ubuntu-24.04-arm] 
         arch: [auto64]
+        include:
+          - os: macos-latest
+            arch: universal2
 
     steps:
       - uses: actions/checkout@v4
@@ -54,7 +60,7 @@ jobs:
       - name: Build gmp from source for MACOSX_DEPLOYMENT_TARGET
         if: runner.os == 'macOS'
         env:
-          MACOSX_DEPLOYMENT_TARGET: "10.9"
+          MACOSX_DEPLOYMENT_TARGET: 10.14
         working-directory: gmp-6.3
         run: |
           brew install texinfo
@@ -68,6 +74,20 @@ jobs:
           make install
 
       - uses: pypa/cibuildwheel@v2.23
+        if: runner.os == 'macOS'
+        name: "pypa/cibuildwheel@2.23 (macos)"
+        env:
+          CIBW_ARCHS: ${{ matrix.arch }}
+          CIBW_BUILD: cp${{ matrix.python }}-*
+          CIBW_BUILD_VERBOSITY: 2
+          MACOSX_DEPLOYMENT_TARGET: 10.14
+          CPPFLAGS: -I/opt/homebrew/include -L/opt/homebrew/lib
+          CXXFLAGS: -I/opt/homebrew/include -L/opt/homebrew/lib
+          CFLAGS: -I/opt/homebrew/include -L/opt/homebrew/lib
+          LDFLAGS: -L/opt/homebrew/lib
+
+      - uses: pypa/cibuildwheel@v2.23
+        if: runner.os != 'macOS'
         env:
           CIBW_ARCHS: ${{ matrix.arch }}
           CIBW_BUILD: cp${{ matrix.python }}-*
