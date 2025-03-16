@@ -49,9 +49,9 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           brew install make automake swig gmp mpfr boost libtool
-          export PATH="/usr/local/opt/make/libexec/gnubin:$PATH"
-          ln -sf /usr/local/opt/make/libexec/gnubin/glibtool /usr/local/opt/make/libexec/gnubin/libtool
-          ln -sf /usr/local/opt/make/libexec/gnubin/glibtoolize /usr/local/opt/make/libexec/gnubin/libtoolize
+          export PATH="/opt/homebrew/opt/make/libexec/gnubin:$PATH"
+          ln -sf /opt/homebrew/opt/make/libexec/gnubin/glibtool /opt/homebrew/opt/make/libexec/gnubin/libtool
+          ln -sf /opt/homebrew/opt/make/libexec/gnubin/glibtoolize /opt/homebrew/opt/make/libexec/gnubin/libtoolize
 
       - name: Install extra deps on Linux
         if: runner.os == 'Linux'
