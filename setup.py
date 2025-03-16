@@ -81,7 +81,9 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
             env = os.environ.copy()
             env["PYTHON"] = sys.executable
             env["PYTHON_INCLUDE"] = f'-I{sysconfig.get_path("include")}'
-            env["CXXFLAGS"] = "-O3 -Bstatic -lgmp -Bdynamic -std=c++17" + env["CXXFLAGS"]
+            env["CXXFLAGS"] = (
+                "-O3 -Bstatic -lgmp -Bdynamic -std=c++17" + env["CXXFLAGS"]
+            )
             env["LDFLAGS"] = env.get("LDFLAGS", "") + f" -Wl,-rpath,{_rpath}"
             env["ORIGIN"] = "$ORIGIN"  # if evaluated, it will still be '$ORIGIN'
 
