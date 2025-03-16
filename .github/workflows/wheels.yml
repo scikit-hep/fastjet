@@ -30,31 +30,10 @@ jobs:
       fail-fast: false
       matrix:
         python: [39, 310, 311, 312, 313]
-        os: [ubuntu-latest] #, macos-latest]
+        os: [ubuntu-latest, ubuntu-24.04-arm] #, macos-latest]
         arch: [auto64]
-        include:
-          - python: 39
-            os: ubuntu-latest
-            arch: aarch64
-          - python: 310
-            os: ubuntu-latest
-            arch: aarch64
-          - python: 311
-            os: ubuntu-latest
-            arch: aarch64
-          - python: 312
-            os: ubuntu-latest
-            arch: aarch64
-          - python: 313
-            os: ubuntu-latest
-            arch: aarch64
 
     steps:
-      - uses: docker/setup-qemu-action@v3
-        if: matrix.arch != 'auto64'
-        with:
-          platforms: arm64
-
       - uses: actions/checkout@v4
         with:
           submodules: recursive
