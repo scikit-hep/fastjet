@@ -60,6 +60,9 @@ jobs:
           export PATH="/opt/homebrew/opt/make/libexec/gnubin:/opt/homebrew/opt/libtool/libexec/gnubin:$PATH"
           export LD_LIBRARY_PATH="/opt/homebrew/lib:$LD_LIBRARY_PATH"
           echo $PATH
+          which libtool
+          which libtoolize
+          pwd
           python -m pip install '.[test]' -v
 
       - name: Install package (Linux)
