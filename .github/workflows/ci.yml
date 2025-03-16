@@ -49,7 +49,6 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           brew install make automake swig gmp mpfr boost libtool
-          echo $SHELL
 
       - name: Install extra deps on Linux
         if: runner.os == 'Linux'
@@ -58,6 +57,7 @@ jobs:
       - name: Install package (MacOS)
         if: runner.os == 'macOS'
         run: |
+          eval "$(/opt/homebrew/bin/brew shellenv)"
           export PATH="/opt/homebrew/opt/make/libexec/gnubin:/opt/homebrew/opt/libtool/libexec/gnubin:$PATH"
           export CPPFLAGS+="-I/opt/homebrew/include -L/opt/homebrew/lib"
           export CFLAGS+="-I/opt/homebrew/include -L/opt/homebrew/lib"
@@ -65,7 +65,6 @@ jobs:
           echo $PATH
           which libtool
           which libtoolize
-          pwd
           python -m pip install '.[test]' -v
 
       - name: Install package (Linux)
