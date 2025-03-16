@@ -34,7 +34,7 @@ jobs:
       fail-fast: false
       matrix:
         python-version: ["3.9", "3.13"]
-        runs-on: [ubuntu-latest, ubuntu-24.04-arm] #, macos-latest]
+        runs-on: [ubuntu-latest, ubuntu-24.04-arm, macos-latest]
         arch: [auto64]
     steps:
       - uses: actions/checkout@v4
@@ -48,8 +48,10 @@ jobs:
       - name: Install compiler tools on macOS
         if: runner.os == 'macOS'
         run: |
-          brew install make automake swig gmp mpfr boost
+          brew install make automake swig gmp mpfr boost libtool
           export PATH="/usr/local/opt/make/libexec/gnubin:$PATH"
+          ln -sf /usr/local/opt/make/libexec/gnubin/glibtool /usr/local/opt/make/libexec/gnubin/libtool
+          ln -sf /usr/local/opt/make/libexec/gnubin/glibtoolize /usr/local/opt/make/libexec/gnubin/libtoolize
 
       - name: Install extra deps on Linux
         if: runner.os == 'Linux'
