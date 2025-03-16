@@ -91,6 +91,7 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
                 "--disable-auto-ptr",
                 "--enable-allcxxplugins",
                 "--enable-cgal",
+                "--enable-cgal-header-only",
                 f"--with-cgaldir={cgal_dir}",
                 "--enable-swig",
                 "--enable-pyext",
