@@ -49,6 +49,7 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           brew install make automake swig gmp mpfr boost libtool
+          echo $SHELL
 
       - name: Install extra deps on Linux
         if: runner.os == 'Linux'
