@@ -95,7 +95,30 @@ jobs:
       - name: Install compiler tools on macOS
         if: runner.os == 'macOS'
         run: |
-          brew install make automake swig mpfr gmp boost libtool
+          brew install make automake swig mpfr boost libtool
+
+      - name: Clone gmp
+        if: runner.os == 'macOS'
+        uses: actions/checkout@v4
+        with:
+          repository: gmp-mirror/gmp-6.3
+          path: gmp-6.3
+
+      - name: Build gmp from source for MACOSX_DEPLOYMENT_TARGET
+        if: runner.os == 'macOS'
+        env:
+          MACOSX_DEPLOYMENT_TARGET: 10.14
+        working-directory: gmp-6.3
+        run: |
+          brew install texinfo
+          autoreconf -i -f
+          ./configure --help
+          ./configure \
+            --prefix=$(brew --prefix) \
+            --enable-cxx
+          touch ./doc/version.texi
+          make --jobs
+          make install
 
       - uses: pypa/cibuildwheel@v2.23
         if: runner.os == 'macOS'
@@ -104,7 +127,7 @@ jobs:
           CIBW_ARCHS: ${{ matrix.arch }}
           CIBW_BUILD: cp${{ matrix.python }}-*
           CIBW_BUILD_VERBOSITY: 2
-          MACOSX_DEPLOYMENT_TARGET: 14.0
+          MACOSX_DEPLOYMENT_TARGET: 10.14
           CPPFLAGS: -I/opt/homebrew/include -L/opt/homebrew/lib
           CXXFLAGS: -I/opt/homebrew/include -L/opt/homebrew/lib
           CFLAGS: -I/opt/homebrew/include -L/opt/homebrew/lib
