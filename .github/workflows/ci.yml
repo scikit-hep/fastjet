@@ -60,6 +60,7 @@ jobs:
           eval "$(/opt/homebrew/bin/brew shellenv)"
           export PATH="/opt/homebrew/opt/make/libexec/gnubin:/opt/homebrew/opt/libtool/libexec/gnubin:$PATH"
           export CPPFLAGS+="-I/opt/homebrew/include -L/opt/homebrew/lib"
+          export CXXFLAGS+="-I/opt/homebrew/include -L/opt/homebrew/lib"
           export CFLAGS+="-I/opt/homebrew/include -L/opt/homebrew/lib"
           export LDFLAGS+="-L/opt/homebrew/lib"
           echo $PATH
