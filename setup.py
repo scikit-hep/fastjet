@@ -123,7 +123,8 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
                     "./configure",
                     f"--fastjet-config={FASTJET}/fastjet-config",
                     f'CXX={env["CXX"]}',
-                    "CXXFLAGS=" + env.get("CXXFLAGS","-O3 -Bstatic -Bdynamic -std=c++17"),
+                    "CXXFLAGS="
+                    + env.get("CXXFLAGS", "-O3 -Bstatic -Bdynamic -std=c++17"),
                     f'LDFLAGS={env["LDFLAGS"]}',
                 ],
                 cwd=FASTJET_CONTRIB,
