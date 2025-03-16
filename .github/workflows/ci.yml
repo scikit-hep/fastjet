@@ -95,14 +95,22 @@ jobs:
       - name: Install compiler tools on macOS
         if: runner.os == 'macOS'
         run: |
-          brew install make automake swig mpfr gmp boost libtool
-          echo 'PATH="/opt/homebrew/opt/make/libexec/gnubin:/opt/homebrew/opt/libtool/libexec/gnubin:$PATH"' >> .profile
-          echo 'CPPFLAGS+="-I/opt/homebrew/include -L/opt/homebrew/lib"' >> .profile
-          echo 'CXXFLAGS+="-I/opt/homebrew/include -L/opt/homebrew/lib"' >> .profile
-          echo 'CFLAGS+="-I/opt/homebrew/include -L/opt/homebrew/lib"' >> .profile
-          echo 'LDFLAGS+="-L/opt/homebrew/lib"' >> .profile
+          brew install make automake swig mpfr gmp boost libtool          
+
+      - uses: pypa/cibuildwheel@2.23
+        if: runner.os == 'macOS'
+        name: "pypa/cibuildwheel@2.23 (macos)"
+        env:
+          CIBW_ARCHS: ${{ matrix.arch }}
+          CIBW_BUILD: cp${{ matrix.python }}-*
+          CIBW_BUILD_VERBOSITY: 2
+          CPPFLAGS: -I/opt/homebrew/include -L/opt/homebrew/lib
+          CXXFLAGS: -I/opt/homebrew/include -L/opt/homebrew/lib
+          CFLAGS: -I/opt/homebrew/include -L/opt/homebrew/lib
+          LDFLAGS: -L/opt/homebrew/lib
 
       - uses: pypa/cibuildwheel@v2.23
+        if: runner.os != 'macOS'
         env:
           CIBW_ARCHS: ${{ matrix.arch }}
           CIBW_BUILD: cp${{ matrix.python }}-*
