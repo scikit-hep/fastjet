@@ -34,7 +34,7 @@ jobs:
       fail-fast: false
       matrix:
         python-version: ["3.9", "3.13"]
-        runs-on: [ubuntu-latest, ubuntu-24.04-arm] #, macos-latest]
+        runs-on: [ubuntu-latest, ubuntu-24.04-arm, macos-latest]
         arch: [auto64]
     steps:
       - uses: actions/checkout@v4
@@ -48,14 +48,25 @@ jobs:
       - name: Install compiler tools on macOS
         if: runner.os == 'macOS'
         run: |
-          brew install make automake swig gmp mpfr boost
-          export PATH="/usr/local/opt/make/libexec/gnubin:$PATH"
+          brew install make automake swig gmp mpfr boost libtool
 
       - name: Install extra deps on Linux
         if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y libboost-dev libmpfr-dev swig autoconf libtool
 
-      - name: Install package
+      - name: Install package (MacOS)
+        if: runner.os == 'macOS'
+        run: |
+          eval "$(/opt/homebrew/bin/brew shellenv)"
+          export PATH="/opt/homebrew/opt/make/libexec/gnubin:/opt/homebrew/opt/libtool/libexec/gnubin:$PATH"
+          export CPPFLAGS+="-I/opt/homebrew/include -L/opt/homebrew/lib"
+          export CXXFLAGS+="-I/opt/homebrew/include -L/opt/homebrew/lib"
+          export CFLAGS+="-I/opt/homebrew/include -L/opt/homebrew/lib"
+          export LDFLAGS+="-L/opt/homebrew/lib"
+          python -m pip install '.[test]' -v
+
+      - name: Install package (Linux)
+        if: runner.os == 'Linux'
         run: |
           echo $PATH
           python -m pip install '.[test]' -v
@@ -72,7 +83,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, ubuntu-24.04-arm] #, macos-latest]
+        os: [ubuntu-latest, ubuntu-24.04-arm, macos-latest, macos-13]
         python: [313]
         arch: [auto64]
 
@@ -81,16 +92,16 @@ jobs:
         with:
           submodules: recursive
 
-      - uses: docker/setup-qemu-action@v3
-        if: matrix.arch != 'auto64'
-        with:
-          platforms: all
-
       - name: Install compiler tools on macOS
         if: runner.os == 'macOS'
         run: |
-          brew install make automake swig mpfr boost
-          export PATH="/usr/local/opt/make/libexec/gnubin:$PATH"
+          brew install make automake swig mpfr boost libtool
+          echo "PATH=/opt/homebrew/opt/make/libexec/gnubin:/opt/homebrew/opt/libtool/libexec/gnubin:$PATH" >> "$GITHUB_ENV"
+          echo "CPPFLAGS=-I/opt/homebrew/include -L/opt/homebrew/lib $CPPFLAGS" >> "$GITHUB_ENV"
+          echo "CXXFLAGS=-I/opt/homebrew/include -L/opt/homebrew/lib $CXXFLAGS" >> "$GITHUB_ENV"
+          echo "CFLAGS=-I/opt/homebrew/include -L/opt/homebrew/lib $CFLAGS" >> "$GITHUB_ENV"
+          echo "LDFLAGS=-L/opt/homebrew/lib $LDFLAGS" >> "$GITHUB_ENV"
+          echo "MACOSX_DEPLOYMENT_TARGET=11.0" >> "$GITHUB_ENV"
 
       - name: Clone gmp
         if: runner.os == 'macOS'
@@ -101,8 +112,6 @@ jobs:
 
       - name: Build gmp from source for MACOSX_DEPLOYMENT_TARGET
         if: runner.os == 'macOS'
-        env:
-          MACOSX_DEPLOYMENT_TARGET: "10.9"
         working-directory: gmp-6.3
         run: |
           brew install texinfo
