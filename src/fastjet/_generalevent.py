@@ -343,10 +343,24 @@ class _classgeneralevent:
             return False
 
     def extract_cons(self, array):
-        px = np.asarray(ak.Array(array.layout.content, behavior=array.behavior, attrs=array.attrs).px)
-        py = np.asarray(ak.Array(array.layout.content, behavior=array.behavior, attrs=array.attrs).py)
-        pz = np.asarray(ak.Array(array.layout.content, behavior=array.behavior, attrs=array.attrs).pz)
-        E = np.asarray(ak.Array(array.layout.content, behavior=array.behavior, attrs=array.attrs).E)
+        px = np.asarray(
+            ak.Array(
+                array.layout.content, behavior=array.behavior, attrs=array.attrs
+            ).px
+        )
+        py = np.asarray(
+            ak.Array(
+                array.layout.content, behavior=array.behavior, attrs=array.attrs
+            ).py
+        )
+        pz = np.asarray(
+            ak.Array(
+                array.layout.content, behavior=array.behavior, attrs=array.attrs
+            ).pz
+        )
+        E = np.asarray(
+            ak.Array(array.layout.content, behavior=array.behavior, attrs=array.attrs).E
+        )
         starts = np.asarray(array.layout.starts)
         stops = np.asarray(array.layout.stops)
         starts = np.insert(starts, 0, 0)
