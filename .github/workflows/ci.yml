@@ -83,13 +83,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, ubuntu-24.04-arm] # , macos-latest]
+        os: [ubuntu-latest, ubuntu-24.04-arm, macos-latest]
         python: [313]
         arch: [auto64]
         include:
           - os: macos-latest
             python: 313
-            arch: universal2
+            arch: x86_64
 
     steps:
       - uses: actions/checkout@v4
