@@ -38,8 +38,6 @@ class _classmultievent:
         E = np.asarray(ak.Array(array.layout.content, behavior=array.behavior).E)
         starts = np.asarray(array.layout.starts)
         stops = np.asarray(array.layout.stops)
-        starts = np.insert(starts, 0, 0)
-        stops = np.insert(stops, 0, 0)
         return px, py, pz, E, starts, stops
 
     def single_to_jagged(self, array):
@@ -56,7 +54,9 @@ class _classmultievent:
                     ["px", "py", "pz", "E"],
                     parameters={"__record__": "Momentum4D"},
                 ),
-            )
+            ),
+            behavior=array.behavior,
+            attrs=array.attrs,
         )
         return single
 
@@ -98,6 +98,7 @@ class _classmultievent:
                 ),
             ),
             behavior=self.data.behavior,
+            attrs=self.data.attrs,
         )
 
     def unclustered_particles(self):
@@ -118,6 +119,7 @@ class _classmultievent:
                 ),
             ),
             behavior=self.data.behavior,
+            attrs=self.data.attrs,
         )
 
     def exclusive_jets(self, n_jets, dcut):
@@ -149,6 +151,7 @@ class _classmultievent:
                 ),
             ),
             behavior=self.data.behavior,
+            attrs=self.data.attrs,
         )
 
     def exclusive_jets_up_to(self, n_jets):
@@ -172,6 +175,7 @@ class _classmultievent:
                 ),
             ),
             behavior=self.data.behavior,
+            attrs=self.data.attrs,
         )
 
     def exclusive_jets_ycut(self, ycut):
@@ -192,6 +196,7 @@ class _classmultievent:
                 ),
             ),
             behavior=self.data.behavior,
+            attrs=self.data.attrs,
         )
 
     def constituent_index(self, min_pt):
@@ -282,6 +287,8 @@ class _classmultievent:
                 "pzsoftdrop": jetpz,
             },
             depth_limit=1,
+            behavior=self.data.behavior,
+            attrs=self.data.attrs,
         )
         return out
 
@@ -456,6 +463,7 @@ class _classmultievent:
                 ),
             ),
             behavior=self.data.behavior,
+            attrs=self.data.attrs,
         )
 
     def exclusive_subdmerge(self, data, nsub):
@@ -558,6 +566,7 @@ class _classmultievent:
                 ),
             ),
             behavior=self.data.behavior,
+            attrs=self.data.attrs,
         )
 
     def jets(self):
@@ -578,6 +587,7 @@ class _classmultievent:
                 ),
             ),
             behavior=self.data.behavior,
+            attrs=self.data.attrs,
         )
 
     def get_parents(self, data):
@@ -604,6 +614,7 @@ class _classmultievent:
                 ),
             ),
             behavior=self.data.behavior,
+            attrs=self.data.attrs,
         )
 
     def get_child(self, data):
@@ -630,4 +641,5 @@ class _classmultievent:
                 ),
             ),
             behavior=self.data.behavior,
+            attrs=self.data.attrs,
         )
