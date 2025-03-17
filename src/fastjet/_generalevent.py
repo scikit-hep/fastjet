@@ -112,11 +112,11 @@ class _classgeneralevent:
             for i in range(len(data.layout.contents)):
                 temp_crumb = crumb_list + (i,)
                 if self._check_subtree(
-                        ak.Array(
-                            data.layout.contents[i],
-                            behavior=data.behavior,
-                            attrs=data.attrs,
-                        )
+                    ak.Array(
+                        data.layout.contents[i],
+                        behavior=data.behavior,
+                        attrs=data.attrs,
+                    )
                 ):
                     self._bread_list.append(crumb_list)
                     return
@@ -132,11 +132,11 @@ class _classgeneralevent:
             for elem in data.layout.fields:
                 temp_crumb = crumb_list + (elem,)
                 if self._check_subtree(
-                        ak.Array(
-                            data.layout.content(elem),
-                            behavior=data.behavior,
-                            attrs=data.attrs,
-                        )
+                    ak.Array(
+                        data.layout.content(elem),
+                        behavior=data.behavior,
+                        attrs=data.attrs,
+                    )
                 ):
                     self._bread_list.append(crumb_list)
                     return
@@ -150,11 +150,11 @@ class _classgeneralevent:
                 )
             return
         elif self._check_listoffset_subtree(
-                ak.Array(
-                    data.layout.content,
-                    behavior=data.behavior,
-                    attrs=data.attrs,
-                )
+            ak.Array(
+                data.layout.content,
+                behavior=data.behavior,
+                attrs=data.attrs,
+            )
         ):
             if self._check_record(
                 ak.Array(
@@ -233,7 +233,7 @@ class _classgeneralevent:
                             behavior=data.behavior,
                             attrs=data.attrs,
                         ),
-                        crumb_list
+                        crumb_list,
                     )
             else:
                 crumb_list = crumb_list + (None,)
@@ -243,7 +243,7 @@ class _classgeneralevent:
                         behavior=data.behavior,
                         attrs=data.attrs,
                     ),
-                    crumb_list
+                    crumb_list,
                 )
         else:
             crumb_list = crumb_list + (None,)
@@ -253,7 +253,7 @@ class _classgeneralevent:
                     behavior=data.behavior,
                     attrs=data.attrs,
                 ),
-                crumb_list
+                crumb_list,
             )
 
     def correct_byteorder(self, data):
@@ -265,11 +265,11 @@ class _classgeneralevent:
 
     def _check_subtree(self, data):
         if self._check_listoffset_subtree(
-                ak.Array(
-                    data.layout,
-                    behavior=data.behavior,
-                    attrs=data.attrs,
-                )
+            ak.Array(
+                data.layout,
+                behavior=data.behavior,
+                attrs=data.attrs,
+            )
         ):
             if self._check_record(
                 ak.Array(
@@ -342,10 +342,24 @@ class _classgeneralevent:
             return False
 
     def extract_cons(self, array):
-        px = np.asarray(ak.Array(array.layout.content, behavior=array.behavior, attrs=array.attrs).px)
-        py = np.asarray(ak.Array(array.layout.content, behavior=array.behavior, attrs=array.attrs).py)
-        pz = np.asarray(ak.Array(array.layout.content, behavior=array.behavior, attrs=array.attrs).pz)
-        E = np.asarray(ak.Array(array.layout.content, behavior=array.behavior, attrs=array.attrs).E)
+        px = np.asarray(
+            ak.Array(
+                array.layout.content, behavior=array.behavior, attrs=array.attrs
+            ).px
+        )
+        py = np.asarray(
+            ak.Array(
+                array.layout.content, behavior=array.behavior, attrs=array.attrs
+            ).py
+        )
+        pz = np.asarray(
+            ak.Array(
+                array.layout.content, behavior=array.behavior, attrs=array.attrs
+            ).pz
+        )
+        E = np.asarray(
+            ak.Array(array.layout.content, behavior=array.behavior, attrs=array.attrs).E
+        )
         off = np.asarray(array.layout.stops)
         off = np.insert(off, 0, 0)
         return px, py, pz, E, off
@@ -365,7 +379,9 @@ class _classgeneralevent:
             for i in range(len(self._input_mapping)):
                 self._cur_idx = i
                 self._mod_data_input = ak.Array(
-                    self.replace(self._mod_data_input.layout, self._input_mapping[i], 0),
+                    self.replace(
+                        self._mod_data_input.layout, self._input_mapping[i], 0
+                    ),
                     behavior=self.data.behavior,
                     attrs=self.data.attrs,
                 )
@@ -567,14 +583,16 @@ class _classgeneralevent:
                 attrs=self.data.attrs,
             )
             self._out.append(
-                ak.Array(ak.contents.ListOffsetArray(ak.index.Index64(off), out.layout)),
+                ak.Array(
+                    ak.contents.ListOffsetArray(ak.index.Index64(off), out.layout)
+                ),
                 behavior=self.data.behavior,
                 attrs=self.data.attrs,
             )
         res = ak.Array(
             self._replace_multi(),
             behavior=self.data.behavior,
-            attrs=self.data.attrs,            
+            attrs=self.data.attrs,
         )
         return res
 
