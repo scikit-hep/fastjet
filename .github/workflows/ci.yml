@@ -83,7 +83,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, ubuntu-24.04-arm, macos-latest]
+        os: [ubuntu-latest, ubuntu-24.04-arm, macos-latest, macos-13]
         python: [313]
         arch: [auto64]
 
@@ -96,6 +96,12 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           brew install make automake swig mpfr boost libtool
+          echo "PATH=/opt/homebrew/opt/make/libexec/gnubin:/opt/homebrew/opt/libtool/libexec/gnubin:$PATH" >> "$GITHUB_ENV"
+          echo "CPPFLAGS=-I/opt/homebrew/include -L/opt/homebrew/lib $CPPFLAGS" >> "$GITHUB_ENV"
+          echo "CXXFLAGS=-I/opt/homebrew/include -L/opt/homebrew/lib $CXXFLAGS" >> "$GITHUB_ENV"
+          echo "CFLAGS=-I/opt/homebrew/include -L/opt/homebrew/lib $CFLAGS" >> "$GITHUB_ENV"
+          echo "LDFLAGS=-L/opt/homebrew/lib $LDFLAGS" >> "$GITHUB_ENV"
+          echo "MACOSX_DEPLOYMENT_TARGET=11.0" >> "$GITHUB_ENV"
 
       - name: Clone gmp
         if: runner.os == 'macOS'
@@ -106,8 +112,6 @@ jobs:
 
       - name: Build gmp from source for MACOSX_DEPLOYMENT_TARGET
         if: runner.os == 'macOS'
-        env:
-          MACOSX_DEPLOYMENT_TARGET: 11.0
         working-directory: gmp-6.3
         run: |
           brew install texinfo
@@ -121,20 +125,6 @@ jobs:
           make install
 
       - uses: pypa/cibuildwheel@v2.23
-        if: runner.os == 'macOS'
-        name: "pypa/cibuildwheel@2.23 (macos)"
-        env:
-          CIBW_ARCHS: ${{ matrix.arch }}
-          CIBW_BUILD: cp${{ matrix.python }}-*
-          CIBW_BUILD_VERBOSITY: 2
-          MACOSX_DEPLOYMENT_TARGET: 11.0
-          CPPFLAGS: -I/opt/homebrew/include -L/opt/homebrew/lib
-          CXXFLAGS: -I/opt/homebrew/include -L/opt/homebrew/lib
-          CFLAGS: -I/opt/homebrew/include -L/opt/homebrew/lib
-          LDFLAGS: -L/opt/homebrew/lib
-
-      - uses: pypa/cibuildwheel@v2.23
-        if: runner.os != 'macOS'
         env:
           CIBW_ARCHS: ${{ matrix.arch }}
           CIBW_BUILD: cp${{ matrix.python }}-*
