@@ -562,11 +562,13 @@ def test_exclusive_constituents_masking_multi():
     )
     mask = ak.Array([True, True, False, True, True])
     jetdef = fastjet.JetDefinition(fastjet.kt_algorithm, 1)
-    result = fastjet.ClusterSequence(
+    result_all = fastjet.ClusterSequence(
+        ak.to_packed(array), jetdef
+    ).exclusive_jets_constituent_index(njets=2)
+    result_mask = fastjet.ClusterSequence(
         array[mask], jetdef
     ).exclusive_jets_constituent_index(njets=2)
-    output = ak.Array([[[1], [0]], [[0], [1]], [[0], [1]], [[0], [1]]])
-    assert ak.all(result == output)
+    assert ak.all(result_mask == result_all[mask])
 
 
 def test_exclusive_ycut():
