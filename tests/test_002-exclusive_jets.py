@@ -566,9 +566,6 @@ def test_exclusive_constituents_masking_multi():
         array[mask], jetdef
     ).exclusive_jets_constituent_index(njets=2)
     output = ak.Array([[[1], [0]], [[0], [1]], [[0], [1]], [[0], [1]]])
-
-    print(result.layout)
-    print(output.layout)
     assert ak.all(result == output)
 
 
