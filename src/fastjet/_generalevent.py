@@ -584,7 +584,7 @@ class _classgeneralevent:
             )
             self._out.append(
                 ak.Array(
-                    ak.contents.ListOffsetArray(ak.index.Index64(off), out.layout)
+                    ak.contents.ListOffsetArray(ak.index.Index64(off), out.layout),
                     behavior=self.data.behavior,
                     attrs=self.data.attrs,
                 ),
