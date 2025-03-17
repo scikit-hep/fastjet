@@ -95,7 +95,6 @@ output_wrapper interfacemulti(
         std::make_shared<std::vector<fj::PseudoJet>>(particles);
     std::shared_ptr<fastjet::ClusterSequence> cs =
         std::make_shared<fastjet::ClusterSequence>(*pj, *jet_def);
-    cs->inclusive_jets();
     startsptr++;
     stopsptr++;
     ow.cse.push_back(cs);
