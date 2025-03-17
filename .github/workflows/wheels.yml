@@ -60,7 +60,7 @@ jobs:
           path: gmp-6.3
 
       - name: Build gmp from source for MACOSX_DEPLOYMENT_TARGET
-        if: runner.os == 'macOS'        
+        if: runner.os == 'macOS'
         working-directory: gmp-6.3
         run: |
           export PATH="/opt/homebrew/opt/make/libexec/gnubin:/opt/homebrew/opt/libtool/libexec/gnubin:$PATH"
