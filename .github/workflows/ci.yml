@@ -83,13 +83,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, ubuntu-24.04-arm, macos-latest]
+        os: [ubuntu-latest, ubuntu-24.04-arm, macos-latest, macos-13]
         python: [313]
         arch: [auto64]
-        include:
-          - os: macos-latest
-            python: 313
-            arch: x86_64
 
     steps:
       - uses: actions/checkout@v4
@@ -127,14 +123,6 @@ jobs:
           touch ./doc/version.texi
           make --jobs
           make install
-
-      - uses: pypa/cibuildwheel@v2.23
-        if: runner.os == 'macOS'
-        name: "pypa/cibuildwheel@2.23 (macos)"
-        env:
-          CIBW_ARCHS: ${{ matrix.arch }}
-          CIBW_BUILD: cp${{ matrix.python }}-*
-          CIBW_BUILD_VERBOSITY: 2
 
       - uses: pypa/cibuildwheel@v2.23
         if: runner.os != 'macOS'
