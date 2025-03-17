@@ -585,9 +585,9 @@ class _classgeneralevent:
             self._out.append(
                 ak.Array(
                     ak.contents.ListOffsetArray(ak.index.Index64(off), out.layout)
+                    behavior=self.data.behavior,
+                    attrs=self.data.attrs,
                 ),
-                behavior=self.data.behavior,
-                attrs=self.data.attrs,
             )
         res = ak.Array(
             self._replace_multi(),
