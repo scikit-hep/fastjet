@@ -543,6 +543,9 @@ class _classgeneralevent:
             np_results = self._results[i].to_numpy_exclusive_njet_with_constituents(
                 njets
             )
+            print("DEBUG")
+            print(np_results)
+            print("DEBUG")
             off = np_results[-1]
             out = ak.Array(
                 ak.contents.ListOffsetArray(
