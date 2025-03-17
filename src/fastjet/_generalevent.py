@@ -363,8 +363,6 @@ class _classgeneralevent:
         )
         starts = np.asarray(array.layout.starts)
         stops = np.asarray(array.layout.stops)
-        starts = np.insert(starts, 0, 0)
-        stops = np.insert(stops, 0, 0)
         return px, py, pz, E, starts, stops
 
     def _replace_multi(self):
