@@ -19,7 +19,9 @@ class _classgeneralevent:
         self.multi_layered_listoffset(self.data, ())
         for i in range(len(self._clusterable_level)):
             self._clusterable_level[i] = ak.Array(
-                self._clusterable_level[i].layout.to_ListOffsetArray64(True)
+                self._clusterable_level[i].layout.to_ListOffsetArray64(True),
+                behavior=self._clusterable_level[i].behavior,
+                attrs=self._clusterable_level[i].attrs,
             )
             px, py, pz, E, offsets = self.extract_cons(self._clusterable_level[i])
             px = self.correct_byteorder(px)
@@ -51,7 +53,12 @@ class _classgeneralevent:
                     self._bread_list_input.append(crumb_list)
                     return
                 self.multi_layered_listoffset_input(
-                    ak.Array(data.layout.contents[i]), temp_crumb
+                    ak.Array(
+                        data.layout.contents[i],
+                        behavior=data.behavior,
+                        attrs=data.attrs,
+                    ),
+                    temp_crumb,
                 )
         elif data.layout.is_record:
             for elem in data.layout.fields:
@@ -60,7 +67,12 @@ class _classgeneralevent:
                     self._bread_list_input.append(crumb_list)
                     return
                 self.multi_layered_listoffset_input(
-                    ak.Array(data.layout.content(elem)), temp_crumb
+                    ak.Array(
+                        data.layout.content(elem),
+                        behavior=data.behavior,
+                        attrs=data.attrs,
+                    ),
+                    temp_crumb,
                 )
             return
         elif self._check_record(ak.Array(data.layout.content)):
@@ -77,37 +89,83 @@ class _classgeneralevent:
             else:
                 crumb_list = crumb_list + (None,)
                 self.multi_layered_listoffset_input(
-                    ak.Array(data.layout.content), crumb_list
+                    ak.Array(
+                        data.layout.content,
+                        behavior=data.behavior,
+                        attrs=data.attrs,
+                    ),
+                    crumb_list,
                 )
         else:
             crumb_list = crumb_list + (None,)
             self.multi_layered_listoffset_input(
-                ak.Array(data.layout.content), crumb_list
+                ak.Array(
+                    data.layout.content,
+                    behavior=data.behavior,
+                    attrs=data.attrs,
+                ),
+                crumb_list,
             )
 
     def multi_layered_listoffset(self, data, crumb_list):
         if data.layout.is_union:
             for i in range(len(data.layout.contents)):
                 temp_crumb = crumb_list + (i,)
-                if self._check_subtree(ak.Array(data.layout.contents[i])):
+                if self._check_subtree(
+                    ak.Array(
+                        data.layout.contents[i],
+                        behavior=data.behavior,
+                        attrs=data.attrs,
+                    )
+                ):
                     self._bread_list.append(crumb_list)
                     return
                 self.multi_layered_listoffset(
-                    ak.Array(data.layout.contents[i]), temp_crumb
+                    ak.Array(
+                        data.layout.contents[i],
+                        behavior=data.behavior,
+                        attrs=data.attrs,
+                    ),
+                    temp_crumb,
                 )
         elif data.layout.is_record:
             for elem in data.layout.fields:
                 temp_crumb = crumb_list + (elem,)
-                if self._check_subtree(ak.Array(data.layout.content(elem))):
+                if self._check_subtree(
+                    ak.Array(
+                        data.layout.content(elem),
+                        behavior=data.behavior,
+                        attrs=data.attrs,
+                    )
+                ):
                     self._bread_list.append(crumb_list)
                     return
                 self.multi_layered_listoffset(
-                    ak.Array(data.layout.content(elem)), temp_crumb
+                    ak.Array(
+                        data.layout.content(elem),
+                        behavior=data.behavior,
+                        attrs=data.attrs,
+                    ),
+                    temp_crumb,
                 )
             return
-        elif self._check_listoffset_subtree(ak.Array(data.layout.content)):
+        elif self._check_listoffset_subtree(
+            ak.Array(
+                data.layout.content,
+                behavior=data.behavior,
+                attrs=data.attrs,
+            )
+        ):
             if self._check_record(
-                ak.Array(ak.Array(data.layout.content).layout.content),
+                ak.Array(
+                    ak.Array(
+                        data.layout.content,
+                        behavior=data.behavior,
+                        attrs=data.attrs,
+                    ).layout.content,
+                    behavior=data.behavior,
+                    attrs=data.attrs,
+                ),
             ):
                 attributes = dir(data)
                 if (
@@ -118,15 +176,37 @@ class _classgeneralevent:
                 ):
                     crumb_list = crumb_list + (None,)
                     self._bread_list.append(crumb_list)
-                    self._clusterable_level.append(ak.Array(data.layout.content))
+                    self._clusterable_level.append(
+                        ak.Array(
+                            data.layout.content,
+                            behavior=data.behavior,
+                            attrs=data.attrs,
+                        )
+                    )
             elif self._check_indexed(
-                ak.Array(ak.Array(data.layout.content).layout.content),
+                ak.Array(
+                    ak.Array(
+                        data.layout.content,
+                        behavior=data.behavior,
+                        attrs=data.attrs,
+                    ).layout.content,
+                    behavior=data.behavior,
+                    attrs=data.attrs,
+                ),
             ):
                 if self._check_record(
                     ak.Array(
                         ak.Array(
-                            ak.Array(data.layout.content).layout.content
-                        ).layout.content
+                            ak.Array(
+                                data.layout.content,
+                                behavior=data.behavior,
+                                attrs=data.attrs,
+                            ).layout.content,
+                            behavior=data.behavior,
+                            attrs=data.attrs,
+                        ).layout.content,
+                        behavior=data.behavior,
+                        attrs=data.attrs,
                     ),
                 ):
                     attributes = dir(data)
@@ -138,18 +218,43 @@ class _classgeneralevent:
                     ):
                         crumb_list = crumb_list + (None,)
                         self._bread_list.append(crumb_list)
-                        self._clusterable_level.append(ak.Array(data.layout.content))
+                        self._clusterable_level.append(
+                            ak.Array(
+                                data.layout.content,
+                                behavior=data.behavior,
+                                attrs=data.attrs,
+                            )
+                        )
                 else:
                     crumb_list = crumb_list + (None,)
                     self.multi_layered_listoffset(
-                        ak.Array(data.layout.content), crumb_list
+                        ak.Array(
+                            data.layout.content,
+                            behavior=data.behavior,
+                            attrs=data.attrs,
+                        ),
+                        crumb_list,
                     )
             else:
                 crumb_list = crumb_list + (None,)
-                self.multi_layered_listoffset(ak.Array(data.layout.content), crumb_list)
+                self.multi_layered_listoffset(
+                    ak.Array(
+                        data.layout.content,
+                        behavior=data.behavior,
+                        attrs=data.attrs,
+                    ),
+                    crumb_list,
+                )
         else:
             crumb_list = crumb_list + (None,)
-            self.multi_layered_listoffset(ak.Array(data.layout.content), crumb_list)
+            self.multi_layered_listoffset(
+                ak.Array(
+                    data.layout.content,
+                    behavior=data.behavior,
+                    attrs=data.attrs,
+                ),
+                crumb_list,
+            )
 
     def correct_byteorder(self, data):
         if data.dtype.byteorder == "=":
@@ -159,9 +264,23 @@ class _classgeneralevent:
         return data
 
     def _check_subtree(self, data):
-        if self._check_listoffset_subtree(ak.Array(data.layout)):
+        if self._check_listoffset_subtree(
+            ak.Array(
+                data.layout,
+                behavior=data.behavior,
+                attrs=data.attrs,
+            )
+        ):
             if self._check_record(
-                ak.Array(ak.Array(data.layout.content)),
+                ak.Array(
+                    ak.Array(
+                        data.layout.content,
+                        behavior=data.behavior,
+                        attrs=data.attrs,
+                    ),
+                    behavior=data.behavior,
+                    attrs=data.attrs,
+                ),
             ):
                 attributes = dir(data)
                 if (
@@ -173,10 +292,22 @@ class _classgeneralevent:
                     self._clusterable_level.append(data)
                     return True
             elif self._check_indexed(
-                ak.Array(data.layout.content),
+                ak.Array(
+                    data.layout.content,
+                    behavior=data.behavior,
+                    attrs=data.attrs,
+                ),
             ):
                 if self._check_record(
-                    ak.Array(ak.Array(data.layout.content).layout.content)
+                    ak.Array(
+                        ak.Array(
+                            data.layout.content,
+                            behavior=data.behavior,
+                            attrs=data.attrs,
+                        ).layout.content,
+                        behavior=data.behavior,
+                        attrs=data.attrs,
+                    )
                 ):
                     attributes = dir(data)
                     if (
@@ -211,10 +342,24 @@ class _classgeneralevent:
             return False
 
     def extract_cons(self, array):
-        px = np.asarray(ak.Array(array.layout.content, behavior=array.behavior).px)
-        py = np.asarray(ak.Array(array.layout.content, behavior=array.behavior).py)
-        pz = np.asarray(ak.Array(array.layout.content, behavior=array.behavior).pz)
-        E = np.asarray(ak.Array(array.layout.content, behavior=array.behavior).E)
+        px = np.asarray(
+            ak.Array(
+                array.layout.content, behavior=array.behavior, attrs=array.attrs
+            ).px
+        )
+        py = np.asarray(
+            ak.Array(
+                array.layout.content, behavior=array.behavior, attrs=array.attrs
+            ).py
+        )
+        pz = np.asarray(
+            ak.Array(
+                array.layout.content, behavior=array.behavior, attrs=array.attrs
+            ).pz
+        )
+        E = np.asarray(
+            ak.Array(array.layout.content, behavior=array.behavior, attrs=array.attrs).E
+        )
         off = np.asarray(array.layout.stops)
         off = np.insert(off, 0, 0)
         return px, py, pz, E, off
@@ -224,13 +369,21 @@ class _classgeneralevent:
         if self._input_flag == 0:
             for i in range(len(self._clusterable_level)):
                 self._cur_idx = i
-                self._mod_data = ak.Array(self.replace(self._mod_data.layout, i, 0))
+                self._mod_data = ak.Array(
+                    self.replace(self._mod_data.layout, i, 0),
+                    behavior=self.data.behavior,
+                    attrs=self.data.attrs,
+                )
             return self._mod_data
         else:
             for i in range(len(self._input_mapping)):
                 self._cur_idx = i
                 self._mod_data_input = ak.Array(
-                    self.replace(self._mod_data_input.layout, self._input_mapping[i], 0)
+                    self.replace(
+                        self._mod_data_input.layout, self._input_mapping[i], 0
+                    ),
+                    behavior=self.data.behavior,
+                    attrs=self.data.attrs,
                 )
             return self._mod_data_input.layout
 
@@ -338,9 +491,14 @@ class _classgeneralevent:
                         ),
                     ),
                     behavior=self.data.behavior,
+                    attrs=self.data.attrs,
                 )
             )
-        res = ak.Array(self._replace_multi())
+        res = ak.Array(
+            self._replace_multi(),
+            behavior=self.data.behavior,
+            attrs=self.data.attrs,
+        )
         return res
 
     def constituents(self, min_pt):
@@ -355,16 +513,23 @@ class _classgeneralevent:
                     ak.contents.NumpyArray(np_results[1]),
                 ),
                 behavior=self.data.behavior,
+                attrs=self.data.attrs,
             )
             outputs_to_inputs = ak.Array(
-                ak.contents.ListOffsetArray(ak.index.Index64(off), out.layout)
+                ak.contents.ListOffsetArray(ak.index.Index64(off), out.layout),
+                behavior=self.data.behavior,
+                attrs=self.data.attrs,
             )
             shape = ak.num(outputs_to_inputs)
             total = np.sum(shape)
             duplicate = ak.unflatten(np.zeros(total, np.int64), shape)
             prepared = self._clusterable_level[i][:, np.newaxis][duplicate]
             self._out.append(prepared[outputs_to_inputs])
-        res = ak.Array(self._replace_multi())
+        res = ak.Array(
+            self._replace_multi(),
+            behavior=self.data.behavior,
+            attrs=self.data.attrs,
+        )
         return res
 
     def exclusive_jets_constituents(self, njets):
@@ -384,16 +549,23 @@ class _classgeneralevent:
                     ak.contents.NumpyArray(np_results[1]),
                 ),
                 behavior=self.data.behavior,
+                attrs=self.data.attrs,
             )
             outputs_to_inputs = ak.Array(
-                ak.contents.ListOffsetArray(ak.index.Index64(off), out.layout)
+                ak.contents.ListOffsetArray(ak.index.Index64(off), out.layout),
+                behavior=self.data.behavior,
+                attrs=self.data.attrs,
             )
             shape = ak.num(outputs_to_inputs)
             total = np.sum(shape)
             duplicate = ak.unflatten(np.zeros(total, np.int64), shape)
             prepared = self._clusterable_level[i][:, np.newaxis][duplicate]
             self._out.append(prepared[outputs_to_inputs])
-        res = ak.Array(self._replace_multi())
+        res = ak.Array(
+            self._replace_multi(),
+            behavior=self.data.behavior,
+            attrs=self.data.attrs,
+        )
         return res
 
     def constituent_index(self, min_pt):
@@ -408,11 +580,20 @@ class _classgeneralevent:
                     ak.contents.NumpyArray(np_results[1]),
                 ),
                 behavior=self.data.behavior,
+                attrs=self.data.attrs,
             )
             self._out.append(
-                ak.Array(ak.contents.ListOffsetArray(ak.index.Index64(off), out.layout))
+                ak.Array(
+                    ak.contents.ListOffsetArray(ak.index.Index64(off), out.layout),
+                    behavior=self.data.behavior,
+                    attrs=self.data.attrs,
+                ),
             )
-        res = ak.Array(self._replace_multi())
+        res = ak.Array(
+            self._replace_multi(),
+            behavior=self.data.behavior,
+            attrs=self.data.attrs,
+        )
         return res
 
     def exclusive_jets_constituent_index(self, njets):
@@ -432,9 +613,14 @@ class _classgeneralevent:
                     ak.contents.NumpyArray(np_results[1]),
                 ),
                 behavior=self.data.behavior,
+                attrs=self.data.attrs,
             )
             self._out.append(
-                ak.Array(ak.contents.ListOffsetArray(ak.index.Index64(off), out.layout))
+                ak.Array(
+                    ak.contents.ListOffsetArray(ak.index.Index64(off), out.layout),
+                    behavior=self.data.behavior,
+                    attrs=self.data.attrs,
+                )
             )
         res = ak.Array(self._replace_multi())
         return res
@@ -506,9 +692,15 @@ class _classgeneralevent:
                     "pzsoftdrop": jetpz,
                 },
                 depth_limit=1,
+                behavior=self.data.behavior,
+                attrs=self.data.attrs,
             )
         )
-        res = ak.Array(self._replace_multi())
+        res = ak.Array(
+            self._replace_multi(),
+            behavior=self.data.behavior,
+            attrs=self.data.attrs,
+        )
         return res
 
     def exclusive_jets_energy_correlator(
@@ -528,8 +720,18 @@ class _classgeneralevent:
         self._input_flag = 0
         for i in range(len(self._clusterable_level)):
             np_results = self._results[i].to_numpy_energy_correlators()
-            self._out.append(ak.Array(ak.contents.NumpyArray(np_results[0])))
-        res = ak.Array(self._replace_multi())
+            self._out.append(
+                ak.Array(
+                    ak.contents.NumpyArray(np_results[0]),
+                    behavior=self.data.behavior,
+                    attrs=self.data.attrs,
+                )
+            )
+        res = ak.Array(
+            self._replace_multi(),
+            behavior=self.data.behavior,
+            attrs=self.data.attrs,
+        )
         return res
 
     def exclusive_jets_lund_declusterings(self, njets):
@@ -555,11 +757,20 @@ class _classgeneralevent:
                     ),
                 ),
                 behavior=self.data.behavior,
+                attrs=self.data.attrs,
             )
             self._out.append(
-                ak.Array(ak.contents.ListOffsetArray(ak.index.Index64(off), out.layout))
+                ak.Array(
+                    ak.contents.ListOffsetArray(ak.index.Index64(off), out.layout),
+                    behavior=self.data.behavior,
+                    attrs=self.data.attrs,
+                )
             )
-        res = ak.Array(self._replace_multi())
+        res = ak.Array(
+            self._replace_multi(),
+            behavior=self.data.behavior,
+            attrs=self.data.attrs,
+        )
         return res
 
     def unclustered_particles(self):
@@ -584,9 +795,14 @@ class _classgeneralevent:
                         ),
                     ),
                     behavior=self.data.behavior,
+                    attrs=self.data.attrs,
                 )
             )
-        res = ak.Array(self._replace_multi())
+        res = ak.Array(
+            self._replace_multi(),
+            behavior=self.data.behavior,
+            attrs=self.data.attrs,
+        )
         return res
 
     def n_particles(self):
@@ -594,8 +810,18 @@ class _classgeneralevent:
         self._input_flag = 0
         for i in range(len(self._clusterable_level)):
             np_results = self._results[i].to_numpy_n_particles()
-            self._out.append(ak.Array(ak.contents.NumpyArray(np_results[0])))
-        res = ak.Array(self._replace_multi())
+            self._out.append(
+                ak.Array(
+                    ak.contents.NumpyArray(np_results[0]),
+                    behavior=self.data.behavior,
+                    attrs=self.data.attrs,
+                )
+            )
+        res = ak.Array(
+            self._replace_multi(),
+            behavior=self.data.behavior,
+            attrs=self.data.attrs,
+        )
         return res
 
     def n_exclusive_jets(self, dcut):
@@ -603,8 +829,18 @@ class _classgeneralevent:
         self._input_flag = 0
         for i in range(len(self._clusterable_level)):
             np_results = self._results[i].to_numpy_n_exclusive_jets(dcut)
-            self._out.append(ak.Array(ak.contents.NumpyArray(np_results[0])))
-        res = ak.Array(self._replace_multi())
+            self._out.append(
+                ak.Array(
+                    ak.contents.NumpyArray(np_results[0]),
+                    behavior=self.data.behavior,
+                    attrs=self.data.attrs,
+                )
+            )
+        res = ak.Array(
+            self._replace_multi(),
+            behavior=self.data.behavior,
+            attrs=self.data.attrs,
+        )
         return res
 
     def childless_pseudojets(self):
@@ -629,9 +865,14 @@ class _classgeneralevent:
                         ),
                     ),
                     behavior=self.data.behavior,
+                    attrs=self.data.attrs,
                 )
             )
-        res = ak.Array(self._replace_multi())
+        res = ak.Array(
+            self._replace_multi(),
+            behavior=self.data.behavior,
+            attrs=self.data.attrs,
+        )
         return res
 
     def jets(self):
@@ -656,9 +897,14 @@ class _classgeneralevent:
                         ),
                     ),
                     behavior=self.data.behavior,
+                    attrs=self.data.attrs,
                 )
             )
-        res = ak.Array(self._replace_multi())
+        res = ak.Array(
+            self._replace_multi(),
+            behavior=self.data.behavior,
+            attrs=self.data.attrs,
+        )
         return res
 
     def exclusive_jets(self, n_jets, dcut):
@@ -694,9 +940,14 @@ class _classgeneralevent:
                         ),
                     ),
                     behavior=self.data.behavior,
+                    attrs=self.data.attrs,
                 )
             )
-        res = ak.Array(self._replace_multi())
+        res = ak.Array(
+            self._replace_multi(),
+            behavior=self.data.behavior,
+            attrs=self.data.attrs,
+        )
         return res
 
     def exclusive_jets_up_to(self, n_jets):
@@ -724,9 +975,14 @@ class _classgeneralevent:
                         ),
                     ),
                     behavior=self.data.behavior,
+                    attrs=self.data.attrs,
                 )
             )
-        res = ak.Array(self._replace_multi())
+        res = ak.Array(
+            self._replace_multi(),
+            behavior=self.data.behavior,
+            attrs=self.data.attrs,
+        )
         return res
 
     def exclusive_jets_ycut(self, ycut):
@@ -752,9 +1008,14 @@ class _classgeneralevent:
                         ),
                     ),
                     behavior=self.data.behavior,
+                    attrs=self.data.attrs,
                 )
             )
-        res = ak.Array(self._replace_multi())
+        res = ak.Array(
+            self._replace_multi(),
+            behavior=self.data.behavior,
+            attrs=self.data.attrs,
+        )
         return res
 
     def unique_history_order(self):
@@ -767,10 +1028,16 @@ class _classgeneralevent:
                 ak.Array(
                     ak.contents.ListOffsetArray(
                         ak.index.Index64(off), ak.contents.NumpyArray(np_results[0])
-                    )
+                    ),
+                    behavior=self.data.behavior,
+                    attrs=self.data.attrs,
                 )
             )
-        res = ak.Array(self._replace_multi())
+        res = ak.Array(
+            self._replace_multi(),
+            behavior=self.data.behavior,
+            attrs=self.data.attrs,
+        )
         return res
 
     def exclusive_dmerge(self, njets):
@@ -778,8 +1045,18 @@ class _classgeneralevent:
         self._input_flag = 0
         for i in range(len(self._clusterable_level)):
             np_results = self._results[i].to_numpy_exclusive_dmerge(njets)
-            self._out.append(ak.Array(ak.contents.NumpyArray(np_results[0])))
-        res = ak.Array(self._replace_multi())
+            self._out.append(
+                ak.Array(
+                    ak.contents.NumpyArray(np_results[0]),
+                    behavior=self.data.behavior,
+                    attrs=self.data.attrs,
+                )
+            )
+        res = ak.Array(
+            self._replace_multi(),
+            behavior=self.data.behavior,
+            attrs=self.data.attrs,
+        )
         return res
 
     def exclusive_dmerge_max(self, njets):
@@ -787,8 +1064,18 @@ class _classgeneralevent:
         self._input_flag = 0
         for i in range(len(self._clusterable_level)):
             np_results = self._results[i].to_numpy_exclusive_dmerge_max(njets)
-            self._out.append(ak.Array(ak.contents.NumpyArray(np_results[0])))
-        res = ak.Array(self._replace_multi())
+            self._out.append(
+                ak.Array(
+                    ak.contents.NumpyArray(np_results[0]),
+                    behavior=self.data.behavior,
+                    attrs=self.data.attrs,
+                )
+            )
+        res = ak.Array(
+            self._replace_multi(),
+            behavior=self.data.behavior,
+            attrs=self.data.attrs,
+        )
         return res
 
     def exclusive_ymerge_max(self, njets):
@@ -796,8 +1083,18 @@ class _classgeneralevent:
         self._input_flag = 0
         for i in range(len(self._clusterable_level)):
             np_results = self._results[i].to_numpy_exclusive_ymerge_max(njets)
-            self._out.append(ak.Array(ak.contents.NumpyArray(np_results[0])))
-        res = ak.Array(self._replace_multi())
+            self._out.append(
+                ak.Array(
+                    ak.contents.NumpyArray(np_results[0]),
+                    behavior=self.data.behavior,
+                    attrs=self.data.attrs,
+                )
+            )
+        res = ak.Array(
+            self._replace_multi(),
+            behavior=self.data.behavior,
+            attrs=self.data.attrs,
+        )
         return res
 
     def exclusive_ymerge(self, njets):
@@ -805,8 +1102,18 @@ class _classgeneralevent:
         self._input_flag = 0
         for i in range(len(self._clusterable_level)):
             np_results = self._results[i].to_numpy_exclusive_ymerge(njets)
-            self._out.append(ak.Array(ak.contents.NumpyArray(np_results[0])))
-        res = ak.Array(self._replace_multi())
+            self._out.append(
+                ak.Array(
+                    ak.contents.NumpyArray(np_results[0]),
+                    behavior=self.data.behavior,
+                    attrs=self.data.attrs,
+                )
+            )
+        res = ak.Array(
+            self._replace_multi(),
+            behavior=self.data.behavior,
+            attrs=self.data.attrs,
+        )
         return res
 
     def Q(self):
@@ -814,8 +1121,18 @@ class _classgeneralevent:
         self._input_flag = 0
         for i in range(len(self._clusterable_level)):
             np_results = self._results[i].to_numpy_q()
-            self._out.append(ak.Array(ak.contents.NumpyArray(np_results[0])))
-        res = ak.Array(self._replace_multi())
+            self._out.append(
+                ak.Array(
+                    ak.contents.NumpyArray(np_results[0]),
+                    behavior=self.data.behavior,
+                    attrs=self.data.attrs,
+                )
+            )
+        res = ak.Array(
+            self._replace_multi(),
+            behavior=self.data.behavior,
+            attrs=self.data.attrs,
+        )
         return res
 
     def Q2(self):
@@ -823,8 +1140,18 @@ class _classgeneralevent:
         self._input_flag = 0
         for i in range(len(self._clusterable_level)):
             np_results = self._results[i].to_numpy_q2()
-            self._out.append(ak.Array(ak.contents.NumpyArray(np_results[0])))
-        res = ak.Array(self._replace_multi())
+            self._out.append(
+                ak.Array(
+                    ak.contents.NumpyArray(np_results[0]),
+                    behavior=self.data.behavior,
+                    attrs=self.data.attrs,
+                )
+            )
+        res = ak.Array(
+            self._replace_multi(),
+            behavior=self.data.behavior,
+            attrs=self.data.attrs,
+        )
         return res
 
     def get_parents(self, data_inp):
@@ -867,10 +1194,15 @@ class _classgeneralevent:
                         ),
                     ),
                     behavior=self.data.behavior,
+                    attrs=self.data.attrs,
                 )
             )
 
-        res = ak.Array(self._replace_multi())
+        res = ak.Array(
+            self._replace_multi(),
+            behavior=self.data.behavior,
+            attrs=self.data.attrs,
+        )
         return res
 
     def exclusive_subdmerge(self, data_inp, nsub):
@@ -899,9 +1231,19 @@ class _classgeneralevent:
             np_results = self._results[idx].to_numpy_exclusive_subdmerge(
                 px, py, pz, E, nsub
             )
-            self._out.append(ak.Array(ak.contents.NumpyArray(np_results[0])))
+            self._out.append(
+                ak.Array(
+                    ak.contents.NumpyArray(np_results[0]),
+                    behavior=self.data.behavior,
+                    attrs=self.data.attrs,
+                )
+            )
 
-        res = ak.Array(self._replace_multi())
+        res = ak.Array(
+            self._replace_multi(),
+            behavior=self.data.behavior,
+            attrs=self.data.attrs,
+        )
         return res
 
     def exclusive_subjets(self, data_inp, dcut, nsub):
@@ -959,9 +1301,14 @@ class _classgeneralevent:
                         ),
                     ),
                     behavior=self.data.behavior,
+                    attrs=self.data.attrs,
                 )
             )
-        res = ak.Array(self._replace_multi())
+        res = ak.Array(
+            self._replace_multi(),
+            behavior=self.data.behavior,
+            attrs=self.data.attrs,
+        )
         return res
 
     def exclusive_subjets_up_to(self, data_inp, nsub):
@@ -1006,9 +1353,14 @@ class _classgeneralevent:
                         ),
                     ),
                     behavior=self.data.behavior,
+                    attrs=self.data.attrs,
                 )
             )
-        res = ak.Array(self._replace_multi())
+        res = ak.Array(
+            self._replace_multi(),
+            behavior=self.data.behavior,
+            attrs=self.data.attrs,
+        )
         return res
 
     def exclusive_subdmerge_max(self, data_inp, nsub):
@@ -1036,8 +1388,18 @@ class _classgeneralevent:
             np_results = self._results[idx].to_numpy_exclusive_subdmerge_max(
                 px, py, pz, E, nsub
             )
-            self._out.append(ak.Array(ak.contents.NumpyArray(np_results[0])))
-        res = ak.Array(self._replace_multi())
+            self._out.append(
+                ak.Array(
+                    ak.contents.NumpyArray(np_results[0]),
+                    behavior=self.data.behavior,
+                    attrs=self.data.attrs,
+                )
+            )
+        res = ak.Array(
+            self._replace_multi(),
+            behavior=self.data.behavior,
+            attrs=self.data.attrs,
+        )
         return res
 
     def n_exclusive_subjets(self, data_inp, dcut):
@@ -1065,8 +1427,18 @@ class _classgeneralevent:
             np_results = self._results[idx].to_numpy_n_exclusive_subjets(
                 px, py, pz, E, dcut
             )
-            self._out.append(ak.Array(ak.contents.NumpyArray(np_results[0])))
-        res = ak.Array(self._replace_multi())
+            self._out.append(
+                ak.Array(
+                    ak.contents.NumpyArray(np_results[0]),
+                    behavior=self.data.behavior,
+                    attrs=self.data.attrs,
+                )
+            )
+        res = ak.Array(
+            self._replace_multi(),
+            behavior=self.data.behavior,
+            attrs=self.data.attrs,
+        )
         return res
 
     def has_parents(self, data_inp):
@@ -1092,8 +1464,18 @@ class _classgeneralevent:
                 continue
             assert len(self._cluster_inputs[i]) == len(self._clusterable_level[idx])
             np_results = self._results[idx].to_numpy_has_parents(px, py, pz, E)
-            self._out.append(ak.Array(ak.contents.NumpyArray(np_results[0])))
-        res = ak.Array(self._replace_multi())
+            self._out.append(
+                ak.Array(
+                    ak.contents.NumpyArray(np_results[0]),
+                    behavior=self.data.behavior,
+                    attrs=self.data.attrs,
+                )
+            )
+        res = ak.Array(
+            self._replace_multi(),
+            behavior=self.data.behavior,
+            attrs=self.data.attrs,
+        )
         return res
 
     def has_child(self, data_inp):
@@ -1119,8 +1501,18 @@ class _classgeneralevent:
                 continue
             assert len(self._cluster_inputs[i]) == len(self._clusterable_level[idx])
             np_results = self._results[idx].to_numpy_has_child(px, py, pz, E)
-            self._out.append(ak.Array(ak.contents.NumpyArray(np_results[0])))
-        res = ak.Array(self._replace_multi())
+            self._out.append(
+                ak.Array(
+                    ak.contents.NumpyArray(np_results[0]),
+                    behavior=self.data.behavior,
+                    attrs=self.data.attrs,
+                )
+            )
+        res = ak.Array(
+            self._replace_multi(),
+            behavior=self.data.behavior,
+            attrs=self.data.attrs,
+        )
         return res
 
     def jet_scale_for_algorithm(self, data_inp):
@@ -1148,8 +1540,18 @@ class _classgeneralevent:
             np_results = self._results[idx].to_numpy_jet_scale_for_algorithm(
                 px, py, pz, E
             )
-            self._out.append(ak.Array(ak.contents.NumpyArray(np_results[0])))
-        res = ak.Array(self._replace_multi())
+            self._out.append(
+                ak.Array(
+                    ak.contents.NumpyArray(np_results[0]),
+                    behavior=self.data.behavior,
+                    attrs=self.data.attrs,
+                )
+            )
+        res = ak.Array(
+            self._replace_multi(),
+            behavior=self.data.behavior,
+            attrs=self.data.attrs,
+        )
         return res
 
     def get_child(self, data_inp):
@@ -1191,7 +1593,12 @@ class _classgeneralevent:
                         ),
                     ),
                     behavior=self.data.behavior,
+                    attrs=self.data.attrs,
                 )
             )
-        res = ak.Array(self._replace_multi())
+        res = ak.Array(
+            self._replace_multi(),
+            behavior=self.data.behavior,
+            attrs=self.data.attrs,
+        )
         return res
