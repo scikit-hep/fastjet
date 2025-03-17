@@ -125,7 +125,6 @@ jobs:
           make install
 
       - uses: pypa/cibuildwheel@v2.23
-        if: runner.os != 'macOS'
         env:
           CIBW_ARCHS: ${{ matrix.arch }}
           CIBW_BUILD: cp${{ matrix.python }}-*
