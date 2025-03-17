@@ -19,7 +19,9 @@ class _classgeneralevent:
         self.multi_layered_listoffset(self.data, ())
         for i in range(len(self._clusterable_level)):
             self._clusterable_level[i] = ak.Array(
-                self._clusterable_level[i].layout.to_ListOffsetArray64(True)
+                self._clusterable_level[i].layout.to_ListOffsetArray64(True),
+                behavior=data.behavior,
+                attrs=data.attrs,
             )
             px, py, pz, E, offsets = self.extract_cons(self._clusterable_level[i])
             px = self.correct_byteorder(px)
