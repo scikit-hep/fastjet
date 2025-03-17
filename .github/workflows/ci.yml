@@ -100,9 +100,11 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           brew install make automake swig mpfr boost libtool
-          echo "CXXFLAGS+=-I/opt/homebrew/include -L/opt/homebrew/lib" >> "$GITHUB_ENV"
-          echo "CFLAGS+=-I/opt/homebrew/include -L/opt/homebrew/lib" >> "$GITHUB_ENV"
-          echo "LDFLAGS+=-L/opt/homebrew/lib" >> "$GITHUB_ENV"
+          echo "PATH=/opt/homebrew/opt/make/libexec/gnubin:/opt/homebrew/opt/libtool/libexec/gnubin:$PATH" >> "$GITHUB_ENV"
+          echo "CPPFLAGS=-I/opt/homebrew/include -L/opt/homebrew/lib $CPPFLAGS" >> "$GITHUB_ENV"
+          echo "CXXFLAGS=-I/opt/homebrew/include -L/opt/homebrew/lib $CXXFLAGS" >> "$GITHUB_ENV"
+          echo "CFLAGS=-I/opt/homebrew/include -L/opt/homebrew/lib $CFLAGS" >> "$GITHUB_ENV"
+          echo "LDFLAGS=-L/opt/homebrew/lib $LDFLAGS" >> "$GITHUB_ENV"
           echo "MACOSX_DEPLOYMENT_TARGET=11.0" >> "$GITHUB_ENV"
 
       - name: Clone gmp
