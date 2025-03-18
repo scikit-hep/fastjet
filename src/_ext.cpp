@@ -1648,6 +1648,8 @@ PYBIND11_MODULE(_ext, m) {
         std::string symmetry_measure = "scalar_z", double R0 = 0.8, std::string recursion_choice = "larger_pt",
         /*const FunctionOfPseudoJet<PseudoJet> * subtractor = 0,*/ double mu_cut = std::numeric_limits<double>::infinity()){
 
+        fastjet::contrib::RecursiveSymmetryCutBase::_verbose = true;
+
         auto css = ow.cse;
         std::vector<double> consts_groomed_px;
         std::vector<double> consts_groomed_py;
