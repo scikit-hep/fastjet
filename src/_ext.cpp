@@ -2,8 +2,10 @@
 // https://github.com/scikit-hep/fastjet/blob/main/LICENSE
 
 #include <algorithm>
+#include <cmath>
 #include <cstdlib>
 #include <iostream>
+#include <limits>
 #include <unordered_map>
 #include <vector>
 
@@ -1655,6 +1657,8 @@ PYBIND11_MODULE(_ext, m) {
         std::vector<double> jet_groomed_m;
         std::vector<double> jet_groomed_E;
         std::vector<double> jet_groomed_pz;
+        std::vector<double> jet_groomed_delta_R;
+        std::vector<double> jet_groomed_symmetry;
 
         fastjet::contrib::RecursiveSymmetryCutBase::SymmetryMeasure sym_meas = fastjet::contrib::RecursiveSymmetryCutBase::SymmetryMeasure::scalar_z;
         if (symmetry_measure == "scalar_z") {
@@ -1687,19 +1691,39 @@ PYBIND11_MODULE(_ext, m) {
           rec_choice = fastjet::contrib::RecursiveSymmetryCutBase::RecursionChoice::larger_E;
         }
 
-        fastjet::contrib::SoftDrop* sd = new fastjet::contrib::SoftDrop(beta, symmetry_cut, sym_meas, R0, mu_cut, rec_choice/*, subtractor*/);
+        auto sd = std::make_shared<fastjet::contrib::SoftDrop>(beta, symmetry_cut, sym_meas, R0, mu_cut, rec_choice/*, subtractor*/);
 
         for (unsigned int i = 0; i < css.size(); i++){  // iterate through events
           auto jets = css[i]->exclusive_jets(n_jets);
           for (unsigned int j = 0; j < jets.size(); j++){
             auto soft = sd->result(jets[j]);
+            if( soft != 0 ) {
+              jet_groomed_pt.push_back(soft.pt());
+              jet_groomed_eta.push_back(soft.eta());
+              jet_groomed_phi.push_back(soft.phi());
+              jet_groomed_m.push_back(soft.m());
+              jet_groomed_E.push_back(soft.E());
+              jet_groomed_pz.push_back(soft.pz());
+
+              // horrificaly dangerous hack around the fact that
+              // fastjet's custom sharedptr doesn't obey const
+              // correctness and this makes llvm-gcc very sad
+              fastjet::PseudoJetStructureBase* structure_ptr = soft.structure_non_const_ptr();
+              fastjet::contrib::SoftDrop::StructureType* as_sd = (fastjet::contrib::SoftDrop::StructureType*)structure_ptr;
+              jet_groomed_delta_R.push_back(as_sd->delta_R());
+              jet_groomed_symmetry.push_back(as_sd->symmetry());
+            } else {
+               jet_groomed_pt.push_back(std::numeric_limits<double>::quiet_NaN());
+               jet_groomed_eta.push_back(std::numeric_limits<double>::quiet_NaN());
+               jet_groomed_phi.push_back(std::numeric_limits<double>::quiet_NaN());
+               jet_groomed_m.push_back(std::numeric_limits<double>::quiet_NaN());
+               jet_groomed_E.push_back(std::numeric_limits<double>::quiet_NaN());
+               jet_groomed_pz.push_back(std::numeric_limits<double>::quiet_NaN());
+               jet_groomed_delta_R.push_back(std::numeric_limits<double>::quiet_NaN());
+               jet_groomed_symmetry.push_back(std::numeric_limits<double>::quiet_NaN());
+            }
+
             nconstituents.push_back(soft.constituents().size());
-            jet_groomed_pt.push_back(soft.pt());
-            jet_groomed_eta.push_back(soft.eta());
-            jet_groomed_phi.push_back(soft.phi());
-            jet_groomed_m.push_back(soft.m());
-            jet_groomed_E.push_back(soft.E());
-            jet_groomed_pz.push_back(soft.pz());
             for (unsigned int k = 0; k < soft.constituents().size(); k++){
               consts_groomed_px.push_back(soft.constituents()[k].px());
               consts_groomed_py.push_back(soft.constituents()[k].py());
@@ -1720,6 +1744,8 @@ PYBIND11_MODULE(_ext, m) {
         auto jet_m = py::array(jet_groomed_m.size(), jet_groomed_m.data());
         auto jet_E = py::array(jet_groomed_E.size(), jet_groomed_E.data());
         auto jet_pz = py::array(jet_groomed_pz.size(), jet_groomed_pz.data());
+        auto jet_delta_R = py::array(jet_groomed_delta_R.size(), jet_groomed_delta_R.data());
+        auto jet_symmetry = py::array(jet_groomed_symmetry.size(), jet_groomed_symmetry.data());
 
         return std::make_tuple(
             consts_px,
@@ -1732,7 +1758,9 @@ PYBIND11_MODULE(_ext, m) {
             jet_phi,
             jet_m,
             jet_E,
-            jet_pz
+            jet_pz,
+            jet_delta_R,
+            jet_symmetry
           );
       }, R"pbdoc(
         Performs softdrop pruning on jets.
