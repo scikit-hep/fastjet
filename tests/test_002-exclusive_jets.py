@@ -534,6 +534,43 @@ def test_exclusive_constituents_multi():
     )
 
 
+def test_exclusive_constituents_masking_multi():
+    array = ak.Array(
+        [
+            [
+                {"px": -0.181, "py": -0.798, "pz": -0.652, "E": 1.06},
+                {"px": 0.377, "py": 0.116, "pz": -0.0749, "E": 0.425},
+            ],
+            [
+                {"px": 0.54, "py": -0.65, "pz": -0.00527, "E": 0.857},
+                {"px": 0.253, "py": -0.0342, "pz": -0.0731, "E": 0.3},
+            ],
+            [
+                {"px": 0.294, "py": 0.254, "pz": -0.259, "E": 0.467},
+                {"px": 4.65, "py": -1.88, "pz": -3.29, "E": 6},
+            ],
+            [
+                {"px": 1.45, "py": -0.179, "pz": -0.876, "E": 1.71},
+                {"px": 12.8, "py": -1.8, "pz": -7.18, "E": 14.8},
+            ],
+            [
+                {"px": -3.55, "py": -1.64, "pz": -0.0941, "E": 3.91},
+                {"px": -1.33, "py": -1.03, "pz": 0.147, "E": 1.7},
+            ],
+        ],
+        with_name="Momentum4D",
+    )
+    mask = ak.Array([True, True, False, True, True])
+    jetdef = fastjet.JetDefinition(fastjet.kt_algorithm, 1)
+    result_all = fastjet.ClusterSequence(
+        array, jetdef
+    ).exclusive_jets_constituent_index(njets=2)
+    result_mask = fastjet.ClusterSequence(
+        array[mask], jetdef
+    ).exclusive_jets_constituent_index(njets=2)
+    assert ak.all(result_mask == result_all[mask])
+
+
 def test_exclusive_ycut():
     array = ak.Array(
         [

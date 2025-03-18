@@ -10,13 +10,16 @@ class _classsingleevent:
     def __init__(self, data, jetdef):
         self.jetdef = jetdef
         self.data = self.single_to_jagged(data)
-        px, py, pz, E, offsets = self.extract_cons(self.data)
+        px, py, pz, E, starts, stops = self.extract_cons(self.data)
         px = self.correct_byteorder(px)
         py = self.correct_byteorder(py)
         pz = self.correct_byteorder(pz)
         E = self.correct_byteorder(E)
-        offsets = self.correct_byteorder(offsets)
-        self._results = fastjet._ext.interfacemulti(px, py, pz, E, offsets, jetdef)
+        starts = self.correct_byteorder(starts)
+        stops = self.correct_byteorder(stops)
+        self._results = fastjet._ext.interfacemulti(
+            px, py, pz, E, starts, stops, jetdef
+        )
 
     def correct_byteorder(self, data):
         if data.dtype.byteorder == "=":
@@ -36,9 +39,9 @@ class _classsingleevent:
         py = np.asarray(ak.Array(array.layout.content, behavior=array.behavior).py)
         pz = np.asarray(ak.Array(array.layout.content, behavior=array.behavior).pz)
         E = np.asarray(ak.Array(array.layout.content, behavior=array.behavior).E)
-        off = np.asarray(array.layout.stops)
-        off = np.insert(off, 0, 0)
-        return px, py, pz, E, off
+        starts = np.asarray(array.layout.starts)
+        stops = np.asarray(array.layout.stops)
+        return px, py, pz, E, starts, stops
 
     def _check_record(self, data):
         return data.layout.is_record or data.layout.is_numpy
