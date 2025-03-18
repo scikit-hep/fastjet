@@ -1710,9 +1710,13 @@ PYBIND11_MODULE(_ext, m) {
               jet_groomed_E.push_back(soft.E());
               jet_groomed_pz.push_back(soft.pz());
 
-              const auto& sd_struct = soft.structure_of<fastjet::contrib::SoftDrop>();
-              jet_groomed_delta_R.push_back(sd_struct.delta_R());
-              jet_groomed_symmetry.push_back(sd_struct.symmetry());
+              // horrificaly dangerous hack around the fact that
+              // fastjet's custom sharedptr doesn't obey const
+              // correctness and this makes llvm-gcc very sad
+              fastjet::PseudoJetStructureBase* structure_ptr = soft.structure_non_const_ptr();
+              fastjet::contrib::SoftDrop::StructureType* as_sd = (fastjet::contrib::SoftDrop::StructureType*)structure_ptr;
+              jet_groomed_delta_R.push_back(as_sd->delta_R());
+              jet_groomed_symmetry.push_back(as_sd->symmetry());
             } else {
                jet_groomed_pt.push_back(std::numeric_limits<double>::quiet_NaN());
                jet_groomed_eta.push_back(std::numeric_limits<double>::quiet_NaN());
