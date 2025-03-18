@@ -1,8 +1,6 @@
 graft src
 graft tests
-graft fastjet-core
-graft fastjet-contrib
-graft pybind11
+graft extern
 global-exclude .git .gitmodules
 include LICENSE README.md pyproject.toml setup.py setup.cfg patch_clustersequence.txt
 exclude .cirrus.yml

@@ -2,7 +2,7 @@
 requires = [
     "setuptools>=42",
     "setuptools_scm[toml]>=3.4",
-    "pybind11>=2.6.1",
+    "pybind11>=2.12.0",
 ]
 build-backend = "setuptools.build_meta"
 
@@ -17,9 +17,9 @@ manylinux-i686-image = "manylinux2014"
 before-all = [
     "yum update -y",
     "yum install -y mpfr-devel",
-    "curl -L https://boostorg.jfrog.io/artifactory/main/release/1.84.0/source/boost_1_84_0.tar.bz2 -o boost_1_84_0.tar.bz2",
-    "tar --bzip2 -xf boost_1_84_0.tar.bz2",
-    "mv boost_1_84_0/boost /usr/include/boost",
+    "curl -L https://archives.boost.io/release/1.87.0/source/boost_1_87_0.tar.bz2 -o boost_1_87_0.tar.bz2",
+    "tar --bzip2 -xf boost_1_87_0.tar.bz2",
+    "mv boost_1_87_0/boost /usr/include/boost",
 ]
 # Skip musllinux builds for the moment
 skip = "*-musllinux_*"

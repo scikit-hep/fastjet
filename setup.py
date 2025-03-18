@@ -24,9 +24,9 @@ import setuptools.command.install
 CGAL_ZIP = "https://github.com/CGAL/cgal/releases/download/v5.6/CGAL-5.6-library.zip"
 
 DIR = pathlib.Path(__file__).parent.resolve()
-FASTJET = DIR / "fastjet-core"
-FASTJET_CONTRIB = DIR / "fastjet-contrib"
-PYTHON = DIR / "src/fastjet"
+FASTJET = DIR / "extern" / "fastjet-core"
+FASTJET_CONTRIB = DIR / "extern" / "fastjet-contrib"
+PYTHON = DIR / "src" / "fastjet"
 OUTPUT = PYTHON / "_fastjet_core"
 
 
@@ -81,7 +81,9 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
             env = os.environ.copy()
             env["PYTHON"] = sys.executable
             env["PYTHON_INCLUDE"] = f'-I{sysconfig.get_path("include")}'
-            env["CXXFLAGS"] = "-O3 -Bstatic -lgmp -Bdynamic -std=c++17"
+            env["CXXFLAGS"] = "-O3 -Bstatic -lgmp -Bdynamic -std=c++17 " + env.get(
+                "CXXFLAGS", ""
+            )
             env["LDFLAGS"] = env.get("LDFLAGS", "") + f" -Wl,-rpath,{_rpath}"
             env["ORIGIN"] = "$ORIGIN"  # if evaluated, it will still be '$ORIGIN'
 
@@ -90,8 +92,8 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
                 "--enable-thread-safety",
                 "--disable-auto-ptr",
                 "--enable-allcxxplugins",
-                "--enable-cgal-header-only",
                 "--enable-cgal",
+                "--enable-cgal-header-only",
                 f"--with-cgaldir={cgal_dir}",
                 "--enable-swig",
                 "--enable-pyext",
@@ -121,7 +123,8 @@ class FastJetBuild(setuptools.command.build_ext.build_ext):
                     "./configure",
                     f"--fastjet-config={FASTJET}/fastjet-config",
                     f'CXX={env["CXX"]}',
-                    "CXXFLAGS=-O3 -Bstatic -Bdynamic -std=c++17",
+                    "CXXFLAGS=-O3 -Bstatic -Bdynamic -std=c++17 "
+                    + env.get("CXXFLAGS", ""),
                     f'LDFLAGS={env["LDFLAGS"]}',
                 ],
                 cwd=FASTJET_CONTRIB,
@@ -162,7 +165,7 @@ class FastJetInstall(setuptools.command.install.install):
 ' print-pythondir""",
                 shell=True,
                 cwd=FASTJET / "pyinterface",
-                universal_newlines=True,
+                text=True,
             ).strip()
         )
 
@@ -173,7 +176,7 @@ class FastJetInstall(setuptools.command.install.install):
 ' print-pyexecdir""",
                 shell=True,
                 cwd=FASTJET / "pyinterface",
-                universal_newlines=True,
+                text=True,
             ).strip()
         )
 
