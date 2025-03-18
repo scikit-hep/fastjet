@@ -373,9 +373,9 @@ PYBIND11_MODULE(_ext, m) {
         }
         jk++;
 
-        auto parid = py::array(py::buffer_info(nullptr, sizeof(int64_t), py::format_descriptor<int64_t>::value, 1, {sizepar}, {sizeof(int64_t)}));
+        auto parid = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {sizepar}, {sizeof(int)}));
         auto bufparid = parid.request();
-        int64_t *ptrid = (int64_t *)bufparid.ptr;
+        int *ptrid = (int *)bufparid.ptr;
 
         auto eventoffsets = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len+1}, {sizeof(int)}));
         auto bufeventoffsets = eventoffsets.request();
