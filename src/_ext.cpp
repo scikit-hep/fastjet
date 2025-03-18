@@ -1698,24 +1698,35 @@ PYBIND11_MODULE(_ext, m) {
           auto jets = css[i]->exclusive_jets(n_jets);
           for (unsigned int j = 0; j < jets.size(); j++){
             auto soft = sd->result(jets[j]);
+            if( soft != 0 ) {              
+              jet_groomed_pt.push_back(soft.pt());
+              jet_groomed_eta.push_back(soft.eta());
+              jet_groomed_phi.push_back(soft.phi());
+              jet_groomed_m.push_back(soft.m());
+              jet_groomed_E.push_back(soft.E());
+              jet_groomed_pz.push_back(soft.pz());
+            
+              const auto& sd_struct = soft.structure_of<fastjet::contrib::SoftDrop>();
+              jet_groomed_delta_R.push_back(sd_struct.delta_R());
+              jet_groomed_symmetry.push_back(sd_struct.symmetry());
+            } else {
+               jet_groomed_pt.push_back(std::nan());
+               jet_groomed_eta.push_back(std::nan());
+               jet_groomed_phi.push_back(std::nan());
+               jet_groomed_m.push_back(std::nan());
+               jet_groomed_E.push_back(std::nan());
+               jet_groomed_pz.push_back(std::nan());
+               jet_groomed_delta_R.push_back(std::nan());
+               jet_groomed_symmetry.push_back(std::nan());
+            }
+
             nconstituents.push_back(soft.constituents().size());
-            jet_groomed_pt.push_back(soft.pt());
-            jet_groomed_eta.push_back(soft.eta());
-            jet_groomed_phi.push_back(soft.phi());
-            jet_groomed_m.push_back(soft.m());
-            jet_groomed_E.push_back(soft.E());
-            jet_groomed_pz.push_back(soft.pz());
-
-            const auto& sd_struct = soft.structure_of<fastjet::contrib::SoftDrop>();
-            jet_groomed_delta_R.push_back(sd_struct.delta_R());
-            jet_groomed_symmetry.push_back(sd_struct.symmetry());
-
             for (unsigned int k = 0; k < soft.constituents().size(); k++){
               consts_groomed_px.push_back(soft.constituents()[k].px());
               consts_groomed_py.push_back(soft.constituents()[k].py());
               consts_groomed_pz.push_back(soft.constituents()[k].pz());
               consts_groomed_E.push_back(soft.constituents()[k].E());
-            }
+            }            
           }
         }
 
