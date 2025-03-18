@@ -1692,7 +1692,7 @@ PYBIND11_MODULE(_ext, m) {
           rec_choice = fastjet::contrib::RecursiveSymmetryCutBase::RecursionChoice::larger_E;
         }
 
-        fastjet::contrib::SoftDrop* sd = new fastjet::contrib::SoftDrop(beta, symmetry_cut, sym_meas, R0, mu_cut, rec_choice/*, subtractor*/);
+        auto sd = std::make_unique<fastjet::contrib::SoftDrop>(beta, symmetry_cut, sym_meas, R0, mu_cut, rec_choice/*, subtractor*/);
 
         for (unsigned int i = 0; i < css.size(); i++){  // iterate through events
           auto jets = css[i]->exclusive_jets(n_jets);
@@ -1706,7 +1706,7 @@ PYBIND11_MODULE(_ext, m) {
             jet_groomed_E.push_back(soft.E());
             jet_groomed_pz.push_back(soft.pz());
 
-            auto sd_struct = soft.structure_of<fastjet::contrib::SoftDrop>();
+            const auto& sd_struct = soft.structure_of<fastjet::contrib::SoftDrop>();
             jet_groomed_delta_R.push_back(sd_struct.delta_R());
             jet_groomed_symmetry.push_back(sd_struct.symmetry());
 
@@ -1718,7 +1718,7 @@ PYBIND11_MODULE(_ext, m) {
             }
           }
         }
-
+        
         auto consts_px = py::array(consts_groomed_px.size(), consts_groomed_px.data());
         auto consts_py = py::array(consts_groomed_py.size(), consts_groomed_py.data());
         auto consts_pz = py::array(consts_groomed_pz.size(), consts_groomed_pz.data());
