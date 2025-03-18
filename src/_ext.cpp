@@ -1692,7 +1692,7 @@ PYBIND11_MODULE(_ext, m) {
           rec_choice = fastjet::contrib::RecursiveSymmetryCutBase::RecursionChoice::larger_E;
         }
 
-        auto sd = std::make_unique<fastjet::contrib::SoftDrop>(beta, symmetry_cut, sym_meas, R0, mu_cut, rec_choice/*, subtractor*/);
+        auto sd = std::make_shared<fastjet::contrib::SoftDrop>(beta, symmetry_cut, sym_meas, R0, mu_cut, rec_choice/*, subtractor*/);
 
         for (unsigned int i = 0; i < css.size(); i++){  // iterate through events
           auto jets = css[i]->exclusive_jets(n_jets);
