@@ -1718,7 +1718,7 @@ PYBIND11_MODULE(_ext, m) {
             }
           }
         }
-        
+
         auto consts_px = py::array(consts_groomed_px.size(), consts_groomed_px.data());
         auto consts_py = py::array(consts_groomed_py.size(), consts_groomed_py.data());
         auto consts_pz = py::array(consts_groomed_pz.size(), consts_groomed_pz.data());
