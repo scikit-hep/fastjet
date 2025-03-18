@@ -6,6 +6,8 @@
 #include <iostream>
 #include <unordered_map>
 #include <vector>
+#include <limits>
+#include <cmath>
 
 #include <fastjet/AreaDefinition.hh>
 #include <fastjet/ClusterSequence.hh>
@@ -1710,14 +1712,14 @@ PYBIND11_MODULE(_ext, m) {
               jet_groomed_delta_R.push_back(sd_struct.delta_R());
               jet_groomed_symmetry.push_back(sd_struct.symmetry());
             } else {
-               jet_groomed_pt.push_back(std::nan());
-               jet_groomed_eta.push_back(std::nan());
-               jet_groomed_phi.push_back(std::nan());
-               jet_groomed_m.push_back(std::nan());
-               jet_groomed_E.push_back(std::nan());
-               jet_groomed_pz.push_back(std::nan());
-               jet_groomed_delta_R.push_back(std::nan());
-               jet_groomed_symmetry.push_back(std::nan());
+               jet_groomed_pt.push_back(std::numeric_limits<double>::quiet_NaN());
+               jet_groomed_eta.push_back(std::numeric_limits<double>::quiet_NaN());
+               jet_groomed_phi.push_back(std::numeric_limits<double>::quiet_NaN());
+               jet_groomed_m.push_back(std::numeric_limits<double>::quiet_NaN());
+               jet_groomed_E.push_back(std::numeric_limits<double>::quiet_NaN());
+               jet_groomed_pz.push_back(std::numeric_limits<double>::quiet_NaN());
+               jet_groomed_delta_R.push_back(std::numeric_limits<double>::quiet_NaN());
+               jet_groomed_symmetry.push_back(std::numeric_limits<double>::quiet_NaN());
             }
 
             nconstituents.push_back(soft.constituents().size());
