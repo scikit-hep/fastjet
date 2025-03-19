@@ -721,10 +721,12 @@ class _classgeneralevent:
         nPass=None,
         akAxesR0=None,
     ):
+        if isinstance(njets, (int, float)):
+            njets = [njets]
         if len(njets) == 0:
-            raise ValueError("Must provide at least one njettiness!")
+            raise ValueError("Must provide at least one njets!")
         if any(njet <= 0 for njet in njets):
-            raise ValueError("Requested njettiness must be > 0!")
+            raise ValueError("Requested njets must be > 0!")
 
         double_max = 999.0
         int_max = 999

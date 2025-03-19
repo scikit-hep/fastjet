@@ -60,7 +60,7 @@ enum AxesDefinition_t {
 const std::unordered_map<std::string, MeasureDefinition_t>
     measure_def_names_to_enum = {
         {"NormalizedMeasure", NormalizedMeasure},
-        {"UnnormalziedMeasure", UnnormalizedMeasure},
+        {"UnnormalizedMeasure", UnnormalizedMeasure},
         {"OriginalGeometricMeasure", OriginalGeometricMeasure},
         {"NormalizedCutoffMeasure", NormalizedCutoffMeasure},
         {"UnnormalizedCutoffMeasure", UnnormalizedCutoffMeasure},
