@@ -2460,7 +2460,7 @@ PYBIND11_MODULE(_ext, m) {
         Args:
           None.
         Returns:
-          pt, eta, phi, m of inclusive jets.
+          the <njets>-tuple of njettiness values for all found jets, and their offsets
       )pbdoc");
   py::class_<ClusterSequence>(m, "ClusterSequence")
       .def(py::init<const std::vector<PseudoJet> &, const JetDefinition &,
