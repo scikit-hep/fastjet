@@ -708,6 +708,52 @@ class _classgeneralevent:
         )
         return res
 
+    def inclusive_jets_njettiness(
+        self,
+        measure_definition="NormalizedMeasure",
+        axes_definition="OnePass_KT_Axes",
+        njets=[1,2,3,4],
+        beta=1.0,
+        R0=0.8,
+        Rcutoff=None,
+        nPass=None,
+        akAxesR0=None,
+    ):
+        if len(njets) == 0:
+            raise ValueError("Must provide at least one njettiness!")
+        if any(njet <= 0 for njet in njets):
+            raise ValueError("Requested njettiness must be > 0!")
+        
+        double_max = 999.0
+        int_max = 999
+
+        self._out = []
+        self._input_flag = 0
+        for i in range(len(self._clusterable_level)):
+            np_results = self._results[i].to_numpy_njettiness(
+              measure_definition,
+              axes_definition,
+              njets,
+              beta,
+              R0,
+              Rcutoff or double_max,
+              nPass or int_max,
+              akAxesR0 or double_max,
+            )
+            self._out.append(
+                ak.Array(
+                    ak.contents.NumpyArray(np_results[0]),
+                    behavior=self.data.behavior,
+                    attrs=self.data.attrs,
+                )
+            )
+        res = ak.Array(
+            self._replace_multi(),
+            behavior=self.data.behavior,
+            attrs=self.data.attrs,
+        )
+        return res
+
     def exclusive_jets_energy_correlator(
         self,
         njets=1,

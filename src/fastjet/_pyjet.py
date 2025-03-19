@@ -166,6 +166,28 @@ class AwkwardClusterSequence(ClusterSequence):
             recursion_choice,  # subtractor,
             mu_cut,
         )
+    
+    def inclusive_jets_njettiness(
+        self,
+        measure_definition="NormalizedMeasure",
+        axes_definition="OnePass_KT_Axes",
+        njets=[1,2,3,4],
+        beta=1.0,
+        R0=0.8,
+        Rcutoff=None,
+        nPass=None,
+        akAxesR0=None,
+    ):
+        return self._internalrep.inclusive_jets_njettiness(
+            measure_definition=measure_definition,
+            axes_definition=axes_definition,
+            njets=njets,
+            beta=beta,
+            R0=R0,
+            Rcutoff=Rcutoff,
+            nPass=nPass,
+            akAxesR0=akAxesR0,
+        )
 
     def exclusive_jets_energy_correlator(
         self,
