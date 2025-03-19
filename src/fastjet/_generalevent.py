@@ -5,6 +5,8 @@ import numpy as np
 
 import fastjet._ext  # noqa: F401, E402
 
+_default_taus_njettiness = [1, 2, 3, 4]
+
 
 class _classgeneralevent:
     def __init__(self, data, jetdef):
@@ -712,7 +714,7 @@ class _classgeneralevent:
         self,
         measure_definition="NormalizedMeasure",
         axes_definition="OnePass_KT_Axes",
-        njets=[1,2,3,4],
+        njets=_default_taus_njettiness,
         beta=1.0,
         R0=0.8,
         Rcutoff=None,
@@ -723,7 +725,7 @@ class _classgeneralevent:
             raise ValueError("Must provide at least one njettiness!")
         if any(njet <= 0 for njet in njets):
             raise ValueError("Requested njettiness must be > 0!")
-        
+
         double_max = 999.0
         int_max = 999
 
@@ -731,14 +733,14 @@ class _classgeneralevent:
         self._input_flag = 0
         for i in range(len(self._clusterable_level)):
             np_results = self._results[i].to_numpy_njettiness(
-              measure_definition,
-              axes_definition,
-              njets,
-              beta,
-              R0,
-              Rcutoff or double_max,
-              nPass or int_max,
-              akAxesR0 or double_max,
+                measure_definition,
+                axes_definition,
+                njets,
+                beta,
+                R0,
+                Rcutoff or double_max,
+                nPass or int_max,
+                akAxesR0 or double_max,
             )
             self._out.append(
                 ak.Array(

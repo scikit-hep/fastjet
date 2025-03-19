@@ -10,6 +10,9 @@ from fastjet.version import __version__  # noqa: E402
 __all__ = ("__version__",)
 
 
+_default_taus_njettiness = [1, 2, 3, 4]
+
+
 class AwkwardClusterSequence(ClusterSequence):
     def __init__(self, data, jetdef):
         if not isinstance(data, ak.Array):
@@ -166,12 +169,12 @@ class AwkwardClusterSequence(ClusterSequence):
             recursion_choice,  # subtractor,
             mu_cut,
         )
-    
+
     def inclusive_jets_njettiness(
         self,
         measure_definition="NormalizedMeasure",
         axes_definition="OnePass_KT_Axes",
-        njets=[1,2,3,4],
+        njets=_default_taus_njettiness,
         beta=1.0,
         R0=0.8,
         Rcutoff=None,

@@ -702,6 +702,7 @@ def test_listoffset_indexed_input():
 
     assert inclusive_jets == cluster.inclusive_jets().to_list()
 
+
 def test_inclusive_njettiness():
     array = ak.Array(
         [

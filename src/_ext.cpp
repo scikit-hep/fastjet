@@ -29,59 +29,57 @@ namespace fj = fastjet;
 namespace py = pybind11;
 using namespace pybind11::literals;
 
-// adapted from https://github.com/cms-svj/SVJProduction/blob/Run3/interface/NjettinessHelper.h
+// adapted from
+// https://github.com/cms-svj/SVJProduction/blob/Run3/interface/NjettinessHelper.h
 namespace njettiness {
-  enum MeasureDefinition_t {
-    NormalizedMeasure=0,       // (beta,R0)
-    UnnormalizedMeasure,       // (beta)
-    OriginalGeometricMeasure,  // (beta)
-    NormalizedCutoffMeasure,   // (beta,R0,Rcutoff)
-    UnnormalizedCutoffMeasure, // (beta,Rcutoff)
-    GeometricCutoffMeasure,    // (beta,Rcutoff)
-    N_MEASURE_DEFINITIONS
-  };
-  enum AxesDefinition_t {
-    KT_Axes=0,
-    CA_Axes,
-    AntiKT_Axes,   // (axAxesR0)
-    WTA_KT_Axes,
-    WTA_CA_Axes,
-    Manual_Axes,
-    OnePass_KT_Axes,
-    OnePass_CA_Axes,
-    OnePass_AntiKT_Axes,   // (axAxesR0)
-    OnePass_WTA_KT_Axes,
-    OnePass_WTA_CA_Axes,
-    OnePass_Manual_Axes,
-    MultiPass_Axes,
-    N_AXES_DEFINITIONS
-  };
-  const std::unordered_map<std::string, MeasureDefinition_t> measure_def_names_to_enum =
-  {
-    {"NormalizedMeasure", NormalizedMeasure},
-    {"UnnormalziedMeasure", UnnormalizedMeasure},
-    {"OriginalGeometricMeasure", OriginalGeometricMeasure},
-    {"NormalizedCutoffMeasure", NormalizedCutoffMeasure},
-    {"UnnormalizedCutoffMeasure", UnnormalizedCutoffMeasure},
-    {"GeometricCutoffMeasure", GeometricCutoffMeasure}
-  };
-  const std::unordered_map<std::string, AxesDefinition_t> axis_def_names_to_enum =
-  {
-    {"KT_Axes", KT_Axes},
-    {"CA_Axes", CA_Axes},
-    {"AntiKT_Axes", AntiKT_Axes},
-    {"WTA_KT_Axes", WTA_KT_Axes},
-    {"WTA_CA_Axes", WTA_CA_Axes},
-    {"Manual_Axes", Manual_Axes},
-    {"OnePass_KT_Axes", OnePass_KT_Axes},
-    {"OnePass_CA_Axes", OnePass_CA_Axes},
-    {"OnePass_AntiKT_Axes", OnePass_AntiKT_Axes},
-    {"OnePass_WTA_KT_Axes", OnePass_WTA_KT_Axes},
-    {"OnePass_WTA_CA_Axes", OnePass_WTA_CA_Axes},
-    {"OnePass_Manual_Axes", OnePass_Manual_Axes},
-    {"MultiPass_Axes", MultiPass_Axes}
-  };
-}
+enum MeasureDefinition_t {
+  NormalizedMeasure = 0,     // (beta,R0)
+  UnnormalizedMeasure,       // (beta)
+  OriginalGeometricMeasure,  // (beta)
+  NormalizedCutoffMeasure,   // (beta,R0,Rcutoff)
+  UnnormalizedCutoffMeasure, // (beta,Rcutoff)
+  GeometricCutoffMeasure,    // (beta,Rcutoff)
+  N_MEASURE_DEFINITIONS
+};
+enum AxesDefinition_t {
+  KT_Axes = 0,
+  CA_Axes,
+  AntiKT_Axes, // (axAxesR0)
+  WTA_KT_Axes,
+  WTA_CA_Axes,
+  Manual_Axes,
+  OnePass_KT_Axes,
+  OnePass_CA_Axes,
+  OnePass_AntiKT_Axes, // (axAxesR0)
+  OnePass_WTA_KT_Axes,
+  OnePass_WTA_CA_Axes,
+  OnePass_Manual_Axes,
+  MultiPass_Axes,
+  N_AXES_DEFINITIONS
+};
+const std::unordered_map<std::string, MeasureDefinition_t>
+    measure_def_names_to_enum = {
+        {"NormalizedMeasure", NormalizedMeasure},
+        {"UnnormalziedMeasure", UnnormalizedMeasure},
+        {"OriginalGeometricMeasure", OriginalGeometricMeasure},
+        {"NormalizedCutoffMeasure", NormalizedCutoffMeasure},
+        {"UnnormalizedCutoffMeasure", UnnormalizedCutoffMeasure},
+        {"GeometricCutoffMeasure", GeometricCutoffMeasure}};
+const std::unordered_map<std::string, AxesDefinition_t> axis_def_names_to_enum =
+    {{"KT_Axes", KT_Axes},
+     {"CA_Axes", CA_Axes},
+     {"AntiKT_Axes", AntiKT_Axes},
+     {"WTA_KT_Axes", WTA_KT_Axes},
+     {"WTA_CA_Axes", WTA_CA_Axes},
+     {"Manual_Axes", Manual_Axes},
+     {"OnePass_KT_Axes", OnePass_KT_Axes},
+     {"OnePass_CA_Axes", OnePass_CA_Axes},
+     {"OnePass_AntiKT_Axes", OnePass_AntiKT_Axes},
+     {"OnePass_WTA_KT_Axes", OnePass_WTA_KT_Axes},
+     {"OnePass_WTA_CA_Axes", OnePass_WTA_CA_Axes},
+     {"OnePass_Manual_Axes", OnePass_Manual_Axes},
+     {"MultiPass_Axes", MultiPass_Axes}};
+} // namespace njettiness
 
 typedef struct {
   PyObject_HEAD void *ptr;
@@ -2388,14 +2386,14 @@ PYBIND11_MODULE(_ext, m) {
 
         auto maybe_axesdef = njettiness::axis_def_names_to_enum.find(axes_definition);
         const auto axesdefenum = maybe_axesdef == njettiness::axis_def_names_to_enum.end() ? njettiness::KT_Axes : maybe_axesdef->second;
-        
+
         // Get the measure definition
         fastjet::contrib::NormalizedMeasure          normalizedMeasure        (beta, R0);
         fastjet::contrib::UnnormalizedMeasure        unnormalizedMeasure      (beta);
         fastjet::contrib::OriginalGeometricMeasure   geometricMeasure         (beta);
         fastjet::contrib::NormalizedCutoffMeasure    normalizedCutoffMeasure  (beta, R0, Rcutoff);
         fastjet::contrib::UnnormalizedCutoffMeasure  unnormalizedCutoffMeasure(beta, Rcutoff);
-        
+
         fastjet::contrib::MeasureDefinition const * measureDef = 0;
         switch ( measdefenum ) {
           case njettiness::UnnormalizedMeasure         : measureDef = &unnormalizedMeasure; break;
@@ -2404,7 +2402,7 @@ PYBIND11_MODULE(_ext, m) {
           case njettiness::UnnormalizedCutoffMeasure   : measureDef = &unnormalizedCutoffMeasure; break;
           case njettiness::NormalizedMeasure : default : measureDef = &normalizedMeasure; break;
         }
-        
+
         // Get the axes definition
         fastjet::contrib::KT_Axes             kt_axes;
         fastjet::contrib::CA_Axes             ca_axes;
@@ -2417,7 +2415,7 @@ PYBIND11_MODULE(_ext, m) {
         fastjet::contrib::OnePass_WTA_KT_Axes onepass_wta_kt_axes;
         fastjet::contrib::OnePass_WTA_CA_Axes onepass_wta_ca_axes;
         fastjet::contrib::MultiPass_Axes      multipass_axes     (nPass);
-              
+
         fastjet::contrib::AxesDefinition const * axesDef = 0;
         switch ( axesdefenum ) {
           case  njettiness::KT_Axes : default   : axesDef = &kt_axes; break;
@@ -2432,13 +2430,13 @@ PYBIND11_MODULE(_ext, m) {
           case  njettiness::OnePass_WTA_CA_Axes : axesDef = &onepass_wta_ca_axes; break;
           case  njettiness::MultiPass_Axes      : axesDef = &multipass_axes; break;
         }
-        
+
         auto routine = std::make_shared<fastjet::contrib::Njettiness>(*axesDef, *measureDef);
-        
+
         auto css = ow.cse;
         std::vector<double> taus;
         std::vector<int64_t> offsets{0};
-        
+
         for (size_t i = 0; i < css.size(); ++i) {
           auto jets = css[i]->inclusive_jets();
           for (size_t j = 0; j < jets.size(); ++j) {
@@ -2452,7 +2450,7 @@ PYBIND11_MODULE(_ext, m) {
 
         auto taus_out = py::array(taus.size(), taus.data());
         taus_out.resize({taus.size()/njets.size(), njets.size()});
-          
+
         return std::make_tuple(
           offsets,
           taus_out

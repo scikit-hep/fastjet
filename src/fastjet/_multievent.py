@@ -5,6 +5,8 @@ import numpy as np
 
 import fastjet._ext  # noqa: F401, E402
 
+_default_taus_njettiness = [1, 2, 3, 4]
+
 
 class _classmultievent:
     def __init__(self, data, jetdef):
@@ -300,7 +302,7 @@ class _classmultievent:
         self,
         measure_definition="NormalizedMeasure",
         axes_definition="OnePass_KT_Axes",
-        njets=[1,2,3,4],
+        njets=_default_taus_njettiness,
         beta=1.0,
         R0=0.8,
         Rcutoff=None,
@@ -311,7 +313,7 @@ class _classmultievent:
             raise ValueError("Must provide at least one njettiness!")
         if any(njet <= 0 for njet in njets):
             raise ValueError("Requested njettiness must be > 0!")
-        
+
         double_max = 999.0
         int_max = 999
 
