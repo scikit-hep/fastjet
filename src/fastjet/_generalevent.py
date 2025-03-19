@@ -742,7 +742,10 @@ class _classgeneralevent:
             )
             self._out.append(
                 ak.Array(
-                    ak.contents.NumpyArray(np_results[0]),
+                    ak.contents.ListOffsetArray(
+                        ak.index.Index64(np_results[0]),
+                        ak.contents.NumpyArray(np_results[1]),
+                    ),
                     behavior=self.data.behavior,
                     attrs=self.data.attrs,
                 )

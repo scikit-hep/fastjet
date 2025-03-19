@@ -2437,7 +2437,8 @@ PYBIND11_MODULE(_ext, m) {
         
         auto css = ow.cse;
         std::vector<double> taus;
-          
+        std::vector<int64_t> offsets{0};
+        
         for (size_t i = 0; i < css.size(); ++i) {
           auto jets = css[i]->inclusive_jets();
           for (size_t j = 0; j < jets.size(); ++j) {
@@ -2446,12 +2447,14 @@ PYBIND11_MODULE(_ext, m) {
               taus.push_back(tau);
             }
           }
+          offsets.push_back(offsets.back() + jets.size());
         }
 
         auto taus_out = py::array(taus.size(), taus.data());
         taus_out.resize({taus.size()/njets.size(), njets.size()});
           
         return std::make_tuple(
+          offsets,
           taus_out
         );
       }, R"pbdoc(

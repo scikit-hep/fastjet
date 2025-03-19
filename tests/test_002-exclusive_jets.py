@@ -701,3 +701,44 @@ def test_listoffset_indexed_input():
     ]
 
     assert inclusive_jets == cluster.inclusive_jets().to_list()
+
+def test_inclusive_njettiness():
+    array = ak.Array(
+        [
+            [
+                {"px": 1.2, "py": 3.2, "pz": 5.4, "E": 2.5, "ex": 0.78},
+                {"px": 1.25, "py": 3.15, "pz": 5.4, "E": 2.4, "ex": 0.78},
+                {"px": 1.4, "py": 3.15, "pz": 5.4, "E": 2.0, "ex": 0.78},
+                {"px": 32.2, "py": 64.21, "pz": 543.34, "E": 24.12, "ex": 0.35},
+                {"px": 32.45, "py": 63.21, "pz": 543.14, "E": 24.56, "ex": 0.0},
+            ],
+            [
+                {"px": 1.2, "py": 3.2, "pz": 5.4, "E": 2.5, "ex": 0.78},
+                {"px": 1.25, "py": 3.15, "pz": 5.4, "E": 2.4, "ex": 0.78},
+                {"px": 1.4, "py": 3.15, "pz": 5.4, "E": 2.0, "ex": 0.78},
+                {"px": 32.2, "py": 64.21, "pz": 543.34, "E": 24.12, "ex": 0.35},
+                {"px": 32.45, "py": 63.21, "pz": 543.14, "E": 24.56, "ex": 0.0},
+            ],
+        ],
+        with_name="Momentum4D",
+    )
+
+    jetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.8)
+    cluster = fastjet._pyjet.AwkwardClusterSequence(array, jetdef)
+
+    expected = ak.Array(
+        [
+            [
+                [0.041999587156887445, 0.008082162710689409, 0.0, 0.0],
+                [0.00921855860347245, 0.0, 0.0, 0.0],
+            ],
+            [
+                [0.041999587156887445, 0.008082162710689409, 0.0, 0.0],
+                [0.00921855860347245, 0.0, 0.0, 0.0],
+            ],
+        ]
+    )
+
+    result = cluster.inclusive_jets_njettiness()
+
+    assert ak.all(ak.isclose(result, expected))

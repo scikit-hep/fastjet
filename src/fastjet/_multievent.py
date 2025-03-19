@@ -325,7 +325,12 @@ class _classmultievent:
             nPass or int_max,
             akAxesR0 or double_max,
         )
-        out = ak.Array(ak.contents.NumpyArray(np_results))
+        out = ak.Array(
+            ak.contents.ListOffsetArray(
+                ak.index.Index64(np_results[0]),
+                ak.contents.NumpyArray(np_results[1]),
+            ),
+        )
         return out
 
     def exclusive_jets_energy_correlator(
