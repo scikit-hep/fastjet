@@ -10,6 +10,9 @@ from fastjet.version import __version__  # noqa: E402
 __all__ = ("__version__",)
 
 
+_default_taus_njettiness = [1, 2, 3, 4]
+
+
 class AwkwardClusterSequence(ClusterSequence):
     def __init__(self, data, jetdef):
         if not isinstance(data, ak.Array):
@@ -165,6 +168,28 @@ class AwkwardClusterSequence(ClusterSequence):
             R0,
             recursion_choice,  # subtractor,
             mu_cut,
+        )
+
+    def njettiness(
+        self,
+        measure_definition="NormalizedMeasure",
+        axes_definition="OnePass_KT_Axes",
+        njets=_default_taus_njettiness,
+        beta=1.0,
+        R0=0.8,
+        Rcutoff=None,
+        nPass=None,
+        akAxesR0=None,
+    ):
+        return self._internalrep.njettiness(
+            measure_definition=measure_definition,
+            axes_definition=axes_definition,
+            njets=njets,
+            beta=beta,
+            R0=R0,
+            Rcutoff=Rcutoff,
+            nPass=nPass,
+            akAxesR0=akAxesR0,
         )
 
     def exclusive_jets_energy_correlator(
@@ -490,6 +515,30 @@ class DaskAwkwardClusterSequence(ClusterSequence):
             recursion_choice=recursion_choice,
             # subtractor=subtractor,
             mu_cut=mu_cut,
+        )
+
+    def njettiness(
+        self,
+        measure_definition="NormalizedMeasure",
+        axes_definition="OnePass_KT_Axes",
+        njets=_default_taus_njettiness,
+        beta=1.0,
+        R0=0.8,
+        Rcutoff=None,
+        nPass=None,
+        akAxesR0=None,
+    ):
+        return _dak_dispatch(
+            self,
+            "njettiness",
+            measure_definition=measure_definition,
+            axes_definition=axes_definition,
+            njets=njets,
+            beta=beta,
+            R0=R0,
+            Rcutoff=Rcutoff,
+            nPass=nPass,
+            akAxesR0=akAxesR0,
         )
 
     def exclusive_jets_energy_correlator(
