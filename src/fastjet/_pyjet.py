@@ -540,7 +540,7 @@ class DaskAwkwardClusterSequence(ClusterSequence):
             nPass=nPass,
             akAxesR0=akAxesR0,
         )
-    
+
     def exclusive_jets_energy_correlator(
         self,
         njets=1,
