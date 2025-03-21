@@ -2433,26 +2433,20 @@ PYBIND11_MODULE(_ext, m) {
 
         auto routine = std::make_shared<fastjet::contrib::Njettiness>(*axesDef, *measureDef);
 
-        auto css = ow.cse;
+        const auto& constituents = ow.parts;
         std::vector<double> taus;
-        std::vector<int64_t> offsets{0};
 
-        for (size_t i = 0; i < css.size(); ++i) {
-          auto jets = css[i]->inclusive_jets();
-          for (size_t j = 0; j < jets.size(); ++j) {
+        for (size_t i = 0; i < constituents.size(); ++i) {
             for(size_t k = 0; k < njets.size(); ++k) {
-              auto tau = routine->getTau(njets[k], jets[j].constituents());
+              auto tau = routine->getTau(njets[k], *constituents[i]);
               taus.push_back(tau);
             }
-          }
-          offsets.push_back(offsets.back() + jets.size());
         }
 
         auto taus_out = py::array(taus.size(), taus.data());
         taus_out.resize({taus.size()/njets.size(), njets.size()});
 
         return std::make_tuple(
-          offsets,
           taus_out
         );
       }, R"pbdoc(

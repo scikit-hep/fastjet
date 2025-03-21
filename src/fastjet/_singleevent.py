@@ -274,7 +274,7 @@ class _classsingleevent:
         )
         return out[0]
 
-    def inclusive_jets_njettiness(
+    def njettiness(
         self,
         measure_definition="NormalizedMeasure",
         axes_definition="OnePass_KT_Axes",
@@ -306,10 +306,7 @@ class _classsingleevent:
             akAxesR0 or double_max,
         )
         out = ak.Array(
-            ak.contents.ListOffsetArray(
-                ak.index.Index64(np_results[0]),
-                ak.contents.NumpyArray(np_results[1]),
-            ),
+            ak.contents.NumpyArray(np_results[0]),
         )
         return out
 

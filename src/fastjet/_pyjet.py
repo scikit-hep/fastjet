@@ -170,7 +170,7 @@ class AwkwardClusterSequence(ClusterSequence):
             mu_cut,
         )
 
-    def inclusive_jets_njettiness(
+    def njettiness(
         self,
         measure_definition="NormalizedMeasure",
         axes_definition="OnePass_KT_Axes",
@@ -181,7 +181,7 @@ class AwkwardClusterSequence(ClusterSequence):
         nPass=None,
         akAxesR0=None,
     ):
-        return self._internalrep.inclusive_jets_njettiness(
+        return self._internalrep.njettiness(
             measure_definition=measure_definition,
             axes_definition=axes_definition,
             njets=njets,
