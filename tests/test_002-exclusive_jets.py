@@ -727,7 +727,7 @@ def test_njettiness():
     jetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.8)
     jet_cluster = fastjet._pyjet.AwkwardClusterSequence(array, jetdef)
 
-    constituents = jet_clusters.constituents()
+    constituents = jet_cluster.constituents()
 
     njettiness_cluster = fastjet._pyjet.AwkwardClusterSequence(constituents, jetdef)
 
