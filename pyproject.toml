@@ -1,10 +1,21 @@
 [build-system]
 requires = [
-    "setuptools>=42",
-    "setuptools_scm[toml]>=3.4",
-    "pybind11>=2.12.0",
+  "setuptools_scm[toml]>=3.4",
+  "pybind11>=2.6.1",
+  "scikit-build-core>=0.8",
 ]
-build-backend = "setuptools.build_meta"
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "fastjet"
+dynamic = ["version"]
+requires-python = ">=3.9"
+dependencies = [
+  "awkward>=2",
+  "numpy>=1.13.3",
+  "vector"
+]
+
 
 [tool.cibuildwheel]
 skip = "pp*"
@@ -23,3 +34,17 @@ before-all = [
 ]
 # Skip musllinux builds for the moment
 skip = "*-musllinux_*"
+
+[tool.scikit-build]
+metadata.version.provider = "scikit_build_core.metadata.setuptools_scm"
+cmake.version = ">=3.11.0"
+sdist.include = ["src/fastjet/version.py"]
+
+[tool.scikit-build.cmake.define]
+FASTJET_ENABLE_PYTHON = "ON"
+FASTJET_ENABLE_CGAL = "ON"
+FASTJET_PYTHON_PACKAGE_NAME = "fastjet_cxx"
+
+[tool.setuptools_scm]
+write_to = "src/fastjet/version.py"
+

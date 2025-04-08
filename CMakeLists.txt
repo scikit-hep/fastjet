@@ -21,3 +21,5 @@ target_link_libraries(_ext PRIVATE fastjet::fastjet)
 target_link_libraries(_ext PRIVATE EnergyCorrelator LundPlane Nsubjettiness RecursiveTools)
 target_include_directories(_ext PRIVATE ${CMAKE_BINARY_DIR}/include)
 #set_target_properties(_ext PROPERTIES BUILD_WITH_INSTALL_RPATH ON)
+
+install(TARGETS _ext LIBRARY DESTINATION ${PKG_INSTALL})
