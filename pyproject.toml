@@ -47,4 +47,3 @@ FASTJET_PYTHON_PACKAGE_NAME = "fastjet_cxx"
 
 [tool.setuptools_scm]
 write_to = "src/fastjet/version.py"
-
