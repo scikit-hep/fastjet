@@ -63,7 +63,7 @@ multi_line_output = 3
 
 [tool.flake8]
 ignore = [
-  "E203", 
+  "E203",
   "E231",
   "E501",
   "E722",
