@@ -27,7 +27,7 @@ manylinux-i686-image = "manylinux2014"
 [tool.cibuildwheel.linux]
 before-all = [
     "yum update -y",
-    "yum install -y mpfr-devel",
+    "yum install -y mpfr-devel CGAL-devel",
     "curl -L https://archives.boost.io/release/1.87.0/source/boost_1_87_0.tar.bz2 -o boost_1_87_0.tar.bz2",
     "tar --bzip2 -xf boost_1_87_0.tar.bz2",
     "mv boost_1_87_0/boost /usr/include/boost",
