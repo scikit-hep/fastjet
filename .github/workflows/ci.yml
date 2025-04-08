@@ -54,7 +54,7 @@ jobs:
 
       - name: Install extra deps on Linux
         if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y libboost-dev libmpfr-dev swig autoconf libtool
+        run: sudo apt-get update && sudo apt-get install -y libboost-dev libmpfr-dev swig autoconf libtool libcgal-dev
 
       - name: Install package (MacOS)
         if: runner.os == 'macOS'
