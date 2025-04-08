@@ -47,7 +47,7 @@ FASTJET_ENABLE_CGAL = "ON"
 FASTJET_PYTHON_PACKAGE_NAME = "_swig"
 FASTJET_CUSTOM_PYTHON_INSTALL = "./"
 CMAKE_BUILD_TYPE = "Release"
-CMAKE_INSTALL_RPATH = "${ORIGIN}/lib"
+CMAKE_INSTALL_RPATH = "$ORIGIN/lib"
 
 [tool.setuptools_scm]
 write_to = "src/fastjet/version.py"
