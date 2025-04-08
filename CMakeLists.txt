@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.11)
+cmake_minimum_required(VERSION 3.15...4.0)
 
 if(NOT SKBUILD_PROJECT_VERSION)
   set(SKBUILD_PROJECT_VERSION "0.0.0")  # provided by scikit-build-core
