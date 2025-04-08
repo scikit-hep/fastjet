@@ -105,7 +105,7 @@ before-all = [
     "cmake -S CGAL-5.6 -B CGAL-5.6/build -DCMAKE_BUILD_TYPE=\"Release\"",
     "cmake --build CGAL-5.6/build --clean-first",
     "cmake --install CGAL-5.6/build",
-    "rm CGAL-5.6 CGAL-5.6-library.zip",
+    "rm -r CGAL-5.6 CGAL-5.6-library.zip",
 ]
 # Skip musllinux builds for the moment
 skip = "*-musllinux_*"
