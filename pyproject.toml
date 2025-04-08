@@ -44,6 +44,7 @@ sdist.include = ["src/fastjet/version.py"]
 FASTJET_ENABLE_PYTHON = "ON"
 FASTJET_ENABLE_CGAL = "ON"
 FASTJET_PYTHON_PACKAGE_NAME = "fastjet_cxx"
+CMAKE_BUILD_TYPE = "Release"
 
 [tool.setuptools_scm]
 write_to = "src/fastjet/version.py"
