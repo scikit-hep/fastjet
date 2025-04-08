@@ -48,7 +48,7 @@ jobs:
       - name: Install compiler tools on macOS
         if: runner.os == 'macOS'
         run: |
-          brew install make automake swig gmp mpfr boost libtool cgal
+          brew install make automake swig gmp mpfr boost libtool cgal gfortran
 
       - name: Install extra deps on Linux
         if: runner.os == 'Linux'
