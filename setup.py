@@ -181,7 +181,7 @@ class FastJetInstall(setuptools.command.install.install):
         )
 
         shutil.copyfile(pythondir / "fastjet.py", fastjetdir / "_swig.py")
-        shutil.copyfile(pyexecdir / "_fastjet.so", fastjetdir / "_fastjet.so")
+        shutil.copyfile(pyexecdir / "_fastjet_swig.so", fastjetdir / "_fastjet_swig.so")
 
         setuptools.command.install.install.run(self)
 
