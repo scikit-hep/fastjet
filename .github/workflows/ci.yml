@@ -95,7 +95,7 @@ jobs:
         run: |
           brew install make automake swig mpfr boost libtool cgal
           brew reinstall gfortran mpfr
-          brew uninstall gmp
+          brew uninstall --ignore-dependencies gmp # since we install it manually later
           echo "PATH=/opt/homebrew/opt/make/libexec/gnubin:/opt/homebrew/opt/libtool/libexec/gnubin:$PATH" >> "$GITHUB_ENV"
           echo "MACOSX_DEPLOYMENT_TARGET=11.0" >> "$GITHUB_ENV"
 
