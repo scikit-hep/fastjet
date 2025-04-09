@@ -137,7 +137,7 @@ jobs:
           autoreconf -i -f
           ./configure --help
           ./configure \
-            --prefix=$(brew --prefix)
+            --prefix=$(brew --prefix) \
             --with-gmp=$(brew --prefix)
           make --jobs
           make install
