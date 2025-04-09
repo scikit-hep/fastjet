@@ -92,6 +92,11 @@ test-command = "pytest {project}/tests"
 manylinux-x86_64-image = "manylinux2014"
 manylinux-i686-image = "manylinux2014"
 
+[[tool.cibuildwheel.overrides]]
+select = "*"
+inherit.repair-wheel-command = "prepend"
+repair-wheel-command = "echo $PWD && ls && delocate-listdeps --depending *.whl"
+
 [tool.cibuildwheel.linux]
 before-all = [
     "yum update -y",
