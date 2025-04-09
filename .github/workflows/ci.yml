@@ -101,7 +101,7 @@ jobs:
         with:
           auto-update-conda: true
           auto-activate-base: true
-          python-version: ${{ matrix.python }}
+          python-version: "3.13"
           mamba-version: "*"
           channels: conda-forge
 
