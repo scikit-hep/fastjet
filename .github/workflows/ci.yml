@@ -138,6 +138,7 @@ jobs:
           ./configure --help
           ./configure \
             --prefix=$(brew --prefix)
+            --with-gmp=$(brew --prefix)
           make --jobs
           make install
 
