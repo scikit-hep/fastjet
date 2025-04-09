@@ -112,7 +112,7 @@ jobs:
       - name: Install extra deps on MacOS
         if: runner.os == 'macOS'
         run: conda install gfortran cgal mpfr gmp
-      
+
       - uses: pypa/cibuildwheel@v2.23
         env:
           CIBW_ARCHS: ${{ matrix.arch }}
