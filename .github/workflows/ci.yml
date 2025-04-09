@@ -90,6 +90,14 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Set MACOSX_DEPLOYMENT_TARGET=14.0
+        if: matrix.os == "macos-latest"
+        run: echo "MACOSX_DEPLOYMENT_TARGET=14.0" >> "$GITHUB_ENV"
+
+      - name: Set MACOSX_DEPLOYMENT_TARGET=13.0
+        if: matrix.os == "macos-13"
+        run: echo "MACOSX_DEPLOYMENT_TARGET=13.0" >> "$GITHUB_ENV"
+
       - name: Install compiler tools on macOS
         if: runner.os == 'macOS'
         run: |
