@@ -93,22 +93,21 @@ jobs:
       - name: Install compiler tools on macOS
         if: runner.os == 'macOS'
         run: |
-          brew install make automake swig mpfr boost libtool cgal
-          brew reinstall gfortran mpfr
-          brew uninstall --ignore-dependencies gmp # since we install it manually later
-          echo "PATH=/opt/homebrew/opt/make/libexec/gnubin:/opt/homebrew/opt/libtool/libexec/gnubin:$PATH" >> "$GITHUB_ENV"
           echo "MACOSX_DEPLOYMENT_TARGET=11.0" >> "$GITHUB_ENV"
+          brew install make automake swig mpfr boost libtool cgal
+          brew reinstall gfortran mpfr gmp
+          echo "PATH=/opt/homebrew/opt/make/libexec/gnubin:/opt/homebrew/opt/libtool/libexec/gnubin:$PATH" >> "$GITHUB_ENV"
 
       - name: Install extra deps on Linux
         if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y libboost-dev libmpfr-dev swig libcgal-dev
 
-      - name: Clone gmp
-        if: runner.os == 'macOS'
-        uses: actions/checkout@v4
-        with:
-          repository: gmp-mirror/gmp-6.3
-          path: gmp-6.3
+      #- name: Clone gmp
+      #  if: runner.os == 'macOS'
+      #  uses: actions/checkout@v4
+      #  with:
+      #    repository: gmp-mirror/gmp-6.3
+      #    path: gmp-6.3
 
       - name: Build gmp from source for MACOSX_DEPLOYMENT_TARGET
         if: runner.os == 'macOS'
