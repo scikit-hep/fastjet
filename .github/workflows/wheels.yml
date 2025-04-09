@@ -44,13 +44,10 @@ jobs:
       - name: Install compiler tools on macOS
         if: runner.os == 'macOS'
         run: |
-          brew install make automake swig mpfr boost libtool
-          echo "PATH=/opt/homebrew/opt/make/libexec/gnubin:/opt/homebrew/opt/libtool/libexec/gnubin:$PATH" >> "$GITHUB_ENV"
-          echo "CPPFLAGS=-I/opt/homebrew/include -L/opt/homebrew/lib $CPPFLAGS" >> "$GITHUB_ENV"
-          echo "CXXFLAGS=-I/opt/homebrew/include -L/opt/homebrew/lib $CXXFLAGS" >> "$GITHUB_ENV"
-          echo "CFLAGS=-I/opt/homebrew/include -L/opt/homebrew/lib $CFLAGS" >> "$GITHUB_ENV"
-          echo "LDFLAGS=-L/opt/homebrew/lib $LDFLAGS" >> "$GITHUB_ENV"
           echo "MACOSX_DEPLOYMENT_TARGET=11.0" >> "$GITHUB_ENV"
+          brew uninstall gcc@12 gcc@13 gnupg gnutls isl libmpc nettle gcc mpfr gmp --ignore-dependencies
+          brew install m4 make automake autoconf libtool swig boost cgal --ignore-dependencies
+          echo "PATH=/opt/homebrew/opt/make/libexec/gnubin:/opt/homebrew/opt/libtool/libexec/gnubin:$PATH" >> "$GITHUB_ENV"
 
       - name: Clone gmp
         if: runner.os == 'macOS'
@@ -71,6 +68,24 @@ jobs:
             --prefix=$(brew --prefix) \
             --enable-cxx
           touch ./doc/version.texi
+          make --jobs
+          make install
+
+      - name: Get mpfr release
+        if: runner.os == 'macOS'
+        run: |
+          curl -Lk https://www.mpfr.org/mpfr-current/mpfr-4.2.2.tar.gz -o mpfr-4.2.2.tar.gz
+          tar -xzf mpfr-4.2.2.tar.gz
+
+      - name: Build mpfr from source for MACOSX_DEPLOYMENT_TARGET=11.0
+        if: runner.os == 'macOS'
+        working-directory: mpfr-4.2.2
+        run: |
+          autoreconf -i -f
+          ./configure --help
+          ./configure \
+            --prefix=$(brew --prefix) \
+            --with-gmp=$(brew --prefix)
           make --jobs
           make install
 
