@@ -97,6 +97,7 @@ jobs:
           brew reinstall gcc mpfr gmp
           brew install swig boost cgal
           echo "PATH=/opt/homebrew/opt/make/libexec/gnubin:/opt/homebrew/opt/libtool/libexec/gnubin:$PATH" >> "$GITHUB_ENV"
+          otool -l /opt/homebrew/lib/libgmp.dylib
 
       - name: Install extra deps on Linux
         if: runner.os == 'Linux'
