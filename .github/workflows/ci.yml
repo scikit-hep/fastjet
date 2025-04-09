@@ -95,7 +95,7 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           echo "MACOSX_DEPLOYMENT_TARGET=11.0" >> "$GITHUB_ENV"
-          brew uninstall gcc mpfr gmp
+          brew uninstall gcc@12 gcc@13 gnupg gnutls isl libmpc nettle gcc mpfr gmp 
           brew install make automake libtool swig boost cgal mpfr gmp
           echo "PATH=/opt/homebrew/opt/make/libexec/gnubin:/opt/homebrew/opt/libtool/libexec/gnubin:$PATH" >> "$GITHUB_ENV"
 
