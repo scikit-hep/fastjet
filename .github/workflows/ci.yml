@@ -95,7 +95,7 @@ jobs:
         run: |
           echo "MACOSX_DEPLOYMENT_TARGET=11.0" >> "$GITHUB_ENV"
           MACOSX_DEPLOYMENT_TARGET=11.0 brew reinstall --build-from-source gcc mpfr gmp
-          MACOSX_DEPLOYMENT_TARGET=11.0 brew install --build-from-source swig boost cgal          
+          MACOSX_DEPLOYMENT_TARGET=11.0 brew install --build-from-source swig boost cgal
           echo "PATH=/opt/homebrew/opt/make/libexec/gnubin:/opt/homebrew/opt/libtool/libexec/gnubin:$PATH" >> "$GITHUB_ENV"
 
       - name: Install extra deps on Linux
