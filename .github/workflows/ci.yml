@@ -126,7 +126,6 @@ jobs:
 
       - name: Get mpfr release
         if: runner.os == 'macOS'
-        uses: actions/checkout@v4
         run: |
           curl -Lk https://www.mpfr.org/mpfr-current/mpfr-4.2.2.tar.gz -o mpfr-4.2.2.tar.gz
           tar -xzf mpfr-4.2.2.tar.gz
