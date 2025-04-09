@@ -94,7 +94,8 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           brew install make automake swig mpfr boost libtool cgal
-          brew reinstall gfortran
+          brew reinstall gfortran mpfr 
+          brew uninstall gmp
           echo "PATH=/opt/homebrew/opt/make/libexec/gnubin:/opt/homebrew/opt/libtool/libexec/gnubin:$PATH" >> "$GITHUB_ENV"
           echo "MACOSX_DEPLOYMENT_TARGET=11.0" >> "$GITHUB_ENV"
 
