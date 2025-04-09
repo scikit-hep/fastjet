@@ -90,39 +90,29 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Install compiler tools on macOS
+      - name: Uninstall homebrew
         if: runner.os == 'macOS'
         run: |
           echo "MACOSX_DEPLOYMENT_TARGET=11.0" >> "$GITHUB_ENV"
-          MACOSX_DEPLOYMENT_TARGET=11.0 brew reinstall --build-from-source gcc mpfr gmp
-          MACOSX_DEPLOYMENT_TARGET=11.0 brew install --build-from-source swig boost cgal
-          echo "PATH=/opt/homebrew/opt/make/libexec/gnubin:/opt/homebrew/opt/libtool/libexec/gnubin:$PATH" >> "$GITHUB_ENV"
+          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/uninstall.sh)"
+
+      - uses: conda-incubator/setup-miniconda@v3
+        if: runner.os == 'macOS'
+        with:
+          auto-update-conda: true
+          auto-activate-base: true
+          python-version: ${{ matrix.python }}
+          mamba-version: "*"
+          channels: conda-forge
 
       - name: Install extra deps on Linux
         if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y libboost-dev libmpfr-dev swig libcgal-dev
 
-      #- name: Clone gmp
-      #  if: runner.os == 'macOS'
-      #  uses: actions/checkout@v4
-      #  with:
-      #    repository: gmp-mirror/gmp-6.3
-      #    path: gmp-6.3
-
-      #- name: Build gmp from source for MACOSX_DEPLOYMENT_TARGET
-      #  if: runner.os == 'macOS'
-      #  working-directory: gmp-6.3
-      #  run: |
-      #    brew install texinfo
-      #    autoreconf -i -f
-      #    ./configure --help
-      #    ./configure \
-      #      --prefix=$(brew --prefix) \
-      #      --enable-cxx
-      #    touch ./doc/version.texi
-      #    make --jobs
-      #    make install
-
+      - name: Install extra deps on MacOS
+        if: runner.os == 'macOS'
+        run: conda install gfortran cgal mpfr gmp
+      
       - uses: pypa/cibuildwheel@v2.23
         env:
           CIBW_ARCHS: ${{ matrix.arch }}
