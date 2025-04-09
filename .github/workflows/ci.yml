@@ -95,8 +95,8 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           echo "MACOSX_DEPLOYMENT_TARGET=11.0" >> "$GITHUB_ENV"
-          brew uninstall gcc@12 gcc@13 gnupg gnutls isl libmpc nettle gcc mpfr gmp
-          brew install make automake libtool swig boost cgal mpfr gmp
+          brew uninstall gcc@12 gcc@13 gnupg gnutls isl libmpc nettle gcc mpfr gmp --ignore-dependencies
+          brew install make automake libtool swig boost cgal --ignore-dependencies
           echo "PATH=/opt/homebrew/opt/make/libexec/gnubin:/opt/homebrew/opt/libtool/libexec/gnubin:$PATH" >> "$GITHUB_ENV"
 
       - name: Install extra deps on Linux
