@@ -90,28 +90,18 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Uninstall homebrew
+      - name: Install compiler tools on macOS
         if: runner.os == 'macOS'
         run: |
           echo "MACOSX_DEPLOYMENT_TARGET=11.0" >> "$GITHUB_ENV"
-          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/uninstall.sh)"
-
-      - uses: conda-incubator/setup-miniconda@v3
-        if: runner.os == 'macOS'
-        with:
-          auto-update-conda: true
-          auto-activate-base: true
-          python-version: "3.13"
-          mamba-version: "*"
-          channels: conda-forge
+          MACOSX_DEPLOYMENT_TARGET=11.0 brew reinstall --build-from-source gmp
+          brew reinstall gcc mpfr
+          brew install swig boost cgal          
+          echo "PATH=/opt/homebrew/opt/make/libexec/gnubin:/opt/homebrew/opt/libtool/libexec/gnubin:$PATH" >> "$GITHUB_ENV"
 
       - name: Install extra deps on Linux
         if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y libboost-dev libmpfr-dev swig libcgal-dev
-
-      - name: Install extra deps on MacOS
-        if: runner.os == 'macOS'
-        run: conda install gfortran cgal mpfr gmp
 
       - uses: pypa/cibuildwheel@v2.23
         env:
