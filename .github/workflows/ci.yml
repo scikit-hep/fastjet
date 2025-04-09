@@ -124,6 +124,24 @@ jobs:
           make --jobs
           make install
 
+      - name: Get mpfr release
+        if: runner.os == 'macOS'
+        uses: actions/checkout@v4
+        run: |
+          curl -Lk https://www.mpfr.org/mpfr-current/mpfr-4.2.2.tar.gz -o mpfr-4.2.2.tar.gz
+          tar -xzf mpfr-4.2.2.tar.gz
+
+      - name: Build mpfr from source for MACOSX_DEPLOYMENT_TARGET=11.0
+        if: runner.os == 'macOS'
+        working-directory: mpfr-4.2.2
+        run: |
+          autoreconf -i -f
+          ./configure --help
+          ./configure \
+            --prefix=$(brew --prefix)
+          make --jobs
+          make install
+
       - uses: pypa/cibuildwheel@v2.23
         env:
           CIBW_ARCHS: ${{ matrix.arch }}
