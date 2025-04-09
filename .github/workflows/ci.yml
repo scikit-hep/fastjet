@@ -93,9 +93,8 @@ jobs:
       - name: Install compiler tools on macOS
         if: runner.os == 'macOS'
         run: |
-          echo "MACOSX_DEPLOYMENT_TARGET=11.0" >> "$GITHUB_ENV"
-          MACOSX_DEPLOYMENT_TARGET=11.0 brew reinstall --build-from-source gmp
-          brew reinstall gcc mpfr
+          echo "MACOSX_DEPLOYMENT_TARGET=14.0" >> "$GITHUB_ENV"
+          brew reinstall gcc mpfr gmp
           brew install swig boost cgal
           echo "PATH=/opt/homebrew/opt/make/libexec/gnubin:/opt/homebrew/opt/libtool/libexec/gnubin:$PATH" >> "$GITHUB_ENV"
 
