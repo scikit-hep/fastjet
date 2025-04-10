@@ -1,6 +1,6 @@
 [submodule "fastjet"]
 	path = extern/fastjet-core
-	url = https://gitlab.com/lgray1/fastjet.git
+	url = https://gitlab.com/fastjet/fastjet.git
 [submodule "fastjet-contrib"]
 	path = extern/fastjet-contrib
 	url = https://github.com/lgray/fastjet-contrib.git
