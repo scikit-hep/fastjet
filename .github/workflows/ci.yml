@@ -78,7 +78,7 @@ jobs:
         if: runner.os == 'windows'
         run: |
           $Env:Path
-          python -m pip install '.[test]' -v
+          CGAL_DIR=C:/vcpkg/packages/cgal_x64-windows/share/cgal/usage python -m pip install '.[test]' -v
 
       - name: List installed Python packages
         run: python -m pip list
