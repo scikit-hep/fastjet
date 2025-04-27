@@ -49,7 +49,6 @@ jobs:
       - name: Install compiler tools on windows
         if: runner.os == 'windows'
         run: |
-          choco install swig boost-msvc-14.3
           vcpkg.exe install cgal
 
       - name: Install compiler tools on macOS
@@ -62,7 +61,7 @@ jobs:
         if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y libboost-dev libmpfr-dev swig libcgal-dev
 
-      - name: Install package (MacOS)
+      - name: Install package (macOS)
         if: runner.os == 'macOS'
         run: |
           eval "$(/opt/homebrew/bin/brew shellenv)"
@@ -73,6 +72,12 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           echo $PATH
+          python -m pip install '.[test]' -v
+
+      - name: Install package (windows)
+        if: runner.os == 'windows'
+        run: |
+          $Env:Path
           python -m pip install '.[test]' -v
 
       - name: List installed Python packages
