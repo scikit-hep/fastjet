@@ -79,7 +79,7 @@ jobs:
         run: |
           $Env:Path
           $Env:CGAL_DIR = 'C:\vcpkg\packages\cgal_x64-windows\share\cgal'
-          $Env:GMP_INCL_DIR = 'C:\vcpkg\packages\gmp_x64-windows\include'
+          $Env:GMP_INC_DIR = 'C:\vcpkg\packages\gmp_x64-windows\include'
           $Env:GMP_LIB_DIR = 'C:\vcpkg\packages\gmp_x64-windows\lib'
           $Env:MPFR_INC_DIR = 'C:\vcpkg\packages\mpfr_x64-windows\include'
           $Env:MPFR_LIB_DIR = 'C:\vcpkg\packages\mpfr_x64-windows\lib'
