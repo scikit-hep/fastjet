@@ -79,6 +79,8 @@ jobs:
         run: |
           $Env:Path
           $Env:CGAL_DIR = 'C:\vcpkg\packages\cgal_x64-windows\share\cgal'
+          $Env:GMP_DIR = 'C:\vcpkg\packages\gmp_x64-windows\share\gmp'
+          $Env:MPFR_DIR = 'C:\vcpkg\packages\mpfr_x64-windows\share\mpfr'
           python -m pip install '.[test]' -v
 
       - name: List installed Python packages
