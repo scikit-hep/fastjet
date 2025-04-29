@@ -84,6 +84,7 @@ jobs:
           $Env:MPFR_INC_DIR = 'C:\vcpkg\packages\mpfr_x64-windows\include'
           $Env:MPFR_LIB_DIR = 'C:\vcpkg\packages\mpfr_x64-windows\lib'
           $Env:Boost_DIR = 'C:\vcpkg\packages\boost-cmake_x64-windows\share\boost'
+          $Env:boost_headers_DIR = 'C:\vcpkg\packages\boost-headers_x64-windows\share\boost_headers'
           python -m pip install '.[test]' -v
 
       - name: List installed Python packages
