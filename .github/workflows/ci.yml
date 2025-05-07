@@ -49,6 +49,7 @@ jobs:
       - name: Install compiler tools on windows
         if: runner.os == 'windows'
         run: |
+          choco install boost-msvc-14.1
           vcpkg.exe install cgal getopt
 
       - name: Install compiler tools on macOS
@@ -83,9 +84,9 @@ jobs:
           $Env:GMP_LIB_DIR = 'C:\vcpkg\packages\gmp_x64-windows\lib'
           $Env:MPFR_INC_DIR = 'C:\vcpkg\packages\mpfr_x64-windows\include'
           $Env:MPFR_LIB_DIR = 'C:\vcpkg\packages\mpfr_x64-windows\lib'
-          $Env:Boost_DIR = 'C:\vcpkg\packages\boost-cmake_x64-windows\share\boost'
-          $Env:boost_headers_DIR = 'C:\vcpkg\packages\boost-headers_x64-windows\share\boost_headers'
-          $Env:boost_config_DIR = 'C:\vcpkg\packages\boost-config_x64-windows\share\boost_config'
+          #$Env:Boost_DIR = 'C:\vcpkg\packages\boost-cmake_x64-windows\share\boost'
+          #$Env:boost_headers_DIR = 'C:\vcpkg\packages\boost-headers_x64-windows\share\boost_headers'
+          #$Env:boost_config_DIR = 'C:\vcpkg\packages\boost-config_x64-windows\share\boost_config'
           $Env:CMAKE_PREFIX_PATH = "C:\vcpkg\packages\getopt-win32_x64-windows\share\unofficial-getopt-win32;$Env:CMAKE_PREFIX_PATH"
           python -m pip install '.[test]' -v
 
