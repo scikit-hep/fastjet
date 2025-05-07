@@ -85,7 +85,8 @@ jobs:
           $Env:MPFR_LIB_DIR = 'C:\vcpkg\packages\mpfr_x64-windows\lib'
           $Env:Boost_DIR = 'C:\vcpkg\packages\boost-cmake_x64-windows\share\boost'
           $Env:boost_headers_DIR = 'C:\vcpkg\packages\boost-headers_x64-windows\share\boost_headers'
-          python -m pip install '.[test]' -v --config-settings=cmake.args='-Dunofficial-getopt-win32_DIR="C:\vcpkg\packages\getopt-win32_x64-windows\share\unofficial-getopt-win32"'
+          $Env:CMAKE_PREFIX_PATH = "C:\vcpkg\packages\getopt-win32_x64-windows\share\unofficial-getopt-win32;$Env:CMAKE_PREFIX_PATH"
+          python -m pip install '.[test]' -v
 
       - name: List installed Python packages
         run: python -m pip list
