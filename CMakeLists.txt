@@ -15,14 +15,14 @@ include(FetchContent)
 
 find_package(pybind11 REQUIRED)
 
-#find_package(CGAL)
-#if (NOT CGAL_FOUND)
-#  FetchContent_Declare(CGAL
-#    GIT_REPOSITORY https://github.com/CGAL/cgal.git
-#    GIT_TAG  v6.0.1
-#  )
-#  FetchContent_MakeAvailable(CGAL)
-#endif()
+find_package(CGAL)
+if (NOT CGAL_FOUND)
+  FetchContent_Declare(CGAL
+    GIT_REPOSITORY https://github.com/CGAL/cgal.git
+    GIT_TAG  v6.0.1
+  )
+  FetchContent_MakeAvailable(CGAL)
+endif()
 
 #FetchContent_Declare(fastjet
 #    SOURCE_DIR ${CMAKE_SOURCE_DIR}/extern/fastjet-core
