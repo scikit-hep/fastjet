@@ -50,7 +50,7 @@ jobs:
         if: runner.os == 'windows'
         run: |
           #choco install boost-msvc-14.1
-          vcpkg.exe install getopt #cgal 
+          vcpkg.exe install getopt #cgal
 
       - name: Install compiler tools on macOS
         if: runner.os == 'macOS'
