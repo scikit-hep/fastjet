@@ -84,12 +84,8 @@ jobs:
           $Env:GMP_LIB_DIR = 'C:\vcpkg\packages\gmp_x64-windows\lib'
           $Env:MPFR_INC_DIR = 'C:\vcpkg\packages\mpfr_x64-windows\include'
           $Env:MPFR_LIB_DIR = 'C:\vcpkg\packages\mpfr_x64-windows\lib'
-          #$Env:Boost_DIR = 'C:\vcpkg\packages\boost-cmake_x64-windows\share\boost'
-          #$Env:boost_headers_DIR = 'C:\vcpkg\packages\boost-headers_x64-windows\share\boost_headers'
-          #$Env:boost_config_DIR = 'C:\vcpkg\packages\boost-config_x64-windows\share\boost_config'
           $Env:CMAKE_PREFIX_PATH = "C:\vcpkg\packages\getopt-win32_x64-windows\share\unofficial-getopt-win32;$Env:CMAKE_PREFIX_PATH"
-          python -m pip install msvc-runtime
-          python -m pip install '.[test]' -v
+          python -m pip install '.[test]' -v -C"cmake.define.GMP_DLL_TO_COPY"="C:\\vcpkg\\packages\\gmp_x64-windows\\bin\\gmp-10.dll"
 
       - name: List installed Python packages
         run: python -m pip list
