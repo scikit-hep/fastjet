@@ -34,7 +34,7 @@ jobs:
       fail-fast: false
       matrix:
         python: [39, 310, 311, 312, 313]
-        os: [ubuntu-latest, ubuntu-24.04-arm, macos-latest, macos-13]
+        os: [ubuntu-latest, ubuntu-24.04-arm, macos-latest, macos-13, windows-latest]
         arch: [auto64]
 
     steps:
@@ -50,6 +50,12 @@ jobs:
           brew uninstall gcc@12 gcc@13 gnupg gnutls isl libmpc nettle gcc mpfr gmp --ignore-dependencies
           brew install m4 make automake autoconf libtool swig boost cgal --ignore-dependencies
           echo "PATH=/opt/homebrew/opt/make/libexec/gnubin:/opt/homebrew/opt/libtool/libexec/gnubin:$PATH" >> "$GITHUB_ENV"
+
+      - name: Install compiler tools on windows
+        if: runner.os == 'windows'
+        run: |
+          choco install boost-msvc-14.1
+          vcpkg.exe install cgal getopt
 
       - name: Clone gmp
         if: runner.os == 'macOS'
@@ -95,7 +101,16 @@ jobs:
         env:
           CIBW_ARCHS: ${{ matrix.arch }}
           CIBW_BUILD: cp${{ matrix.python }}-*
-          CIBW_BUILD_VERBOSITY: 2
+          CIBW_BUILD_VERBOSITY: 1
+          CIBW_CONFIG_SETTINGS_WINDOWS: >
+            "cmake.define.GMP_DLL_TO_COPY"="C:\\vcpkg\\packages\\gmp_x64-windows\\bin\\gmp-10.dll"
+            "cmake.define.unofficial-getopt-win32_DIR"="C:\\vcpkg\\packages\\getopt-win32_x64-windows\\share\\unofficial-getopt-win32"
+          CIBW_ENVIRONMENT_WINDOWS: >
+            CGAL_DIR='C:\vcpkg\packages\cgal_x64-windows\share\cgal'
+            GMP_INC_DIR='C:\vcpkg\packages\gmp_x64-windows\include'
+            GMP_LIB_DIR='C:\vcpkg\packages\gmp_x64-windows\lib'
+            MPFR_INC_DIR='C:\vcpkg\packages\mpfr_x64-windows\include'
+            MPFR_LIB_DIR='C:\vcpkg\packages\mpfr_x64-windows\lib'
 
       - name: Upload wheels
         uses: actions/upload-artifact@v4
