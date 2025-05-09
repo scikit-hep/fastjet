@@ -171,7 +171,7 @@ jobs:
           CIBW_ARCHS: ${{ matrix.arch }}
           CIBW_BUILD: cp${{ matrix.python }}-*
           CIBW_BUILD_VERBOSITY: 2
-          CIBW_BUILD_FRONTEND: "pip; args: -C'cmake.define.GMP_DLL_TO_COPY'='C:\\vcpkg\\packages\\gmp_x64-windows\\bin\\gmp-10.dll'"
+          CIBW_CONFIG_SETTINGS_WINDOWS: -C"cmake.define.GMP_DLL_TO_COPY"="C:\\vcpkg\\packages\\gmp_x64-windows\\bin\\gmp-10.dll"
           CIBW_ENVIRONMENT_WINDOWS: >
             CGAL_DIR='C:\vcpkg\packages\cgal_x64-windows\share\cgal'
             GMP_INC_DIR='C:\vcpkg\packages\gmp_x64-windows\include'
