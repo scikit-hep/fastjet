@@ -45,4 +45,8 @@ else()
   set_target_properties(_ext PROPERTIES INSTALL_RPATH "$ORIGIN/lib")
 endif()
 
+if (MSVC AND FASTJET_ENABLE_CGAL)
+  message("-- Copying ${GMP_DLL_TO_COPY} to project area!")
+  install(FILES ${GMP_DLL_TO_COPY} DESTINATION ${CMAKE_INSTALL_PREFIX})
+endif()
 install(TARGETS _ext LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX})
