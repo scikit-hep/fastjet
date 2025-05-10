@@ -3,4 +3,4 @@
 	url = https://gitlab.com/fastjet/fastjet.git
 [submodule "fastjet-contrib"]
 	path = extern/fastjet-contrib
-	url = https://github.com/cms-externals/fastjet-contrib.git
+	url = https://github.com/lgray/fastjet-contrib.git
