@@ -41,18 +41,11 @@ repos:
   hooks:
   - id: setup-cfg-fmt
 
-- repo: https://github.com/pycqa/flake8
-  rev: 7.2.0
+- repo: https://github.com/astral-sh/ruff-pre-commit
+  rev: v0.11.4
   hooks:
-  - id: flake8
-    exclude: docs/conf.py
-    additional_dependencies: [flake8-bugbear, flake8-print]
-
-- repo: https://github.com/mgedmin/check-manifest
-  rev: "0.50"
-  hooks:
-  - id: check-manifest
-    stages: [manual]
+  - id: ruff
+    args: [--fix, --show-fixes]
 
 - repo: https://github.com/pre-commit/mirrors-clang-format
   rev: "v20.1.0"

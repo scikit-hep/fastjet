@@ -1,3 +1,4 @@
+src/fastjet/version.py
 _swig.py
 _fastjet_core
 *.so.[0-9]
