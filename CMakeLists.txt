@@ -9,29 +9,26 @@ list(GET VERSION_SPLIT 1 SPLIT_VERSION_MINOR)
 
 project(fastjet VERSION ${SPLIT_VERSION_MAJOR}.${SPLIT_VERSION_MINOR} LANGUAGES CXX)
 
+option(SKHEPFJ_USE_INSTALLED_FASTJET          "Use an existing installed version of fastjet"         OFF)
+option(SKHEPFJ_USE_INSTALLED_FASTJET_CONTRIB  "Use an existing installed version of fastjet-contrib" OFF)
+
 set(PKG_INSTALL "fastjet") ## python package name
 
 include(FetchContent)
 
 find_package(pybind11 REQUIRED)
 
-find_package(CGAL)
-if (NOT CGAL_FOUND)
-  FetchContent_Declare(CGAL
-    GIT_REPOSITORY https://github.com/CGAL/cgal.git
-    GIT_TAG  v6.0.1
-  )
-  FetchContent_MakeAvailable(CGAL)
+if (SKHEPFJ_USE_INSTALLED_FASTJET)
+  find_package(fastjet REQUIRED)
+else()
+  add_subdirectory(${CMAKE_SOURCE_DIR}/extern/fastjet-core)
 endif()
 
-#FetchContent_Declare(fastjet
-#    SOURCE_DIR ${CMAKE_SOURCE_DIR}/extern/fastjet-core
-#    CMAKE_ARGS "-DCMAKE_BUILD_TYPE=\"Release\" -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}/${PKG_INSTALL} -DFASTJET_CUSTOM_PYTHON_INSTALL=lib/${PKG_INSTALL} -DFASTJET_PYTHON_PACKAGE_NAME=_swig -DFASTJET_ENABLE_CGAL=ON"
-#  )
-#FetchContent_MakeAvailable(fastjet)
-
-add_subdirectory(${CMAKE_SOURCE_DIR}/extern/fastjet-core)
-add_subdirectory(${CMAKE_SOURCE_DIR}/extern/fastjet-contrib)
+if (SKHEPFJ_USE_INSTALLED_FASTJET_CONTRIB)
+  find_package(fastjetcontrib REQUIRED)
+else()
+  add_subdirectory(${CMAKE_SOURCE_DIR}/extern/fastjet-contrib)
+endif()
 
 pybind11_add_module(_ext MODULE src/_ext.cpp)
 target_link_libraries(_ext PRIVATE fastjet::fastjet)
