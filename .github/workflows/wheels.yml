@@ -34,7 +34,7 @@ jobs:
       fail-fast: false
       matrix:
         python: [39, 310, 311, 312, 313]
-        os: [ubuntu-latest, ubuntu-24.04-arm, macos-latest, macos-13, windows-latest]
+        os: [ubuntu-latest, ubuntu-24.04-arm, macos-latest, macos-13] # , windows-latest]
         arch: [auto64]
 
     steps:
