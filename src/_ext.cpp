@@ -1,6 +1,7 @@
 // BSD 3-Clause License; see
 // https://github.com/scikit-hep/fastjet/blob/main/LICENSE
 
+#define _USE_MATH_DEFINES
 #include <algorithm>
 #include <cmath>
 #include <cstdlib>
