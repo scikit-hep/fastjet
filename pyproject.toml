@@ -1,10 +1,93 @@
 [build-system]
 requires = [
-    "setuptools>=42",
-    "setuptools_scm[toml]>=3.4",
-    "pybind11>=2.12.0",
+  "pybind11>=2.6.1",
+  "scikit-build-core>=0.11",
 ]
-build-backend = "setuptools.build_meta"
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "fastjet"
+dynamic = ["version"]
+requires-python = ">=3.9"
+classifiers = [
+  "Development Status :: 1 - Planning",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Science/Research",
+  "Operating System :: MacOS :: MacOS X",
+  "Operating System :: POSIX :: Linux",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Topic :: Scientific/Engineering",
+]
+dependencies = [
+  "awkward>=2",
+  "numpy>=1.13.3,<2.3",
+  "vector"
+]
+
+[project.optional-dependencies]
+local_build = [
+    "scikit-build-core>=0.11",
+    "setuptools-scm",
+]
+dask = [
+    "dask>=2023.4.0",
+    "dask-awkward>=2023.4.2",
+]
+dev = [
+    "pytest>=4.6",
+]
+docs = [
+    "Sphinx>=3.0.0",
+    "recommonmark>=0.5.0",
+    "sphinx-copybutton",
+    "sphinx-rtd-theme>=0.5.0",
+]
+test = [
+    "pytest>=4.6",
+    "uproot>=5",
+    "dask>=2023.4.0;python_version>'3.7'",
+    "dask-awkward[test]>=2023.4.2;python_version>'3.7'",
+    "distributed>=2023.4.0;python_version>'3.7'",
+]
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+testpaths = ["tests"]
+addopts = [
+  "-vv",
+  "-rs",
+  "-Wd",
+]
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+
+[tool.ruff]
+extend-exclude = ["docs/conf.py"]
+
+[tools.mypy]
+files = "src"
+python_version = 3.9
+warn_unused_configs = true
+disallow_any_generics = true
+disallow_subclassing_any = true
+disallow_untyped_calls = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_return_any = true
+no_implicit_reexport = true
+strict_equality = true
+
+[tools.mypy.numpy]
+ignore_missing_imports = true
 
 [tool.cibuildwheel]
 skip = "pp*"
@@ -20,6 +103,31 @@ before-all = [
     "curl -L https://archives.boost.io/release/1.87.0/source/boost_1_87_0.tar.bz2 -o boost_1_87_0.tar.bz2",
     "tar --bzip2 -xf boost_1_87_0.tar.bz2",
     "mv boost_1_87_0/boost /usr/include/boost",
+    "curl -L https://github.com/CGAL/cgal/releases/download/v5.6/CGAL-5.6-library.zip -o CGAL-5.6-library.zip",
+    "unzip -q CGAL-5.6-library.zip",
+    "mkdir CGAL-5.6/build",
+    "cmake -S CGAL-5.6 -B CGAL-5.6/build -DCMAKE_BUILD_TYPE=\"Release\"",
+    "cmake --build CGAL-5.6/build --clean-first",
+    "cmake --install CGAL-5.6/build",
+    "rm -r CGAL-5.6 CGAL-5.6-library.zip",
 ]
 # Skip musllinux builds for the moment
 skip = "*-musllinux_*"
+
+[tool.scikit-build]
+minimum-version = "build-system.requires"
+metadata.version.provider = "scikit_build_core.metadata.setuptools_scm"
+cmake.version = "CMakeLists.txt"
+sdist.include = ["src/fastjet/version.py"]
+wheel.install-dir = "fastjet"
+
+[tool.scikit-build.cmake.define]
+FASTJET_ENABLE_PYTHON = "ON"
+FASTJET_ENABLE_CGAL = "ON"
+FASTJET_PYTHON_PACKAGE_NAME = "_swig"
+FASTJET_CUSTOM_PYTHON_INSTALL = "./"
+FASTJET_ENABLE_ALLCXXPLUGINS = "ON"
+FASTJETCONTRIB_ENABLE_FRAGILELIB = "ON"
+
+[tool.setuptools_scm]
+write_to = "src/fastjet/version.py"
