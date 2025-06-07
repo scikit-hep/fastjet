@@ -34,7 +34,7 @@ jobs:
       fail-fast: false
       matrix:
         python: [39, 310, 311, 312, 313]
-        os: [ubuntu-latest, ubuntu-24.04-arm, macos-latest, macos-13] # , windows-latest]
+        os: [ubuntu-latest, ubuntu-24.04-arm, macos-latest, macos-13, windows-latest]
         arch: [auto64]
 
     steps:
@@ -114,6 +114,7 @@ jobs:
             "cmake.define.unofficial-getopt-win32_DIR"="C:\vcpkg\packages\getopt-win32_x64-windows\share\unofficial-getopt-win32"
             "cmake.define.FASTJET_ENABLE_DEBUG"="OFF"
             "cmake.define.SISCONE_ENABLE_DEBUG"="OFF"
+            "cmake.define.SKHEPFJ_COPY_GMP_DLL"="ON"
           CIBW_ENVIRONMENT_WINDOWS: >
             GMP_INC_DIR='C:\a\fastjet\fastjet\cgal_auxlibs\auxiliary\gmp\include'
             GMP_LIB_DIR='C:\a\fastjet\fastjet\cgal_auxlibs\auxiliary\gmp\lib'
