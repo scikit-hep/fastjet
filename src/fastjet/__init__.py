@@ -1,5 +1,15 @@
 # BSD 3-Clause License; see https://github.com/scikit-hep/fastjet/blob/main/LICENSE
 
+import os as _os
+
+if _os.name == "nt":
+    module_dir = _os.path.dirname(_os.path.abspath(__file__))
+
+    dll_dir1 = _os.path.abspath(_os.path.join(module_dir, "bin"))
+
+    if _os.path.exists(dll_dir1):
+        _os.add_dll_directory(dll_dir1)
+
 from typing import Union
 
 import awkward as ak
