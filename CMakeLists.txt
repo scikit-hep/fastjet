@@ -22,7 +22,7 @@ if (SKHEPFJ_USE_INSTALLED_FASTJET)
   find_package(fastjet REQUIRED)
 else()
   if (SKHEPFJ_PATCH_FJCORE)
-    execute_process(COMMAND 
+    execute_process(COMMAND
                       git apply --whitespace=fix ../../0001-use-CMAKE_INSTALL_LIBDIR-consistently-in-pyinterface.patch
                     WORKING_DIRECTORY
                       ${CMAKE_CURRENT_SOURCE_DIR}/extern/fastjet-core

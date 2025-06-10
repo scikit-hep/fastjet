@@ -12,7 +12,7 @@ index 7016f179..88aa2ad4 100644
 --- a/pyinterface/CMakeLists.txt
 +++ b/pyinterface/CMakeLists.txt
 @@ -21,9 +21,9 @@ set_property(TARGET fastjet_swig PROPERTY SWIG_USE_TARGET_INCLUDE_DIRECTORIES TR
- 
+
  # NB this is specifically for building scikit-hep/fastjet wheels
  if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 -  set_target_properties(fastjet_swig PROPERTIES INSTALL_RPATH "@loader_path/../lib;@loader_path/../../../../lib")
@@ -21,8 +21,7 @@ index 7016f179..88aa2ad4 100644
 -  set_target_properties(fastjet_swig PROPERTIES INSTALL_RPATH "$ORIGIN/../lib:$ORIGIN/../../../../lib")
 +  set_target_properties(fastjet_swig PROPERTIES INSTALL_RPATH "$ORIGIN/../${CMAKE_INSTALL_LIBDIR}:$ORIGIN/../../../../${CMAKE_INSTALL_LIBDIR}")
  endif()
- 
- # Unix only, Windows is different
--- 
-2.39.5 (Apple Git-154)
 
+ # Unix only, Windows is different
+--
+2.39.5 (Apple Git-154)
