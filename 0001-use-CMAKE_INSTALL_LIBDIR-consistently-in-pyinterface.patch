@@ -1,0 +1,27 @@
+From fce87ff35162b911fc2241637b1f3516e4bb2d2f Mon Sep 17 00:00:00 2001
+From: Lindsey Gray <lindsey.gray@gmail.com>
+Date: Tue, 10 Jun 2025 14:04:22 -0500
+Subject: [PATCH] use CMAKE_INSTALL_LIBDIR consistently in pyinterface
+
+---
+ pyinterface/CMakeLists.txt | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/pyinterface/CMakeLists.txt b/pyinterface/CMakeLists.txt
+index 7016f179..88aa2ad4 100644
+--- a/pyinterface/CMakeLists.txt
++++ b/pyinterface/CMakeLists.txt
+@@ -21,9 +21,9 @@ set_property(TARGET fastjet_swig PROPERTY SWIG_USE_TARGET_INCLUDE_DIRECTORIES TR
+
+ # NB this is specifically for building scikit-hep/fastjet wheels
+ if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+-  set_target_properties(fastjet_swig PROPERTIES INSTALL_RPATH "@loader_path/../lib;@loader_path/../../../../lib")
++  set_target_properties(fastjet_swig PROPERTIES INSTALL_RPATH "@loader_path/../${CMAKE_INSTALL_LIBDIR};@loader_path/../../../../${CMAKE_INSTALL_LIBDIR}")
+ else()
+-  set_target_properties(fastjet_swig PROPERTIES INSTALL_RPATH "$ORIGIN/../lib:$ORIGIN/../../../../lib")
++  set_target_properties(fastjet_swig PROPERTIES INSTALL_RPATH "$ORIGIN/../${CMAKE_INSTALL_LIBDIR}:$ORIGIN/../../../../${CMAKE_INSTALL_LIBDIR}")
+ endif()
+
+ # Unix only, Windows is different
+--
+2.39.5 (Apple Git-154)
