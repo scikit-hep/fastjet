@@ -11,6 +11,7 @@ project(fastjet VERSION ${SPLIT_VERSION_MAJOR}.${SPLIT_VERSION_MINOR} LANGUAGES 
 
 option(SKHEPFJ_USE_INSTALLED_FASTJET          "Use an existing installed version of fastjet"         OFF)
 option(SKHEPFJ_USE_INSTALLED_FASTJET_CONTRIB  "Use an existing installed version of fastjet-contrib" OFF)
+option(SKHEPFJ_PATCH_FJCORE                   "Patch fastjet-contrib with CMAKE_INSTALL_LIBDIR use"  ON)
 option(SKHEPFJ_PATCH_FJCONTRIB                "Patch fastjet-contrib with cmake build"               ON)
 
 set(PKG_INSTALL "fastjet") ## python package name
@@ -20,13 +21,19 @@ find_package(pybind11 REQUIRED)
 if (SKHEPFJ_USE_INSTALLED_FASTJET)
   find_package(fastjet REQUIRED)
 else()
+  if (SKHEPFJ_PATCH_FJCORE)
+    execute_process(COMMAND 
+                      git apply --whitespace=fix ../../0001-use-CMAKE_INSTALL_LIBDIR-consistently-in-pyinterface.patch
+                    WORKING_DIRECTORY
+                      ${CMAKE_CURRENT_SOURCE_DIR}/extern/fastjet-core
+                   )
+  endif()
   add_subdirectory(${CMAKE_SOURCE_DIR}/extern/fastjet-core)
 endif()
 
 if (SKHEPFJ_USE_INSTALLED_FASTJET_CONTRIB)
   find_package(fastjetcontrib REQUIRED)
 else()
-  message("${CMAKE_CURRENT_SOURCE_DIR}/extern/fastjet-contrib")
   if (SKHEPFJ_PATCH_FJCONTRIB)
     execute_process(COMMAND
                       git apply --whitespace=fix ../../0001-fjcontrib-top-level-only-cmake-scripts.patch
