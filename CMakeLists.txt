@@ -28,7 +28,7 @@ if (SKHEPFJ_USE_INSTALLED_FASTJET_CONTRIB)
 else()
   message("${CMAKE_CURRENT_SOURCE_DIR}/extern/fastjet-contrib")
   if (SKHEPFJ_PATCH_FJCONTRIB)
-    execute_process(COMMAND 
+    execute_process(COMMAND
                       git apply --whitespace=fix ../../0001-fjcontrib-top-level-only-cmake-scripts.patch
                     WORKING_DIRECTORY
                       ${CMAKE_CURRENT_SOURCE_DIR}/extern/fastjet-contrib

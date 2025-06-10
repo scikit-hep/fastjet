@@ -36,7 +36,7 @@ index 0000000..c51bd38
 +set(PROJECT_VERSION_PRERELEASE "-devel")
 +
 +if(MSVC)
-+  execute_process(COMMAND 
++  execute_process(COMMAND
 +                    git apply --whitespace=fix -p0 0001-required-source-changes-for-windows-build.patch
 +                  WORKING_DIRECTORY
 +                    ${CMAKE_CURRENT_SOURCE_DIR}
@@ -182,7 +182,7 @@ index 0000000..c51bd38
 +        endif()
 +      endif()
 +      list(APPEND fjcontrib_combined_TARGETS $<TARGET_OBJECTS:${FJCONTRIB_NAME}>)
-+    endif()    
++    endif()
 +  endif()
 +
 +endforeach()
@@ -193,7 +193,7 @@ index 0000000..c51bd38
 +   foreach (FJCONTRIB_NAME ${fjcontrib_DIRNAMES})
 +     target_include_directories(fastjetcontribfragile
 +                                PUBLIC
-+                                  $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/${FJCONTRIB_NAME}/include> 
++                                  $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/${FJCONTRIB_NAME}/include>
 +                                  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/${FJCONTRIB_NAME}/include>
 +                                  $<INSTALL_INTERFACE:include>
 +                                )
@@ -208,7 +208,7 @@ index 0000000..c51bd38
 +   add_library(fastjet::contrib::fastjetcontribfragile ALIAS fastjetcontribfragile)
 +   install(TARGETS
 +            fastjetcontribfragile
-+          EXPORT 
++          EXPORT
 +            FastjetContribTargets
 +          RUNTIME
 +            COMPONENT Runtime
@@ -318,7 +318,7 @@ index 0000000..6b5df86
 +    add_library(fastjet::contrib::${FJCONTRIB_NAME} ALIAS ${FJCONTRIB_NAME})
 +    install(TARGETS
 +              ${FJCONTRIB_NAME}
-+            EXPORT 
++            EXPORT
 +              FastjetContribTargets
 +            RUNTIME
 +              COMPONENT Runtime
@@ -372,9 +372,9 @@ index 0000000..86f9c72
 --- /dev/null
 +++ b/incdir_CMakeLists.txt.in
 @@ -0,0 +1,5 @@
-+install(FILES 
++install(FILES
 +          ${${FJCONTRIB_NAME_LOWER}_INCLUDES}
-+        DESTINATION 
++        DESTINATION
 +          include/fastjet/contrib
 +       )
 diff --git a/incfastjet_CMakeLists.txt.in b/incfastjet_CMakeLists.txt.in
@@ -385,6 +385,5 @@ index 0000000..e05498f
 @@ -0,0 +1,2 @@
 +add_subdirectory(fastjet)
 +
--- 
+--
 2.39.5 (Apple Git-154)
-
