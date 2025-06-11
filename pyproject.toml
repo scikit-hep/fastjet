@@ -93,8 +93,6 @@ strict_equality = true
 ignore_missing_imports = true
 
 [tool.cibuildwheel]
-# Skip musllinux builds for the moment
-skip = "*-musllinux_*"
 test-extras = "test"
 test-command = "pytest {project}/tests"
 
