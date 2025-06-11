@@ -90,11 +90,11 @@ strict_equality = true
 ignore_missing_imports = true
 
 [tool.cibuildwheel]
-skip = "pp*"
+# Skip musllinux builds for the moment
+skip = "*-musllinux_*"
 test-extras = "test"
 test-command = "pytest {project}/tests"
 manylinux-x86_64-image = "manylinux2014"
-manylinux-i686-image = "manylinux2014"
 
 [tool.cibuildwheel.linux]
 before-all = [
@@ -111,8 +111,6 @@ before-all = [
     "cmake --install CGAL-5.6/build",
     "rm -r CGAL-5.6 CGAL-5.6-library.zip",
 ]
-# Skip musllinux builds for the moment
-skip = "*-musllinux_*"
 
 [tool.scikit-build]
 minimum-version = "build-system.requires"
