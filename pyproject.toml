@@ -97,7 +97,6 @@ ignore_missing_imports = true
 skip = "*-musllinux_*"
 test-extras = "test"
 test-command = "pytest {project}/tests"
-manylinux-x86_64-image = "manylinux2014"
 
 [tool.cibuildwheel.linux]
 before-all = [
