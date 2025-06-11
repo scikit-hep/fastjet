@@ -177,7 +177,7 @@ jobs:
           make --jobs
           make install
 
-      - uses: pypa/cibuildwheel@v2.23
+      - uses: pypa/cibuildwheel@v3.0
         env:
           CIBW_ARCHS: ${{ matrix.arch }}
           CIBW_BUILD: cp${{ matrix.python }}-*
