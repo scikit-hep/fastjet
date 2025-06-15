@@ -34,7 +34,7 @@ jobs:
       fail-fast: false
       matrix:
         python-version: ["3.9", "3.13"]
-        runs-on: [ubuntu-latest, ubuntu-24.04-arm, macos-latest] # , windows-latest]
+        runs-on: [ubuntu-latest, ubuntu-24.04-arm, macos-latest, windows-latest]
         arch: [auto64]
     steps:
       - uses: actions/checkout@v4
@@ -90,7 +90,7 @@ jobs:
           $Env:MPFR_INC_DIR = "${PWD}\cgal_auxlibs\auxiliary\gmp\include"
           $Env:MPFR_LIB_DIR = "${PWD}\cgal_auxlibs\auxiliary\gmp\lib"
           $Env:CMAKE_PREFIX_PATH = "C:\vcpkg\packages\getopt-win32_x64-windows\share\unofficial-getopt-win32;$Env:CMAKE_PREFIX_PATH"
-          python -m pip install '.[test]' -v -C"cmake.define.GMP_DLL_TO_COPY"="C:\\a\\fastjet\\fastjet\\cgal_auxlibs\\auxiliary\\gmp\\bin\\gmp-10.dll" -C"cmake.define.Boost_INCLUDE_DIR"="${PWD}\boost_1_88_0\boost_1_88_0" -C"cmake.define.CGAL_DIR"="${PWD}\CGAL-6.0.1\CGAL-6.0.1" -C"cmake.define.FASTJET_ENABLE_DEBUG"="OFF" -C"cmake.define.SISCONE_ENABLE_DEBUG"="OFF"
+          python -m pip install '.[test]' -v -C"cmake.define.GMP_DLL_TO_COPY"="C:\\a\\fastjet\\fastjet\\cgal_auxlibs\\auxiliary\\gmp\\bin\\gmp-10.dll" -C"cmake.define.Boost_INCLUDE_DIR"="${PWD}\boost_1_88_0\boost_1_88_0" -C"cmake.define.CGAL_DIR"="${PWD}\CGAL-6.0.1\CGAL-6.0.1" -C"cmake.define.FASTJET_ENABLE_DEBUG"="OFF" -C"cmake.define.SISCONE_ENABLE_DEBUG"="OFF" -C"cmake.define.SKHEPFJ_COPY_GMP_DLL"="ON"
 
       - name: List installed Python packages
         run: python -m pip list
@@ -104,7 +104,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, ubuntu-24.04-arm, macos-latest, macos-13] # , windows-latest]
+        os: [ubuntu-latest, ubuntu-24.04-arm, macos-latest, macos-13, windows-latest]
         python: [313]
         arch: [auto64]
 
@@ -189,6 +189,7 @@ jobs:
             "cmake.define.unofficial-getopt-win32_DIR"="C:\vcpkg\packages\getopt-win32_x64-windows\share\unofficial-getopt-win32"
             "cmake.define.FASTJET_ENABLE_DEBUG"="OFF"
             "cmake.define.SISCONE_ENABLE_DEBUG"="OFF"
+            "cmake.define.SKHEPFJ_COPY_GMP_DLL"="ON"
           CIBW_ENVIRONMENT_WINDOWS: >
             GMP_INC_DIR='C:\a\fastjet\fastjet\cgal_auxlibs\auxiliary\gmp\include'
             GMP_LIB_DIR='C:\a\fastjet\fastjet\cgal_auxlibs\auxiliary\gmp\lib'
