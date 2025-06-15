@@ -25,7 +25,7 @@ classifiers = [
 ]
 dependencies = [
   "awkward>=2",
-  "numpy>=1.13.3,<2.3",
+  "numpy>=1.13.3",
   "vector"
 ]
 
