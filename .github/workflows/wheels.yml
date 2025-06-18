@@ -107,6 +107,8 @@ jobs:
         env:
           CIBW_ARCHS: ${{ matrix.arch }}
           CIBW_BUILD: cp${{ matrix.python }}-*
+          CIBW_CONFIG_SETTINGS: >
+            "cmake.define.FASTJET_ENABLE_CGAL"="ON"
           CIBW_CONFIG_SETTINGS_WINDOWS: >
             "cmake.define.GMP_DLL_TO_COPY"="C:\\\\a\\\\fastjet\\\\fastjet\\\\cgal_auxlibs\\\\auxiliary\\\\gmp\\\\bin\\\\gmp-10.dll"
             "cmake.define.Boost_INCLUDE_DIR"="C:\a\fastjet\fastjet\boost_1_88_0\boost_1_88_0"

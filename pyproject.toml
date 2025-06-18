@@ -122,7 +122,6 @@ wheel.install-dir = "fastjet"
 
 [tool.scikit-build.cmake.define]
 FASTJET_ENABLE_PYTHON = "ON"
-FASTJET_ENABLE_CGAL = "ON"
 FASTJET_PYTHON_PACKAGE_NAME = "_swig"
 FASTJET_CUSTOM_PYTHON_INSTALL = "./"
 FASTJET_ENABLE_ALLCXXPLUGINS = "ON"
