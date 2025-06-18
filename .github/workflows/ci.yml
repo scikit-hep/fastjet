@@ -189,8 +189,6 @@ jobs:
             "cmake.define.Boost_INCLUDE_DIR"="C:\a\fastjet\fastjet\boost_1_88_0\boost_1_88_0"
             "cmake.define.CGAL_DIR"="C:\a\fastjet\fastjet\CGAL-6.0.1\CGAL-6.0.1"
             "cmake.define.unofficial-getopt-win32_DIR"="C:\vcpkg\packages\getopt-win32_x64-windows\share\unofficial-getopt-win32"
-            "cmake.define.FASTJET_ENABLE_DEBUG"="OFF"
-            "cmake.define.SISCONE_ENABLE_DEBUG"="OFF"
           CIBW_ENVIRONMENT_WINDOWS: >
             GMP_INC_DIR='C:\a\fastjet\fastjet\cgal_auxlibs\auxiliary\gmp\include'
             GMP_LIB_DIR='C:\a\fastjet\fastjet\cgal_auxlibs\auxiliary\gmp\lib'
