@@ -73,13 +73,13 @@ jobs:
         run: |
           eval "$(/opt/homebrew/bin/brew shellenv)"
           export PATH="/opt/homebrew/opt/make/libexec/gnubin:/opt/homebrew/opt/libtool/libexec/gnubin:$PATH"
-          python -m pip install '.[test]' -v
+          python -m pip install '.[test]' -v -C"cmake.define.FASTJET_ENABLE_CGAL"="ON"
 
       - name: Install package (Linux)
         if: runner.os == 'Linux'
         run: |
           echo $PATH
-          python -m pip install '.[test]' -v
+          python -m pip install '.[test]' -v -C"cmake.define.FASTJET_ENABLE_CGAL"="ON"
 
       - name: Install package (windows)
         if: runner.os == 'windows'
@@ -90,7 +90,7 @@ jobs:
           $Env:MPFR_INC_DIR = "${PWD}\cgal_auxlibs\auxiliary\gmp\include"
           $Env:MPFR_LIB_DIR = "${PWD}\cgal_auxlibs\auxiliary\gmp\lib"
           $Env:CMAKE_PREFIX_PATH = "C:\vcpkg\packages\getopt-win32_x64-windows\share\unofficial-getopt-win32;$Env:CMAKE_PREFIX_PATH"
-          python -m pip install '.[test]' -v -C"cmake.define.GMP_DLL_TO_COPY"="C:\\a\\fastjet\\fastjet\\cgal_auxlibs\\auxiliary\\gmp\\bin\\gmp-10.dll" -C"cmake.define.Boost_INCLUDE_DIR"="${PWD}\boost_1_88_0\boost_1_88_0" -C"cmake.define.CGAL_DIR"="${PWD}\CGAL-6.0.1\CGAL-6.0.1" -C"cmake.define.FASTJET_ENABLE_DEBUG"="OFF" -C"cmake.define.SISCONE_ENABLE_DEBUG"="OFF"
+          python -m pip install '.[test]' -v -C"cmake.define.GMP_DLL_TO_COPY"="C:\\a\\fastjet\\fastjet\\cgal_auxlibs\\auxiliary\\gmp\\bin\\gmp-10.dll" -C"cmake.define.Boost_INCLUDE_DIR"="${PWD}\boost_1_88_0\boost_1_88_0" -C"cmake.define.CGAL_DIR"="${PWD}\CGAL-6.0.1\CGAL-6.0.1" -C"cmake.define.FASTJET_ENABLE_DEBUG"="OFF" -C"cmake.define.SISCONE_ENABLE_DEBUG"="OFF" -C"cmake.define.FASTJET_ENABLE_CGAL"="ON"
 
       - name: List installed Python packages
         run: python -m pip list
@@ -182,13 +182,13 @@ jobs:
           CIBW_ARCHS: ${{ matrix.arch }}
           CIBW_BUILD: cp${{ matrix.python }}-*
           CIBW_BUILD_VERBOSITY: 1
+          CIBW_CONFIG_SETTINGS: >
+            "cmake.define.FASTJET_ENABLE_CGAL"="ON"
           CIBW_CONFIG_SETTINGS_WINDOWS: >
             "cmake.define.GMP_DLL_TO_COPY"="C:\\\\a\\\\fastjet\\\\fastjet\\\\cgal_auxlibs\\\\auxiliary\\\\gmp\\\\bin\\\\gmp-10.dll"
             "cmake.define.Boost_INCLUDE_DIR"="C:\a\fastjet\fastjet\boost_1_88_0\boost_1_88_0"
             "cmake.define.CGAL_DIR"="C:\a\fastjet\fastjet\CGAL-6.0.1\CGAL-6.0.1"
             "cmake.define.unofficial-getopt-win32_DIR"="C:\vcpkg\packages\getopt-win32_x64-windows\share\unofficial-getopt-win32"
-            "cmake.define.FASTJET_ENABLE_DEBUG"="OFF"
-            "cmake.define.SISCONE_ENABLE_DEBUG"="OFF"
           CIBW_ENVIRONMENT_WINDOWS: >
             GMP_INC_DIR='C:\a\fastjet\fastjet\cgal_auxlibs\auxiliary\gmp\include'
             GMP_LIB_DIR='C:\a\fastjet\fastjet\cgal_auxlibs\auxiliary\gmp\lib'
