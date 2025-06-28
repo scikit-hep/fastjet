@@ -96,7 +96,7 @@ jobs:
         run: |
           $Env:Path
           python -m pip install '.[test]' -v -C"cmake.define.Boost_INCLUDE_DIR"="${{ github.workspace }}\boost_1_88_0\boost_1_88_0" -C"cmake.define.CGAL_DIR"="${{ github.workspace }}\CGAL-6.0.1\CGAL-6.0.1" -C"cmake.define.FASTJET_ENABLE_CGAL"="ON"
-    
+
       - name: Install package (windows arm64)
         if: matrix.runs-on == 'windows-11-arm'
         run: |
