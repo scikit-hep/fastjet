@@ -34,8 +34,12 @@ jobs:
       fail-fast: false
       matrix:
         python-version: ["3.9", "3.13"]
-        runs-on: [ubuntu-latest, ubuntu-24.04-arm, macos-latest] # , windows-latest]
+        runs-on: [ubuntu-latest, ubuntu-24.04-arm, macos-latest, windows-latest, windows-11-arm]
         arch: [auto64]
+        exclude:
+          - runs-on: windows-11-arm
+            python-version: "3.9"
+
     steps:
       - uses: actions/checkout@v4
         with:
@@ -46,27 +50,33 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install compiler tools on windows
+      - if: matrix.runs-on == 'windows-11-arm'
+        name: Install rustup on Windows ARM
+        shell: sh
+        run: |
+          curl -LOs https://static.rust-lang.org/rustup/dist/aarch64-pc-windows-msvc/rustup-init.exe
+          ./rustup-init.exe -y --default-toolchain none --no-modify-path
+          echo "$USERPROFILE/.cargo/bin" >> "$GITHUB_PATH"
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+
+      - name: Install extra deps on windows
         if: runner.os == 'windows'
         run: |
-          Install-Module -Name 7Zip4Powershell -Force
           Invoke-Webrequest -Uri https://archives.boost.io/release/1.88.0/source/boost_1_88_0.zip -OutFile boost_1_88_0.zip
           Invoke-Webrequest -Uri https://github.com/CGAL/cgal/releases/download/v6.0.1/CGAL-6.0.1.zip -OutFile CGAL-6.0.1.zip
-          Invoke-Webrequest -Uri https://github.com/CGAL/cgal/releases/download/v6.0.1/CGAL-6.0.1-win64-auxiliary-libraries-gmp-mpfr.zip -OutFile cgal_auxlibs.zip
-          Expand-7Zip boost_1_88_0.zip .\boost_1_88_0
-          Expand-7Zip CGAL-6.0.1.zip .\CGAL-6.0.1
-          Expand-7Zip cgal_auxlibs.zip .\cgal_auxlibs
-          vcpkg.exe install getopt
+          Expand-Archive boost_1_88_0.zip .\boost_1_88_0
+          Expand-Archive CGAL-6.0.1.zip .\CGAL-6.0.1
 
-      - name: Install compiler tools on macOS
+      - name: Install extra deps on macOS
         if: runner.os == 'macOS'
         run: |
-          brew reinstall gfortran
-          brew install swig boost cgal gmp mpfr
+          brew install --ignore-dependencies swig boost cgal
 
       - name: Install extra deps on Linux
         if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y libboost-dev libmpfr-dev swig libcgal-dev
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libboost-dev swig libcgal-dev
 
       - name: Install package (macOS)
         if: runner.os == 'macOS'
@@ -81,21 +91,23 @@ jobs:
           echo $PATH
           python -m pip install '.[test]' -v -C"cmake.define.FASTJET_ENABLE_CGAL"="ON"
 
-      - name: Install package (windows)
-        if: runner.os == 'windows'
+      - name: Install package (windows x64)
+        if: matrix.runs-on == 'windows-latest'
         run: |
           $Env:Path
-          $Env:GMP_INC_DIR = "${PWD}\cgal_auxlibs\auxiliary\gmp\include"
-          $Env:GMP_LIB_DIR = "${PWD}\cgal_auxlibs\auxiliary\gmp\lib"
-          $Env:MPFR_INC_DIR = "${PWD}\cgal_auxlibs\auxiliary\gmp\include"
-          $Env:MPFR_LIB_DIR = "${PWD}\cgal_auxlibs\auxiliary\gmp\lib"
-          $Env:CMAKE_PREFIX_PATH = "C:\vcpkg\packages\getopt-win32_x64-windows\share\unofficial-getopt-win32;$Env:CMAKE_PREFIX_PATH"
-          python -m pip install '.[test]' -v -C"cmake.define.GMP_DLL_TO_COPY"="C:\\a\\fastjet\\fastjet\\cgal_auxlibs\\auxiliary\\gmp\\bin\\gmp-10.dll" -C"cmake.define.Boost_INCLUDE_DIR"="${PWD}\boost_1_88_0\boost_1_88_0" -C"cmake.define.CGAL_DIR"="${PWD}\CGAL-6.0.1\CGAL-6.0.1" -C"cmake.define.FASTJET_ENABLE_DEBUG"="OFF" -C"cmake.define.SISCONE_ENABLE_DEBUG"="OFF" -C"cmake.define.FASTJET_ENABLE_CGAL"="ON"
+          python -m pip install '.[test]' -v -C"cmake.define.Boost_INCLUDE_DIR"="${{ github.workspace }}\boost_1_88_0\boost_1_88_0" -C"cmake.define.CGAL_DIR"="${{ github.workspace }}\CGAL-6.0.1\CGAL-6.0.1" -C"cmake.define.FASTJET_ENABLE_CGAL"="ON"
+
+      - name: Install package (windows arm64)
+        if: matrix.runs-on == 'windows-11-arm'
+        run: |
+          $Env:Path
+          python -m pip install . -v -C"cmake.define.Boost_INCLUDE_DIR"="${{ github.workspace }}\boost_1_88_0\boost_1_88_0" -C"cmake.define.CGAL_DIR"="${{ github.workspace }}\CGAL-6.0.1\CGAL-6.0.1" -C"cmake.define.FASTJET_ENABLE_CGAL"="ON"
 
       - name: List installed Python packages
         run: python -m pip list
 
       - name: Test package
+        if: matrix.runs-on != 'windows-11-arm'
         run: python -m pytest -vv -rs -Wd
 
   test_wheels:
@@ -104,7 +116,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, ubuntu-24.04-arm, macos-latest, macos-13] # , windows-latest]
+        os: [ubuntu-latest, ubuntu-24.04-arm, macos-latest, macos-13, windows-latest, windows-11-arm]
         python: [313]
         arch: [auto64]
 
@@ -114,68 +126,33 @@ jobs:
           submodules: recursive
           fetch-depth: 0
 
-      - name: Install compiler tools on macOS
+      - name: Install extra deps on macOS
         if: runner.os == 'macOS'
         run: |
           echo "MACOSX_DEPLOYMENT_TARGET=11.0" >> "$GITHUB_ENV"
-          brew uninstall --force --ignore-dependencies gcc@12 gcc@13 gnupg gnutls isl libmpc nettle gcc mpfr gmp
-          brew install --ignore-dependencies m4 make automake autoconf libtool swig boost cgal
+          brew install --ignore-dependencies swig boost cgal
           echo "PATH=/opt/homebrew/opt/make/libexec/gnubin:/opt/homebrew/opt/libtool/libexec/gnubin:$PATH" >> "$GITHUB_ENV"
 
-      - name: Install compiler tools on windows
+      - if: matrix.os == 'windows-11-arm'
+        name: Install rustup on Windows ARM
+        shell: sh
+        run: |
+          curl -LOs https://static.rust-lang.org/rustup/dist/aarch64-pc-windows-msvc/rustup-init.exe
+          ./rustup-init.exe -y --default-toolchain none --no-modify-path
+          echo "$USERPROFILE/.cargo/bin" >> "$GITHUB_PATH"
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+
+      - name: Install extra deps on windows
         if: runner.os == 'windows'
         run: |
-          Install-Module -Name 7Zip4Powershell -Force
           Invoke-Webrequest -Uri https://archives.boost.io/release/1.88.0/source/boost_1_88_0.zip -OutFile boost_1_88_0.zip
           Invoke-Webrequest -Uri https://github.com/CGAL/cgal/releases/download/v6.0.1/CGAL-6.0.1.zip -OutFile CGAL-6.0.1.zip
-          Invoke-Webrequest -Uri https://github.com/CGAL/cgal/releases/download/v6.0.1/CGAL-6.0.1-win64-auxiliary-libraries-gmp-mpfr.zip -OutFile cgal_auxlibs.zip
-          Expand-7Zip boost_1_88_0.zip .\boost_1_88_0
-          Expand-7Zip CGAL-6.0.1.zip .\CGAL-6.0.1
-          Expand-7Zip cgal_auxlibs.zip .\cgal_auxlibs
-          vcpkg.exe install getopt
+          Expand-Archive -Path boost_1_88_0.zip -DestinationPath .\boost_1_88_0
+          Expand-Archive -Path CGAL-6.0.1.zip -DestinationPath .\CGAL-6.0.1
 
       - name: Install extra deps on Linux
         if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y libboost-dev libmpfr-dev swig libcgal-dev
-
-      - name: Clone gmp
-        if: runner.os == 'macOS'
-        uses: actions/checkout@v4
-        with:
-          repository: gmp-mirror/gmp-6.3
-          path: gmp-6.3
-
-      - name: Build gmp from source for MACOSX_DEPLOYMENT_TARGET=11.0
-        if: runner.os == 'macOS'
-        working-directory: gmp-6.3
-        run: |
-          brew install texinfo
-          autoreconf -i -f
-          ./configure --help
-          ./configure \
-            --prefix=$(brew --prefix) \
-            --enable-cxx
-          touch ./doc/version.texi
-          make --jobs
-          make install
-
-      - name: Get mpfr release
-        if: runner.os == 'macOS'
-        run: |
-          curl -Lk https://www.mpfr.org/mpfr-current/mpfr-4.2.2.tar.gz -o mpfr-4.2.2.tar.gz
-          tar -xzf mpfr-4.2.2.tar.gz
-
-      - name: Build mpfr from source for MACOSX_DEPLOYMENT_TARGET=11.0
-        if: runner.os == 'macOS'
-        working-directory: mpfr-4.2.2
-        run: |
-          autoreconf -i -f
-          ./configure --help
-          ./configure \
-            --prefix=$(brew --prefix) \
-            --with-gmp=$(brew --prefix)
-          make --jobs
-          make install
+        run: sudo apt-get update && sudo apt-get install -y libboost-dev swig libcgal-dev
 
       - uses: pypa/cibuildwheel@v3.0
         env:
@@ -185,15 +162,9 @@ jobs:
           CIBW_CONFIG_SETTINGS: >
             "cmake.define.FASTJET_ENABLE_CGAL"="ON"
           CIBW_CONFIG_SETTINGS_WINDOWS: >
-            "cmake.define.GMP_DLL_TO_COPY"="C:\\\\a\\\\fastjet\\\\fastjet\\\\cgal_auxlibs\\\\auxiliary\\\\gmp\\\\bin\\\\gmp-10.dll"
-            "cmake.define.Boost_INCLUDE_DIR"="C:\a\fastjet\fastjet\boost_1_88_0\boost_1_88_0"
-            "cmake.define.CGAL_DIR"="C:\a\fastjet\fastjet\CGAL-6.0.1\CGAL-6.0.1"
-            "cmake.define.unofficial-getopt-win32_DIR"="C:\vcpkg\packages\getopt-win32_x64-windows\share\unofficial-getopt-win32"
-          CIBW_ENVIRONMENT_WINDOWS: >
-            GMP_INC_DIR='C:\a\fastjet\fastjet\cgal_auxlibs\auxiliary\gmp\include'
-            GMP_LIB_DIR='C:\a\fastjet\fastjet\cgal_auxlibs\auxiliary\gmp\lib'
-            MPFR_INC_DIR='C:\a\fastjet\fastjet\cgal_auxlibs\auxiliary\gmp\include'
-            MPFR_LIB_DIR='C:\a\fastjet\fastjet\cgal_auxlibs\auxiliary\gmp\lib'
+            "cmake.define.Boost_INCLUDE_DIR"="${{ github.workspace }}\boost_1_88_0\boost_1_88_0"
+            "cmake.define.CGAL_DIR"="${{ github.workspace }}\CGAL-6.0.1\CGAL-6.0.1"
+            "cmake.define.FASTJET_ENABLE_CGAL"="ON"
 
       - name: Upload wheels
         uses: actions/upload-artifact@v4
