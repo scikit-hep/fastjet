@@ -95,22 +95,20 @@ ignore_missing_imports = true
 [tool.cibuildwheel]
 test-extras = "test"
 test-command = "pytest {project}/tests"
+test-skip = "*-win_arm64" # skip win_arm64 tests for now since much of the wheel infrastructure is missing
 
 [tool.cibuildwheel.linux]
 before-all = [
-    "if command -v yum > /dev/null; then yum update -y; yum install -y mpfr-devel; fi",
-    "if command -v apt-get > /dev/null; then apt-get update -y; apt-get install -y libmpfr-dev; fi",
-    "if command -v apk > /dev/null; then apk update; apk add mpfr-dev gmp-dev; fi",
-    "curl -L https://archives.boost.io/release/1.87.0/source/boost_1_87_0.tar.bz2 -o boost_1_87_0.tar.bz2",
-    "tar --bzip2 -xf boost_1_87_0.tar.bz2",
-    "mv boost_1_87_0/boost /usr/include/boost",
-    "curl -L https://github.com/CGAL/cgal/releases/download/v5.6/CGAL-5.6-library.zip -o CGAL-5.6-library.zip",
-    "unzip -q CGAL-5.6-library.zip",
-    "mkdir CGAL-5.6/build",
-    "cmake -S CGAL-5.6 -B CGAL-5.6/build -DCMAKE_BUILD_TYPE=\"Release\"",
-    "cmake --build CGAL-5.6/build --clean-first",
-    "cmake --install CGAL-5.6/build",
-    "rm -r CGAL-5.6 CGAL-5.6-library.zip",
+    "curl -L https://archives.boost.io/release/1.88.0/source/boost_1_88_0.tar.bz2 -o boost_1_88_0.tar.bz2",
+    "tar --bzip2 -xf boost_1_88_0.tar.bz2",
+    "mv boost_1_88_0/boost /usr/include/boost",
+    "curl -L https://github.com/CGAL/cgal/releases/download/v6.0.1/CGAL-6.0.1-library.zip -o CGAL-6.0.1-library.zip",
+    "unzip -q CGAL-6.0.1-library.zip",
+    "mkdir CGAL-6.0.1/build",
+    "cmake -S CGAL-6.0.1 -B CGAL-6.0.1/build -DCMAKE_BUILD_TYPE=\"Release\"",
+    "cmake --build CGAL-6.0.1/build --clean-first",
+    "cmake --install CGAL-6.0.1/build",
+    "rm -r CGAL-6.0.1 CGAL-6.0.1-library.zip",
 ]
 
 [tool.scikit-build]
@@ -128,6 +126,10 @@ FASTJET_ENABLE_ALLCXXPLUGINS = "ON"
 FASTJETCONTRIB_ENABLE_FRAGILELIB = "ON"
 FASTJET_ENABLE_DEBUG = "OFF"
 SISCONE_ENABLE_DEBUG = "OFF"
+FASTJET_BUILD_EXAMPLES = "OFF"
+SISCONE_BUILD_EXAMPLES = "OFF"
+CGAL_CMAKE_EXACT_NT_BACKEND = "BOOST_BACKEND"
+CGAL_DISABLE_GMP = "ON"
 
 [tool.setuptools_scm]
 write_to = "src/fastjet/version.py"
