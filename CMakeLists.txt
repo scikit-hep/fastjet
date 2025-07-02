@@ -20,31 +20,19 @@ set(SKHEPFJ_FASTJET_LIB_PYMODULE_NAME "fastjet_cxx" CACHE STRING "The name of th
 
 set(PKG_INSTALL "fastjet") ## python package name
 
+include(FetchContent)
+
 find_package(pybind11 REQUIRED)
 
 if (SKHEPFJ_USE_INSTALLED_FASTJET)
   find_package(fastjet REQUIRED)
 else()
-  if (SKHEPFJ_PATCH_FJCORE)
-    execute_process(COMMAND
-                      git apply --whitespace=fix ../../0001-use-CMAKE_INSTALL_LIBDIR-consistently-in-pyinterface.patch
-                    WORKING_DIRECTORY
-                      ${CMAKE_CURRENT_SOURCE_DIR}/extern/fastjet-core
-                   )
-  endif()
   add_subdirectory(${CMAKE_SOURCE_DIR}/extern/fastjet-core)
 endif()
 
 if (SKHEPFJ_USE_INSTALLED_FASTJET_CONTRIB)
   find_package(fastjetcontrib REQUIRED)
 else()
-  if (SKHEPFJ_PATCH_FJCONTRIB)
-    execute_process(COMMAND
-                      git apply --whitespace=fix ../../0001-fjcontrib-top-level-only-cmake-scripts.patch
-                    WORKING_DIRECTORY
-                      ${CMAKE_CURRENT_SOURCE_DIR}/extern/fastjet-contrib
-                   )
-  endif()
   add_subdirectory(${CMAKE_SOURCE_DIR}/extern/fastjet-contrib)
 endif()
 
