@@ -11,7 +11,7 @@ project(fastjet VERSION ${SPLIT_VERSION_MAJOR}.${SPLIT_VERSION_MINOR} LANGUAGES 
 
 option(SKHEPFJ_USE_INSTALLED_FASTJET         "Use an existing installed version of fastjet"                         OFF)
 option(SKHEPFJ_USE_INSTALLED_FASTJET_CONTRIB "Use an existing installed version of fastjet-contrib"                 OFF)
-option(SKHEPFJ_PATCH_FJCORE                  "Patch fastjet-contrib with CMAKE_INSTALL_LIBDIR use"                  ON)
+option(SKHEPFJ_PATCH_FJCORE                  "Patch fastjet-contrib with CMAKE_INSTALL_LIBDIR use"                  OFF)
 option(SKHEPFJ_PATCH_FJCONTRIB               "Patch fastjet-contrib with cmake build"                               ON)
 option(SKHEPFJ_PASSTHRU_FASTJET_SWIG         "Create a _swig.py that just imports <fastjet-lib python module>"      OFF)
 option(SKHEPFJ_COPY_GMP_DLL                  "On Windows, force a copy of the amp runtime .dll to the wheel area"   OFF)
