@@ -42,13 +42,13 @@ repos:
   - id: setup-cfg-fmt
 
 - repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.12.8
+  rev: v0.13.0
   hooks:
   - id: ruff
     args: [--fix, --show-fixes]
 
 - repo: https://github.com/pre-commit/mirrors-clang-format
-  rev: "v20.1.8"
+  rev: "v21.1.0"
   hooks:
     - id: clang-format
       types_or: [c++, c, cuda]
