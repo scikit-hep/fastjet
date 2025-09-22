@@ -22,7 +22,7 @@ jobs:
         with:
           submodules: recursive
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
       - uses: pre-commit/action@v3.0.1
         with:
           extra_args: --hook-stage manual --all-files
@@ -46,7 +46,7 @@ jobs:
           submodules: recursive
           fetch-depth: 0
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
 
