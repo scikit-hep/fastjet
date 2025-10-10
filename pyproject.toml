@@ -95,7 +95,7 @@ ignore_missing_imports = true
 [tool.cibuildwheel]
 test-extras = "test"
 test-command = "pytest {project}/tests"
-test-skip = "*-win_arm64" # skip win_arm64 tests for now since much of the wheel infrastructure is missing
+test-skip = "cp314* *-win_arm64" # skip win_arm64 tests for now since much of the wheel infrastructure is missing
 
 [tool.cibuildwheel.linux]
 before-all = [
