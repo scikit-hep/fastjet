@@ -72,7 +72,7 @@ jobs:
           Expand-Archive boost_1_88_0.zip .\boost_1_88_0
           Expand-Archive CGAL-6.0.1.zip .\CGAL-6.0.1
 
-      - uses: pypa/cibuildwheel@v3.1
+      - uses: pypa/cibuildwheel@v3.2
         env:
           CIBW_ARCHS: ${{ matrix.arch }}
           CIBW_BUILD: cp${{ matrix.python }}-*
