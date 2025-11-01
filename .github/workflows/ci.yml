@@ -33,7 +33,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.9", "3.13"]
+        python-version: ["3.9", "3.14"]
         runs-on: [ubuntu-latest, ubuntu-24.04-arm, macos-latest, windows-latest, windows-11-arm]
         arch: [auto64]
         exclude:
@@ -117,7 +117,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, ubuntu-24.04-arm, macos-latest, macos-13, windows-latest, windows-11-arm]
-        python: [313]
+        python: [314]
         arch: [auto64]
 
     steps:
