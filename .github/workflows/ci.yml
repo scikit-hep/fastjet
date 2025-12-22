@@ -167,7 +167,7 @@ jobs:
             "cmake.define.FASTJET_ENABLE_CGAL"="ON"
 
       - name: Upload wheels
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: cibw-wheels-${{ matrix.os }}-${{ matrix.python }}-${{ matrix.arch }}
           path: wheelhouse/*.whl
