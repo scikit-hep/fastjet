@@ -41,7 +41,7 @@ jobs:
             python: 39
           - os: windows-11-arm
             python: 310
-          - os: ubuntu-latest:
+          - os: ubuntu-latest
             arch: universal2
           - os: ubuntu-24.04-arm
             arch: universal2
