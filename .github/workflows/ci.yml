@@ -118,7 +118,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, ubuntu-24.04-arm, macos-latest, windows-latest, windows-11-arm]
         python: [314]
-        arch: [auto64, universal2]       
+        arch: [auto64, universal2]
         exclude:
           - os: ubuntu-latest
             arch: universal2
