@@ -116,9 +116,20 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, ubuntu-24.04-arm, macos-latest, macos-13, windows-latest, windows-11-arm]
+        os: [ubuntu-latest, ubuntu-24.04-arm, macos-latest, windows-latest, windows-11-arm]
         python: [314]
-        arch: [auto64]
+        arch: [auto64, universal2]
+        exclude:
+          - os: ubuntu-latest
+            arch: universal2
+          - os: ubuntu-24.04-arm
+            arch: universal2
+          - os: macos-latest
+            arch: auto64
+          - os: windows-latest
+            arch: universal2
+          - os: windows-11-arm
+            arch: universal2
 
     steps:
       - uses: actions/checkout@v6
