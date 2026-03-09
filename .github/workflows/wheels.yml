@@ -22,7 +22,7 @@ jobs:
       - name: Build SDist
         run: pipx run build --sdist
 
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         with:
           name: cibw-sdist
           path: dist/*.tar.gz
@@ -82,7 +82,7 @@ jobs:
           Expand-Archive boost_1_88_0.zip .\boost_1_88_0
           Expand-Archive CGAL-6.0.1.zip .\CGAL-6.0.1
 
-      - uses: pypa/cibuildwheel@v3.3
+      - uses: pypa/cibuildwheel@v3.4
         env:
           CIBW_ARCHS: ${{ matrix.arch }}
           CIBW_BUILD: cp${{ matrix.python }}-*
@@ -94,7 +94,7 @@ jobs:
             "cmake.define.FASTJET_ENABLE_CGAL"="ON"
 
       - name: Upload wheels
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: cibw-wheels-${{ matrix.os }}-${{ matrix.python }}-${{ matrix.arch }}
           path: wheelhouse/*.whl
@@ -103,7 +103,7 @@ jobs:
     needs: [make_sdist]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v7
+      - uses: actions/download-artifact@v8
         with:
           pattern: cibw-*
           path: dist
@@ -129,7 +129,7 @@ jobs:
     if: github.event_name == 'release' && github.event.action == 'published'
 
     steps:
-      - uses: actions/download-artifact@v7
+      - uses: actions/download-artifact@v8
         with:
           pattern: cibw-*
           path: dist
