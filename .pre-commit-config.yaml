@@ -6,11 +6,6 @@ ci:
     autoupdate_commit_msg: 'ci(pre-commit): pre-commit autoupdate'
 
 repos:
-- repo: https://github.com/psf/black-pre-commit-mirror
-  rev: 26.3.1
-  hooks:
-  - id: black
-
 - repo: https://github.com/pre-commit/pre-commit-hooks
   rev: v6.0.0
   hooks:
@@ -34,7 +29,7 @@ repos:
   rev: v3.21.2
   hooks:
   - id: pyupgrade
-    args: ["--py39-plus"]
+    args: ["--py310-plus"]
 
 - repo: https://github.com/asottile/setup-cfg-fmt
   rev: v3.2.0
@@ -44,8 +39,9 @@ repos:
 - repo: https://github.com/astral-sh/ruff-pre-commit
   rev: v0.15.10
   hooks:
-  - id: ruff
+  - id: ruff-check
     args: [--fix, --show-fixes]
+  - id: ruff-format
 
 - repo: https://github.com/pre-commit/mirrors-clang-format
   rev: "v22.1.3"

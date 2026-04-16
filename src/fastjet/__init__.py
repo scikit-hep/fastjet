@@ -10,7 +10,6 @@ if _os.name == "nt":
     if _os.path.exists(dll_dir1):
         _os.add_dll_directory(dll_dir1)
 
-from typing import Union
 
 import awkward as ak
 
@@ -440,7 +439,7 @@ class ClusterSequence:  # The super class
 
         raise AssertionError()
 
-    def exclusive_dmerge(self, njets: int = 10) -> Union[ak.Array, float]:
+    def exclusive_dmerge(self, njets: int = 10) -> ak.Array | float:
         """Returns the dmin corresponding to the recombination that went from n+1 to n jets.
 
         Args:
@@ -451,7 +450,7 @@ class ClusterSequence:  # The super class
         """
         raise AssertionError()
 
-    def exclusive_dmerge_max(self, njets: int = 10) -> Union[ak.Array, float]:
+    def exclusive_dmerge_max(self, njets: int = 10) -> ak.Array | float:
         """Returns the maximum of the dmin encountered during all recombinations up to the one that led to an n-jet final state.
 
         Args:
@@ -462,7 +461,7 @@ class ClusterSequence:  # The super class
         """
         raise AssertionError()
 
-    def exclusive_ymerge_max(self, njets: int = 10) -> Union[ak.Array, float]:
+    def exclusive_ymerge_max(self, njets: int = 10) -> ak.Array | float:
         """Same as exclusive_dmerge_max, but normalised to squared total energy.
 
         Args:
@@ -473,7 +472,7 @@ class ClusterSequence:  # The super class
         """
         raise AssertionError()
 
-    def exclusive_ymerge(self, njets: int = 10) -> Union[ak.Array, float]:
+    def exclusive_ymerge(self, njets: int = 10) -> ak.Array | float:
         """Returns the ymin corresponding to the recombination that went from n+1 to n jets.
 
         Args:
@@ -484,7 +483,7 @@ class ClusterSequence:  # The super class
         """
         raise AssertionError()
 
-    def Q(self) -> Union[ak.Array, float]:
+    def Q(self) -> ak.Array | float:
         """Returns the sum of all energies in the event (relevant mainly for e+e-)
 
         Args:
@@ -495,7 +494,7 @@ class ClusterSequence:  # The super class
         """
         raise AssertionError()
 
-    def Q2(self) -> Union[ak.Array, float]:
+    def Q2(self) -> ak.Array | float:
         """Return Q()^2
 
         Args:
@@ -533,9 +532,7 @@ class ClusterSequence:  # The super class
         """
         raise AssertionError()
 
-    def exclusive_subdmerge(
-        self, data: ak.Array, nsub: int = 0
-    ) -> Union[ak.Array, float]:
+    def exclusive_subdmerge(self, data: ak.Array, nsub: int = 0) -> ak.Array | float:
         """Returns the dij that was present in the merging nsub+1 -> nsub subjets inside this jet.
 
         Args:
@@ -549,7 +546,7 @@ class ClusterSequence:  # The super class
 
     def exclusive_subdmerge_max(
         self, data: ak.Array, nsub: int = 0
-    ) -> Union[ak.Array, float]:
+    ) -> ak.Array | float:
         """Returns the maximum dij that occurred in the whole event at the stage that the nsub+1 -> nsub merge of subjets occurred inside this jet.
 
         Args:
@@ -561,9 +558,7 @@ class ClusterSequence:  # The super class
         """
         raise AssertionError()
 
-    def n_exclusive_subjets(
-        self, data: ak.Array, dcut: float = 0
-    ) -> Union[ak.Array, int]:
+    def n_exclusive_subjets(self, data: ak.Array, dcut: float = 0) -> ak.Array | int:
         """Returns the size of exclusive_subjets(...); still n ln n with same coefficient, but marginally more efficient than manually taking len(exclusive_subjets)
 
         Args:
@@ -575,7 +570,7 @@ class ClusterSequence:  # The super class
         """
         raise AssertionError()
 
-    def has_parents(self, data: ak.Array) -> Union[ak.Array, bool]:
+    def has_parents(self, data: ak.Array) -> ak.Array | bool:
         """if the jet has parents in the clustering, it returns true.
 
         Args:
@@ -586,7 +581,7 @@ class ClusterSequence:  # The super class
         """
         raise AssertionError()
 
-    def has_child(self, data: ak.Array) -> Union[ak.Array, bool]:
+    def has_child(self, data: ak.Array) -> ak.Array | bool:
         """If the jet has children in the clustering, it returns true.
 
         Args:
@@ -597,7 +592,7 @@ class ClusterSequence:  # The super class
         """
         raise AssertionError()
 
-    def jet_scale_for_algorithm(self, data: ak.Array) -> Union[ak.Array, float]:
+    def jet_scale_for_algorithm(self, data: ak.Array) -> ak.Array | float:
         """Returns the scale associated with a jet as required for this clustering algorithm (kt^2 for the kt-algorithm, 1 for the Cambridge algorithm).
 
         Args:
@@ -619,7 +614,7 @@ class ClusterSequence:  # The super class
         """
         raise AssertionError()
 
-    def n_particles(self) -> Union[ak.Array, int]:
+    def n_particles(self) -> ak.Array | int:
         """Returns the number of particles that were provided to the clustering algorithm.
 
         Args:
@@ -630,7 +625,7 @@ class ClusterSequence:  # The super class
         """
         raise AssertionError()
 
-    def n_exclusive_jets(self, dcut: float = 0) -> Union[ak.Array, int]:
+    def n_exclusive_jets(self, dcut: float = 0) -> ak.Array | int:
         """Returns the number of jets (in the sense of the exclusive algorithm) that would be obtained when running the algorithm with the given dcut.
 
         Args:
