@@ -10,7 +10,6 @@ if _os.name == "nt":
     if _os.path.exists(dll_dir1):
         _os.add_dll_directory(dll_dir1)
 
-from typing import Union
 
 import awkward as ak
 
