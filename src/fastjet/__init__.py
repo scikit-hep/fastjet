@@ -533,9 +533,7 @@ class ClusterSequence:  # The super class
         """
         raise AssertionError()
 
-    def exclusive_subdmerge(
-        self, data: ak.Array, nsub: int = 0
-    ) -> ak.Array | float:
+    def exclusive_subdmerge(self, data: ak.Array, nsub: int = 0) -> ak.Array | float:
         """Returns the dij that was present in the merging nsub+1 -> nsub subjets inside this jet.
 
         Args:
@@ -561,9 +559,7 @@ class ClusterSequence:  # The super class
         """
         raise AssertionError()
 
-    def n_exclusive_subjets(
-        self, data: ak.Array, dcut: float = 0
-    ) -> ak.Array | int:
+    def n_exclusive_subjets(self, data: ak.Array, dcut: float = 0) -> ak.Array | int:
         """Returns the size of exclusive_subjets(...); still n ln n with same coefficient, but marginally more efficient than manually taking len(exclusive_subjets)
 
         Args:
