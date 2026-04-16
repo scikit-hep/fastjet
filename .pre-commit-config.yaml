@@ -6,12 +6,6 @@ ci:
     autoupdate_commit_msg: 'ci(pre-commit): pre-commit autoupdate'
 
 repos:
-- repo: https://github.com/psf/black-pre-commit-mirror
-  rev: 26.3.1
-  hooks:
-  - id: black
-    args: ["--target-version","py312"]
-
 - repo: https://github.com/pre-commit/pre-commit-hooks
   rev: v6.0.0
   hooks:
@@ -45,7 +39,9 @@ repos:
 - repo: https://github.com/astral-sh/ruff-pre-commit
   rev: v0.15.10
   hooks:
-  - id: ruff
+  - id: ruff-check
+    args: [--fix, --show-fixes]
+  - id: ruff-format
     args: [--fix, --show-fixes]
 
 - repo: https://github.com/pre-commit/mirrors-clang-format
