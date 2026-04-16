@@ -42,7 +42,6 @@ repos:
   - id: ruff-check
     args: [--fix, --show-fixes]
   - id: ruff-format
-    args: [--fix, --show-fixes]
 
 - repo: https://github.com/pre-commit/mirrors-clang-format
   rev: "v22.1.3"
