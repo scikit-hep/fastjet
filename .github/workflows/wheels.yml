@@ -38,8 +38,6 @@ jobs:
         arch: [auto64, universal2]
         exclude:
           - os: windows-11-arm
-            python: 39
-          - os: windows-11-arm
             python: 310
           - os: ubuntu-latest
             arch: universal2
