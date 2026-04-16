@@ -33,7 +33,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python: [39, 310, 311, 312, 313, 314]
+        python: [39, 310, 311, 312, 313, 314, '314t']
         os: [ubuntu-latest, ubuntu-24.04-arm, macos-latest, windows-latest, windows-11-arm]
         arch: [auto64, universal2]
         exclude:
