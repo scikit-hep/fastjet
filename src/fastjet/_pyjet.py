@@ -549,7 +549,7 @@ class DaskAwkwardClusterSequence(ClusterSequence):
         angles=-1,
         alpha=0,
         func="generalized",
-        normalized=False,
+        normalized=True,
     ):
         return _dak_dispatch(
             self,
