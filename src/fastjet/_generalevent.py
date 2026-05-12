@@ -763,7 +763,7 @@ class _classgeneralevent:
         njets=1,
         beta=1,
         npoint=0,
-        angles: int= -1,
+        angles: int = -1,
         alpha=0,
         func="generalized",
         normalized=True,
