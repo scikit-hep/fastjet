@@ -221,7 +221,7 @@ class JetDefinition(JetDefinitionNoCast):
             as_kwargs = True
 
         if not isinstance(R_in, (float, int)):
-            raise ValueError(
+            raise TypeError(
                 f"R_in should be a real number, got {R_in} of type {type(R_in)}"
             )
 
@@ -257,7 +257,7 @@ class ClusterSequence:  # The super class
 
     def __init__(self, data, jetdef):
         if not isinstance(jetdef, fastjet._swig.JetDefinition):
-            raise AttributeError("JetDefinition is not correct") from None
+            raise TypeError("JetDefinition is not correct") from None
         if isinstance(data, ak.Array):
             self.__class__ = fastjet._pyjet.AwkwardClusterSequence
             fastjet._pyjet.AwkwardClusterSequence.__init__(
