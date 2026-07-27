@@ -1,8 +1,8 @@
-import awkward as ak  # noqa: F401
-import numpy as np  # noqa: F401
+import awkward as ak
+import numpy as np
 import pytest  # noqa: F401
 
-import fastjet._pyjet  # noqa: F401
+import fastjet._pyjet
 
 
 def test_listoffset_inclusive():
