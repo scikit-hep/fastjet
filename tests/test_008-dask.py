@@ -1,12 +1,12 @@
-import awkward as ak  # noqa: F401
+import awkward as ak
 import numpy as np  # noqa: F401
-import pytest  # noqa: F401
+import pytest
 
-import fastjet._pyjet  # noqa: F401
+import fastjet._pyjet
 
-dak = pytest.importorskip("dask_awkward")  # noqa: F401
+dak = pytest.importorskip("dask_awkward")
 distributed = pytest.importorskip("distributed")
-vector = pytest.importorskip("vector")  # noqa: F401
+vector = pytest.importorskip("vector")
 
 
 def test_multi():
