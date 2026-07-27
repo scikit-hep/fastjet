@@ -3,7 +3,7 @@ import warnings
 import awkward as ak
 import numpy as np
 
-import fastjet._ext  # noqa: F401, E402
+import fastjet._ext
 
 _default_taus_njettiness = [1, 2, 3, 4]
 
@@ -470,7 +470,6 @@ class _classgeneralevent:
                 "dcut and exclusive jets for jet-finders other than kt, C/A or genkt with p>=0 should be interpreted with care.",
                 stacklevel=2,
             )
-        return
 
     def inclusive_jets(self, min_pt):
         self._out = []
@@ -761,9 +760,9 @@ class _classgeneralevent:
     def exclusive_jets_energy_correlator(
         self,
         njets=1,
-        n_point=0,
-        angles: int = -1,
         beta=1,
+        npoint=0,
+        angles: int = -1,
         alpha=0,
         func="generalized",
         normalized=True,
@@ -774,10 +773,18 @@ class _classgeneralevent:
         self._out = []
         self._input_flag = 0
         for i in range(len(self._clusterable_level)):
-            np_results = self._results[i].to_numpy_energy_correlators()
+            np_results = self._results[i].to_numpy_energy_correlators(
+                njets,
+                beta,
+                npoint,
+                angles,
+                alpha,
+                func,
+                normalized,
+            )
             self._out.append(
                 ak.Array(
-                    ak.contents.NumpyArray(np_results[0]),
+                    ak.contents.NumpyArray(np_results),
                     behavior=self.data.behavior,
                     attrs=self.data.attrs,
                 )

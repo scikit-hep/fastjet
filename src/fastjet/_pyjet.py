@@ -1,11 +1,11 @@
 import awkward as ak
 
-import fastjet._ext  # noqa: F401, E402
+import fastjet._ext
 import fastjet._generalevent
 import fastjet._multievent
 import fastjet._singleevent
 from fastjet.__init__ import ClusterSequence
-from fastjet.version import __version__  # noqa: E402
+from fastjet.version import __version__
 
 __all__ = ("__version__",)
 
@@ -549,7 +549,7 @@ class DaskAwkwardClusterSequence(ClusterSequence):
         angles=-1,
         alpha=0,
         func="generalized",
-        normalized=False,
+        normalized=True,
     ):
         return _dak_dispatch(
             self,
