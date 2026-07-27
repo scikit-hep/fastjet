@@ -67,7 +67,7 @@ def join(*argv):
     else:
         for arg in argv:
             if isinstance(arg, ak.Array):
-                raise AttributeError(
+                raise TypeError(
                     "All arguments need to be of the same type"
                 ) from None
         if len(argv) == 1:  # Calling different constructors
