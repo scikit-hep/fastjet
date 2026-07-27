@@ -90,6 +90,8 @@ jobs:
             "cmake.define.Boost_INCLUDE_DIR"="${{ github.workspace }}\boost_1_88_0\boost_1_88_0"
             "cmake.define.CGAL_DIR"="${{ github.workspace }}\CGAL-6.0.1\CGAL-6.0.1"
             "cmake.define.FASTJET_ENABLE_CGAL"="ON"
+          CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: >
+            "delvewheel repair --add-path D:{project}\bin -w {dest_dir} -v {wheel}"
 
       - name: Upload wheels
         uses: actions/upload-artifact@v7
