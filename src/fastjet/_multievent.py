@@ -3,7 +3,7 @@ import warnings
 import awkward as ak
 import numpy as np
 
-import fastjet._ext  # noqa: F401, E402
+import fastjet._ext
 
 _default_taus_njettiness = [1, 2, 3, 4]
 
@@ -80,7 +80,6 @@ class _classmultievent:
                 "dcut and exclusive jets for jet-finders other than kt, C/A or genkt with p>=0 should be interpreted with care.",
                 stacklevel=2,
             )
-        return
 
     def inclusive_jets(self, min_pt):
         np_results = self._results.to_numpy(min_pt)
