@@ -97,6 +97,12 @@ test-extras = "test"
 test-command = "pytest {project}/tests"
 test-skip = "*-win_arm64" # skip win_arm64 tests for now since much of the wheel infrastructure is missing
 
+[tool.cibuildwheel.windows]
+# The build already installs our DLLs into fastjet/bin (fastjet/__init__.py adds
+# that to the DLL search path). delvewheel only searches PATH, so without this it
+# fails with "Unable to find library: fastjet.dll".
+repair-wheel-command = "delvewheel repair --ignore-existing -w {dest_dir} -v {wheel}"
+
 [tool.cibuildwheel.linux]
 before-all = [
     "curl -L https://archives.boost.io/release/1.88.0/source/boost_1_88_0.tar.bz2 -o boost_1_88_0.tar.bz2",
