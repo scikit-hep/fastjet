@@ -14,7 +14,7 @@ jobs:
     name: Make SDist
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v6
         with:
           submodules: recursive
           fetch-depth: 0
@@ -51,7 +51,7 @@ jobs:
             arch: universal2
 
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v6
         with:
           submodules: recursive
           fetch-depth: 0
@@ -80,7 +80,7 @@ jobs:
           Expand-Archive boost_1_88_0.zip .\boost_1_88_0
           Expand-Archive CGAL-6.0.1.zip .\CGAL-6.0.1
 
-      - uses: pypa/cibuildwheel@v4.1
+      - uses: pypa/cibuildwheel@v3.4
         env:
           CIBW_ARCHS: ${{ matrix.arch }}
           CIBW_BUILD: cp${{ matrix.python }}-*
