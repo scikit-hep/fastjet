@@ -137,12 +137,9 @@ output_wrapper interfacemulti(
   output_wrapper ow;
   for (int i = 0; i < dimoff; i++) {
     std::vector<fj::PseudoJet> particles;
+    // starts/stops index into the content; lists need not begin at 0
     for (int j = *startsptr; j < *stopsptr; j++) {
-      particles.push_back(fj::PseudoJet(*pxptr, *pyptr, *pzptr, *Eptr));
-      pxptr++;
-      pyptr++;
-      pzptr++;
-      Eptr++;
+      particles.push_back(fj::PseudoJet(pxptr[j], pyptr[j], pzptr[j], Eptr[j]));
     }
     std::vector<fj::PseudoJet> jets;
     auto jet_def = swigtocpp<fj::JetDefinition *>(jetdef);
