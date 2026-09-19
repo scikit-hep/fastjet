@@ -238,3 +238,27 @@ def test_a_second_array_must_be_deferred_too():
     )
     with pytest.raises(TypeError):
         cluseq.get_parents(_JETS)
+
+
+def test_a_second_array_from_another_session_is_refused():
+    session, other = (
+        graphed.Session(ga.AwkwardBackend()),
+        graphed.Session(ga.AwkwardBackend()),
+    )
+    cluseq = fastjet.ClusterSequence(
+        ga.from_awkward(session, "ev", _events()),
+        fastjet.JetDefinition(fastjet.antikt_algorithm, 0.6),
+    )
+    recorded = session.node_count()
+    with pytest.raises(graphed.GraphedTypeError):
+        cluseq.get_parents(ga.from_awkward(other, "jets", _JETS))
+    assert session.node_count() == recorded
+
+
+def test_a_recorded_query_points_at_the_analysts_line():
+    session = graphed.Session(ga.AwkwardBackend())
+    cluseq = fastjet.ClusterSequence(
+        ga.from_awkward(session, "ev", _events()),
+        fastjet.JetDefinition(fastjet.antikt_algorithm, 0.6),
+    )
+    assert session.provenance(cluseq.inclusive_jets()).filename == __file__

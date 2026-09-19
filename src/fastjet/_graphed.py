@@ -2,10 +2,10 @@ import hashlib
 import json
 
 import awkward as ak
-from graphed import Array, Varied, labels, universe
+from graphed import Array, Varied, expand, labels, universe
 from graphed.awkward import AwkwardForm
 from graphed.core import PayloadDescriptor
-from graphed.varied import expand
+from graphed.provenance import register_internal
 
 import fastjet._pyjet
 from fastjet.__init__ import ClusterSequence
@@ -13,6 +13,9 @@ from fastjet._pyjet import _default_taus_njettiness
 from fastjet.version import __version__
 
 __all__ = ("__version__",)
+
+# a recorded query's provenance is the analyst's line, not the fastjet frame that recorded it
+register_internal("fastjet")
 
 
 class _FnGraphedInternalRepCaller:
