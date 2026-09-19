@@ -1,3 +1,6 @@
+import subprocess
+import sys
+
 import awkward as ak
 import pytest
 
@@ -94,6 +97,99 @@ def test_query_form_and_value_match_eager(query, kwargs, takes_jets):
         ak.Array(expected.layout.to_typetracer(forget_length=True)).type
     )
     assert session.materialize(out).to_list() == expected.to_list()
+
+
+def _two_particles_half_a_radius_apart():
+    # dR ~= 0.48, so anti-kt finds one jet at R = 0.6 and two at R = 0.4
+    return ak.Array(
+        [
+            [
+                {"px": 10.0, "py": 0.0, "pz": 0.0, "E": 10.0},
+                {"px": 9.5, "py": 4.9, "pz": 0.0, "E": 10.7},
+            ]
+        ],
+        with_name="Momentum4D",
+    )
+
+
+def test_the_jet_definition_is_part_of_the_recorded_node():
+    array = _two_particles_half_a_radius_apart()
+    session = graphed.Session(
+        ga.AwkwardBackend(behavior=vector.backends.awkward.behavior)
+    )
+    source = ga.from_awkward(session, "ev", array)
+
+    def deferred(jetdef):
+        return fastjet.ClusterSequence(source, jetdef).inclusive_jets()
+
+    def eager(jetdef):
+        return fastjet.ClusterSequence(array, jetdef).inclusive_jets().to_list()
+
+    narrow = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.4)
+    wide = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.6)
+    kt_wide = fastjet.JetDefinition(fastjet.kt_algorithm, 0.6)
+
+    jets = [deferred(jetdef) for jetdef in (narrow, wide, kt_wide)]
+    assert len({jet.node_id for jet in jets}) == 3
+
+    # the radius alone changes the answer, so sharing a node would hand back the other's jets
+    assert eager(narrow) != eager(wide)
+    for jetdef, jet in zip((narrow, wide, kt_wide), jets):
+        assert session.materialize(jet).to_list() == eager(jetdef)
+
+
+_AVAILABILITY_PROBE = """
+import os
+import sys
+
+import fastjet  # the dispatch imports graphed lazily, so only that import is at stake
+
+jetdef = fastjet.JetDefinition(fastjet.antikt_algorithm, 0.6)
+if sys.argv[1] == "uninstalled":
+    for name in [m for m in sys.modules if m.split(".")[0] == "graphed"]:
+        del sys.modules[name]
+    sys.path[:] = [
+        p
+        for p in sys.path
+        if not os.path.exists(os.path.join(p, "graphed", "__init__.py"))
+    ]
+    import graphed  # the empty directory in the cwd, as a namespace package
+
+    assert not hasattr(graphed, "Array"), graphed.__path__
+    try:
+        fastjet.ClusterSequence("not an array", jetdef)
+    except TypeError:
+        print("TypeError")
+else:
+    import awkward as ak
+    import graphed
+    import graphed.awkward as ga
+
+    session = graphed.Session(ga.AwkwardBackend())
+    particles = ga.from_awkward(
+        session, "ev", ak.Array([[{"px": 1.0, "py": 2.0, "pz": 3.0, "E": 4.0}]])
+    )
+    print(type(fastjet.ClusterSequence(particles, jetdef)).__name__)
+"""
+
+
+def test_an_empty_graphed_directory_is_not_a_graphed_install(tmp_path):
+    (tmp_path / "graphed").mkdir()
+
+    def run(mode):
+        probe = subprocess.run(
+            [sys.executable, "-c", _AVAILABILITY_PROBE, mode],
+            cwd=tmp_path,
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        return probe.stdout.splitlines()[-1]
+
+    # an installed graphed shadows the directory, and the deferred arm is still reached
+    assert run("installed") == "GraphedClusterSequence"
+    # without one, `import graphed` succeeds over that directory and carries no names
+    assert run("uninstalled") == "TypeError"
 
 
 def test_a_second_array_must_be_deferred_too():
