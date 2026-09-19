@@ -2,7 +2,7 @@ import hashlib
 import json
 
 import awkward as ak
-from graphed import Array, Varied
+from graphed import Array, Varied, labels, universe
 from graphed.awkward import AwkwardForm
 from graphed.core import PayloadDescriptor
 from graphed.varied import expand
@@ -27,6 +27,17 @@ class _FnGraphedInternalRepCaller:
     def __call__(self, array, *arrays):
         seq = fastjet._pyjet.AwkwardClusterSequence(array, self.jetdef)
         return getattr(seq, self.name)(*arrays, **self.kwargs)
+
+
+def _holds_one_event_per_entry(data):
+    """The first axis of a deferred array is the partition axis, so every event's particles have
+    to sit in a list of their own; the recorded form answers that without reading any data."""
+    members = (
+        [universe(data, label) for label in labels(data)]
+        if isinstance(data, Varied)
+        else [data]
+    )
+    return all(member.session.form(member).tt.ndim > 1 for member in members)
 
 
 def _length_zero(array):
@@ -91,6 +102,11 @@ class GraphedClusterSequence(ClusterSequence):
             raise TypeError("The input data is not a graphed Array")
         if not isinstance(jetdef, fastjet._swig.JetDefinition):
             raise TypeError("JetDefinition is not of valid type")
+        if not _holds_one_event_per_entry(data):
+            raise TypeError(
+                "The input must hold one list of particles per event; cluster a single "
+                "event eagerly with an awkward array"
+            )
         self._jetdef = jetdef
         self._data = data
 
