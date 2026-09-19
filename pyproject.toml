@@ -41,6 +41,10 @@ dask = [
 dev = [
     "pytest>=4.6",
 ]
+graphed = [
+    # unpinned: the release carrying the External wiring this arm records through is not out yet
+    "graphed;python_version>='3.11'",
+]
 docs = [
     "Sphinx>=3.0.0",
     "recommonmark>=0.5.0",

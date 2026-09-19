@@ -277,9 +277,27 @@ class ClusterSequence:  # The super class
                     self, data=data, jetdef=jetdef
                 )
             else:
-                raise TypeError(
-                    f"{data} must be an awkward.Array, dask_awkward.Array, or list!"
-                )
+                try:
+                    # a bare `import graphed` can succeed as an empty namespace package, so the
+                    # availability guard imports the name this branch needs
+                    from graphed import Array as GraphedArray
+                    from graphed import Varied as GraphedVaried
+                except ImportError:
+                    graphed_types = ()
+                else:
+                    graphed_types = (GraphedArray, GraphedVaried)
+                if isinstance(data, graphed_types):
+                    from fastjet import _graphed
+
+                    self.__class__ = _graphed.GraphedClusterSequence
+                    _graphed.GraphedClusterSequence.__init__(
+                        self, data=data, jetdef=jetdef
+                    )
+                else:
+                    raise TypeError(
+                        f"{data} must be an awkward.Array, dask_awkward.Array, "
+                        "graphed.Array, or list!"
+                    )
 
     def jet_def(self) -> JetDefinition:
         """Returns the Jet Definition Object associated with the instance
