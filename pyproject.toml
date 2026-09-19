@@ -41,6 +41,10 @@ dask = [
 dev = [
     "pytest>=4.6",
 ]
+graphed = [
+    # 0.0.3 is the first release carrying the External wiring this arm records through
+    "graphed>=0.0.3;python_version>='3.11'",
+]
 docs = [
     "Sphinx>=3.0.0",
     "recommonmark>=0.5.0",
@@ -53,6 +57,7 @@ test = [
     "dask>=2023.4.0;python_version>'3.7'",
     "dask-awkward[test]>=2023.4.2;python_version>'3.7'",
     "distributed>=2023.4.0;python_version>'3.7'",
+    "graphed>=0.0.3;python_version>='3.11'",
 ]
 
 [tool.pytest.ini_options]

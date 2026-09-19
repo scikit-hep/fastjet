@@ -146,6 +146,41 @@ Any output that has to be an Array will be an Awkward Array in the array oriente
 	>>> cluster.inclusive_jets()
 	<MomentumArray4D [{px: 1.2, py: 3.2, pz: 5.4, ...}, ...] type='2 * Momentum...'>
 
+Deferred Clustering
+-------------------
+``ClusterSequence`` also takes a `graphed <https://github.com/graphed-org/graphed>`__ array, alongside the Awkward Array and `dask-awkward <https://dask-awkward.readthedocs.io>`__ inputs. Nothing is clustered while the analysis is written: each query records one node in the graphed session, and the clustering runs when the graph is evaluated. ::
+
+	>>> import graphed
+	>>> import graphed.awkward as ga
+	>>> session = graphed.Session(ga.AwkwardBackend(behavior=vector.backends.awkward.behavior))
+	>>> events = ak.Array(
+	...     [
+	...         [
+	...             {"px": 1.2, "py": 3.2, "pz": 5.4, "E": 23.5},
+	...             {"px": 32.2, "py": 64.21, "pz": 543.34, "E": 755.12},
+	...             {"px": 32.45, "py": 63.21, "pz": 543.14, "E": 835.56},
+	...         ],
+	...         [
+	...             {"px": 1.2, "py": 3.2, "pz": 5.4, "E": 23.5},
+	...             {"px": 32.2, "py": 64.21, "pz": 543.34, "E": 755.12},
+	...         ],
+	...     ],
+	...     with_name="Momentum4D",
+	... )
+	>>> particles = ga.from_awkward(session, "particles", events)
+	>>> cluster = fastjet.ClusterSequence(particles, jetdef)
+	>>> jets = cluster.inclusive_jets()
+	>>> session.form(jets).describe()
+	'## * var * Momentum4D[px: float64, py: float64, pz: float64, E: float64]'
+	>>> session.materialize(jets)
+	<MomentumArray4D [[{px: 1.2, py: 3.2, ...}, ...], ...] type='2 * var * Mome...'>
+
+A graphed array holds one list of particles per event, because its first axis is the one a partitioned source splits. A single event given as a flat collection, like ``array3`` above, is refused; cluster it eagerly as an Awkward Array instead.
+
+Each query is recorded with the type it really returns, so an operation on the result is type checked where it is written rather than where it runs. Over a partitioned source the queries are outputs of a ``graphed.aggregate_plan``, which runs the clustering once per query per partition; a varied input (``graphed.vary``) clusters once per universe.
+
+This interface needs ``graphed``, which is an optional dependency: ``pip install fastjet[graphed]``.
+
 Limitations
 -----------
 The Awkward Array interface is only available for the fastjet.ClusterSequence class. The Awkward Array functionality is likely to be expanded to other classes in the future.
