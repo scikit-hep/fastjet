@@ -99,13 +99,26 @@ def test_query_form_and_value_match_eager(query, kwargs, takes_jets):
     assert session.materialize(out).to_list() == expected.to_list()
 
 
-def _two_particles_half_a_radius_apart():
-    # dR ~= 0.48, so anti-kt finds one jet at R = 0.6 and two at R = 0.4
+def _one_hard_particle_and_two_soft_ones():
+    # a hard particle at eta = 0 and soft ones at eta = 0.5 and 1.0. anti-kt pulls the near
+    # soft one into the hard jet at R = 0.6 and leaves all three alone at R = 0.4; kt merges
+    # the two soft ones with each other instead, so radius and algorithm each change the jets
     return ak.Array(
         [
             [
-                {"px": 10.0, "py": 0.0, "pz": 0.0, "E": 10.0},
-                {"px": 9.5, "py": 4.9, "pz": 0.0, "E": 10.7},
+                {"px": 100.0, "py": 0.0, "pz": 0.0, "E": 100.0},
+                {
+                    "px": 1.0,
+                    "py": 0.0,
+                    "pz": 0.5210953054937474,
+                    "E": 1.1276259652063807,
+                },
+                {
+                    "px": 1.0,
+                    "py": 0.0,
+                    "pz": 1.1752011936438014,
+                    "E": 1.5430806348152437,
+                },
             ]
         ],
         with_name="Momentum4D",
@@ -113,7 +126,7 @@ def _two_particles_half_a_radius_apart():
 
 
 def test_the_jet_definition_is_part_of_the_recorded_node():
-    array = _two_particles_half_a_radius_apart()
+    array = _one_hard_particle_and_two_soft_ones()
     session = graphed.Session(
         ga.AwkwardBackend(behavior=vector.backends.awkward.behavior)
     )
@@ -132,8 +145,9 @@ def test_the_jet_definition_is_part_of_the_recorded_node():
     jets = [deferred(jetdef) for jetdef in (narrow, wide, kt_wide)]
     assert len({jet.node_id for jet in jets}) == 3
 
-    # the radius alone changes the answer, so sharing a node would hand back the other's jets
-    assert eager(narrow) != eager(wide)
+    # radius alone and algorithm alone each change the answer, so sharing a node would hand
+    # back the other definition's jets rather than merely reusing an equivalent one
+    assert eager(narrow) != eager(wide) != eager(kt_wide)
     for jetdef, jet in zip((narrow, wide, kt_wide), jets):
         assert session.materialize(jet).to_list() == eager(jetdef)
 
@@ -190,6 +204,30 @@ def test_an_empty_graphed_directory_is_not_a_graphed_install(tmp_path):
     assert run("installed") == "GraphedClusterSequence"
     # without one, `import graphed` succeeds over that directory and carries no names
     assert run("uninstalled") == "TypeError"
+
+
+def test_every_universe_of_a_varied_input_must_hold_one_event_per_entry():
+    session = graphed.Session(
+        ga.AwkwardBackend(behavior=vector.backends.awkward.behavior)
+    )
+    jagged = ga.from_awkward(session, "ev", _events())
+    varied = graphed.vary(
+        jagged, "squash", points={"flat": ga.gak.flatten(jagged, axis=1)}
+    )
+    # the nominal is one list of particles per event and the varied universe is not
+    assert [
+        session.form(graphed.universe(varied, label)).tt.ndim
+        for label in graphed.labels(varied)
+    ] == [2, 1]
+
+    before = session.node_count()
+    # checking only the nominal would defer a universe silently clustered as one event,
+    # which partitioning may tear apart
+    with pytest.raises(TypeError, match="per event"):
+        fastjet.ClusterSequence(
+            varied, fastjet.JetDefinition(fastjet.antikt_algorithm, 0.6)
+        )
+    assert session.node_count() == before
 
 
 def test_a_second_array_must_be_deferred_too():
