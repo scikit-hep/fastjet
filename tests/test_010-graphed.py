@@ -160,8 +160,8 @@ def test_min_pt_is_part_of_the_query():
     assert ak.num(hard_jets, axis=1).to_list() == [1, 0, 2, 0]
 
 
-def test_single_record_per_event_matches_eager():
-    array = ak.Array(
+def test_a_flat_particle_collection_is_refused():
+    flat = ak.Array(
         [
             {"px": 1.2, "py": 3.2, "pz": 5.4, "E": 2.5},
             {"px": 32.2, "py": 64.21, "pz": 543.34, "E": 24.12},
@@ -171,13 +171,26 @@ def test_single_record_per_event_matches_eager():
     )
     jetdef = _jetdef()
     session = _session()
-    cluseq = fastjet.ClusterSequence(ga.from_awkward(session, "ev", array), jetdef)
-    eager = fastjet.ClusterSequence(array, jetdef)
-    for query in ("inclusive_jets", "constituents", "constituent_index"):
-        graphed_out = getattr(cluseq, query)()
-        eager_out = getattr(eager, query)()
-        assert _recorded_type(graphed_out) == _eager_type(eager_out)
-        assert session.materialize(graphed_out).to_list() == eager_out.to_list()
+    source = ga.from_awkward(session, "ev", flat)
+    before = session.node_count()
+
+    # the first axis of a deferred array is the partition axis, so a flat collection
+    # is one event that partitioning may silently tear apart
+    with pytest.raises(TypeError, match="per event"):
+        fastjet.ClusterSequence(source, jetdef)
+    assert session.node_count() == before
+
+    # the refusal is about deferring, not about the particles: they cluster eagerly
+    eager_jets = fastjet.ClusterSequence(flat, jetdef).inclusive_jets()
+    assert len(eager_jets) == 2
+    assert ak.sum(eager_jets.E) == pytest.approx(ak.sum(flat.E))
+
+    # and one list of particles per event is still accepted
+    jagged = fastjet.ClusterSequence(ga.from_awkward(session, "evs", _events()), jetdef)
+    assert (
+        session.materialize(jagged.inclusive_jets()).to_list()
+        == fastjet.ClusterSequence(_events(), jetdef).inclusive_jets().to_list()
+    )
 
 
 def test_two_array_queries_take_a_second_graphed_array():
