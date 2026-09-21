@@ -4,6 +4,7 @@ ci:
 
         for more information, see https://pre-commit.ci
     autoupdate_commit_msg: 'ci(pre-commit): pre-commit autoupdate'
+    autoupdate_schedule: monthly
 
 repos:
 - repo: https://github.com/pre-commit/pre-commit-hooks
