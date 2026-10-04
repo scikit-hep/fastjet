@@ -72,6 +72,7 @@ def _count_clusterings(monkeypatch):
 
 
 def _parquet_source(tmp_path, chunks):
+    pytest.importorskip("pyarrow")
     paths = []
     for i, chunk in enumerate(chunks):
         path = tmp_path / f"part{i}.parquet"

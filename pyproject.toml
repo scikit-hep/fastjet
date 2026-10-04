@@ -8,7 +8,7 @@ build-backend = "scikit_build_core.build"
 [project]
 name = "fastjet"
 dynamic = ["version"]
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 readme = "README.md"
 license = "BSD-3-clause"
 license-files = ["LICENSE"]
@@ -43,7 +43,7 @@ dev = [
 ]
 graphed = [
     # 0.0.3 is the first release carrying the External wiring this arm records through
-    "graphed>=0.0.3;python_version>='3.11'",
+    "graphed>=0.0.3",
 ]
 docs = [
     "Sphinx>=3.0.0",
@@ -55,9 +55,11 @@ test = [
     "pytest>=4.6",
     "uproot>=5",
     "dask>=2023.4.0;python_version>'3.7'",
-    "dask-awkward[test]>=2023.4.2;python_version>'3.7'",
+    # [test] pulls pyarrow, which has no cp315 wheels yet; the floor keeps dask inside dask-awkward's cap
+    "dask-awkward[test]>=2023.4.2;python_version<'3.15'",
+    "dask-awkward>=2026.2.1;python_version>='3.15'",
     "distributed>=2023.4.0;python_version>'3.7'",
-    "graphed>=0.0.3;python_version>='3.11'",
+    "graphed>=0.0.3",
 ]
 
 [tool.pytest.ini_options]
@@ -78,7 +80,7 @@ extend-exclude = ["docs/conf.py"]
 
 [tools.mypy]
 files = "src"
-python_version = 3.10
+python_version = 3.11
 warn_unused_configs = true
 disallow_any_generics = true
 disallow_subclassing_any = true
