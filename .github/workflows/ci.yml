@@ -130,7 +130,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, ubuntu-24.04-arm, macos-latest, windows-latest, windows-11-arm]
-        python: [315, '315t']
+        python: [abi3, '315t']
         arch: [auto64, universal2]
         exclude:
           - os: ubuntu-latest
@@ -181,7 +181,7 @@ jobs:
       - uses: pypa/cibuildwheel@v4.2
         env:
           CIBW_ARCHS: ${{ matrix.arch }}
-          CIBW_BUILD: cp${{ matrix.python }}-*
+          CIBW_BUILD: ${{ matrix.python == 'abi3' && 'cp312-* cp313-* cp314-* cp315-*' || format('cp{0}-*', matrix.python) }}
           CIBW_BUILD_VERBOSITY: 1
           CIBW_CONFIG_SETTINGS: >
             "cmake.define.FASTJET_ENABLE_CGAL"="ON"

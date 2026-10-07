@@ -76,3 +76,9 @@ Then you can build it using the following command:
 ``` bash
 python -m pip install '.[test]'
 ```
+
+On non-free-threaded CPython >= 3.12 this builds a limited-API (abi3) module, which needs SWIG >= 4.3; Ubuntu 24.04's apt ships SWIG 4.2.
+With an older SWIG, build a version-specific module instead:
+``` bash
+python -m pip install '.[test]' -Cwheel.py-api=
+```
