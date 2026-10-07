@@ -48,6 +48,21 @@ jobs:
           python-version: ${{ matrix.python-version }}
           allow-prereleases: true
 
+      # apt's swig lags (4.2.0 on Ubuntu 24.04); PyPI's ships current releases for every runner.
+      # Its console script cannot import itself under pip's build isolation, so CMake gets the binary.
+      - name: Install SWIG
+        shell: bash
+        run: |
+          python -m pip install "swig>=4.4"
+          python - >> "$GITHUB_ENV" <<'EOF'
+          import pathlib, swig
+          exe = next(pathlib.Path(swig.BIN_DIR).glob("swig*")).as_posix()
+          print("SWIG_LIB=" + pathlib.Path(swig.SWIG_LIB_ENV["SWIG_LIB"]).as_posix())
+          print("CMAKE_ARGS=-DSWIG_EXECUTABLE=" + exe)
+          EOF
+          cat "$GITHUB_ENV"
+          swig -version
+
       - if: matrix.runs-on == 'windows-11-arm'
         name: Install rustup on Windows ARM
         shell: sh
@@ -68,13 +83,13 @@ jobs:
       - name: Install extra deps on macOS
         if: runner.os == 'macOS'
         run: |
-          brew install --ignore-dependencies swig boost cgal
+          brew install --ignore-dependencies boost cgal
 
       - name: Install extra deps on Linux
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libboost-dev swig libcgal-dev
+          sudo apt-get install -y libboost-dev libcgal-dev
 
       - name: Install package (macOS)
         if: runner.os == 'macOS'
