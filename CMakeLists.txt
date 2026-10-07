@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.15...4.0)
+cmake_minimum_required(VERSION 3.18...4.0)
 
 if(NOT SKBUILD_PROJECT_VERSION)
   set(SKBUILD_PROJECT_VERSION "0.0.0")  # provided by scikit-build-core
@@ -42,7 +42,7 @@ if (TARGET fastjet_swig)
   target_include_directories(fastjet_swig BEFORE PRIVATE ${CMAKE_BINARY_DIR}/swig-shim)
 
   if (SKBUILD_SABI_COMPONENT)
-    # SWIG < 4.3 output calls malloc/free without <cstdlib>, which Python.h only includes outside the limited API.
+    # SWIG < 4.3 output calls malloc/free without <cstdlib>, which Python.h omits under the 3.11+ limited API.
     if (SWIG_VERSION VERSION_LESS 4.3)
       message(FATAL_ERROR "SWIG ${SWIG_VERSION} cannot build the limited-API (abi3) module: install SWIG >= 4.3, "
                           "or build a version-specific wheel with -Cwheel.py-api=")
