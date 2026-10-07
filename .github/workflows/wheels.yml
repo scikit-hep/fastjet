@@ -33,7 +33,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python: [311, 312, 313, 314, 315, '314t', '315t']
+        python: [311, abi3, '314t', '315t']
         os: [ubuntu-latest, ubuntu-24.04-arm, macos-latest, windows-latest, windows-11-arm]
         arch: [auto64, universal2]
         exclude:
@@ -81,7 +81,8 @@ jobs:
       - uses: pypa/cibuildwheel@v4.2
         env:
           CIBW_ARCHS: ${{ matrix.arch }}
-          CIBW_BUILD: cp${{ matrix.python }}-*
+          # abi3 is built once with cp312 and tested on every later CPython selected here
+          CIBW_BUILD: ${{ matrix.python == 'abi3' && 'cp312-* cp313-* cp314-* cp315-*' || format('cp{0}-*', matrix.python) }}
           CIBW_CONFIG_SETTINGS: >
             "cmake.define.FASTJET_ENABLE_CGAL"="ON"
           CIBW_CONFIG_SETTINGS_WINDOWS: >
@@ -105,9 +106,23 @@ jobs:
           path: dist
           merge-multiple: true
 
+      # An abi3 build needs SWIG >= 4.3; apt ships 4.2.0 (same step as ci.yml checks).
+      - name: Install SWIG
+        shell: bash
+        run: |
+          python -m pip install "swig>=4.4"
+          python - >> "$GITHUB_ENV" <<'EOF'
+          import pathlib, swig
+          exe = next(pathlib.Path(swig.BIN_DIR).glob("swig*")).as_posix()
+          print("SWIG_LIB=" + pathlib.Path(swig.SWIG_LIB_ENV["SWIG_LIB"]).as_posix())
+          print("CMAKE_ARGS=-DSWIG_EXECUTABLE=" + exe)
+          EOF
+          cat "$GITHUB_ENV"
+          swig -version
+
       - name: Install extra deps on Linux
         if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y libboost-dev swig libcgal-dev
+        run: sudo apt-get update && sudo apt-get install -y libboost-dev libcgal-dev
 
       - name: test sdist
         run: python -m pip install dist/*.tar.gz
