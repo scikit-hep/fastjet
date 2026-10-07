@@ -20,14 +20,45 @@
 #include <fastjet/contrib/Njettiness.hh>
 #include <fastjet/contrib/SoftDrop.hh>
 
-#include <pybind11/numpy.h>
-#include <pybind11/operators.h>
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <nanobind/nanobind.h>
+#include <nanobind/ndarray.h>
+#include <nanobind/stl/shared_ptr.h>
+#include <nanobind/stl/string.h>
+#include <nanobind/stl/tuple.h>
+#include <nanobind/stl/vector.h>
 
 namespace fj = fastjet;
-namespace py = pybind11;
-using namespace pybind11::literals;
+namespace nb = nanobind;
+using namespace nb::literals;
+
+template <typename T>
+using in_array = nb::ndarray<const T, nb::c_contig, nb::device::cpu>;
+template <typename T> using out_array = nb::ndarray<nb::numpy, T>;
+
+// nanobind's ndarray caster takes only buffer/DLPack objects of the exact dtype; callers also pass lists,
+// awkward arrays, other dtypes and byte orders, which numpy converts.
+template <typename T> in_array<T> forcecast(nb::handle obj) {
+  auto np = nb::module_::import_("numpy");
+  return nb::cast<in_array<T>>(np.attr("ascontiguousarray")(obj, std::is_same_v<T, int> ? "int32" : "float64"));
+}
+
+// Uninitialized numpy array owning a new[] buffer.
+template <typename T>
+out_array<T> empty_array(size_t rows, size_t cols = 0) {
+  size_t n = cols ? rows * cols : rows;
+  T *data = new T[n];
+  nb::capsule owner(data, [](void *p) noexcept { delete[] static_cast<T *>(p); });
+  if (cols)
+    return out_array<T>(data, {rows, cols}, owner);
+  return out_array<T>(data, {rows}, owner);
+}
+
+template <typename T>
+out_array<T> to_array(const std::vector<T> &v, size_t cols = 0) {
+  auto a = empty_array<T>(cols ? v.size() / cols : v.size(), cols);
+  std::copy(v.begin(), v.end(), a.data());
+  return a;
+}
 
 // adapted from
 // https://github.com/cms-svj/SVJProduction/blob/Run3/interface/NjettinessHelper.h
@@ -88,10 +119,11 @@ typedef struct {
   PyObject *next;
 } SwigPyObject;
 
-template <typename T> T swigtocpp(py::object obj) {
+template <typename T> T swigtocpp(nb::handle obj) {
   // unwraps python object to get the cpp pointer
   // from the swig bindings
-  auto upointer = obj.attr("this").ptr();
+  nb::object self = obj.attr("this");
+  auto upointer = self.ptr();
   auto swigpointer = reinterpret_cast<SwigPyObject *>(upointer);
   auto objpointervoid = swigpointer->ptr;
   auto objpointer = reinterpret_cast<T>(objpointervoid);
@@ -106,34 +138,33 @@ public:
     auto a = cse[0];
     return a;
   }
-  void setCluster() {}
 };
 
 output_wrapper interfacemulti(
-    py::array_t<double, py::array::c_style | py::array::forcecast> pxi,
-    py::array_t<double, py::array::c_style | py::array::forcecast> pyi,
-    py::array_t<double, py::array::c_style | py::array::forcecast> pzi,
-    py::array_t<double, py::array::c_style | py::array::forcecast> Ei,
-    py::array_t<int, py::array::c_style | py::array::forcecast> starts,
-    py::array_t<int, py::array::c_style | py::array::forcecast> stops,
-    py::object jetdef) {
+    nb::handle pxi,
+    nb::handle pyi,
+    nb::handle pzi,
+    nb::handle Ei,
+    nb::handle starts,
+    nb::handle stops,
+    nb::handle jetdef) {
   // requesting buffer information of the input
-  py::buffer_info infostarts = starts.request();
-  py::buffer_info infostops = stops.request();
-  py::buffer_info infopx = pxi.request();
-  py::buffer_info infopy = pyi.request();
-  py::buffer_info infopz = pzi.request();
-  py::buffer_info infoE = Ei.request();
+  auto infostarts = forcecast<int>(starts);
+  auto infostops = forcecast<int>(stops);
+  auto infopx = forcecast<double>(pxi);
+  auto infopy = forcecast<double>(pyi);
+  auto infopz = forcecast<double>(pzi);
+  auto infoE = forcecast<double>(Ei);
 
   // pointers to the initial values
-  auto startsptr = static_cast<int *>(infostarts.ptr);
-  auto stopsptr = static_cast<int *>(infostops.ptr);
-  auto pxptr = static_cast<double *>(infopx.ptr);
-  auto pyptr = static_cast<double *>(infopy.ptr);
-  auto pzptr = static_cast<double *>(infopz.ptr);
-  auto Eptr = static_cast<double *>(infoE.ptr);
+  auto startsptr = infostarts.data();
+  auto stopsptr = infostops.data();
+  auto pxptr = infopx.data();
+  auto pyptr = infopy.data();
+  auto pzptr = infopz.data();
+  auto Eptr = infoE.data();
 
-  int dimoff = infostarts.shape[0];
+  int dimoff = infostarts.shape(0);
   output_wrapper ow;
   for (int i = 0; i < dimoff; i++) {
     std::vector<fj::PseudoJet> particles;
@@ -155,14 +186,23 @@ output_wrapper interfacemulti(
   return ow;
 }
 
-PYBIND11_MODULE(_ext, m) {
+NB_MODULE(_ext, m) {
+  // fastjet::Error and bare-string throws are not std::exceptions; callers expect RuntimeError, not SystemError.
+  nb::register_exception_translator([](const std::exception_ptr &p, void *) {
+    try {
+      std::rethrow_exception(p);
+    } catch (const std::exception &) {
+      throw; // nanobind's built-in translators
+    } catch (...) {
+      PyErr_SetString(PyExc_RuntimeError, "Caught an unknown exception!");
+    }
+  });
   using namespace fastjet;
-  m.def("interfacemulti", &interfacemulti,
-        py::return_value_policy::take_ownership);
+  m.def("interfacemulti", &interfacemulti);
   /// Jet algorithm definitions
 
-  py::class_<output_wrapper>(m, "output_wrapper")
-    .def_property("cse", &output_wrapper::getCluster,&output_wrapper::setCluster)
+  nb::class_<output_wrapper>(m, "output_wrapper")
+    .def_prop_ro("cse", &output_wrapper::getCluster)
     .def("to_numpy",
       [](const output_wrapper ow, double min_pt = 0) {
         auto css = ow.cse;
@@ -172,25 +212,25 @@ PYBIND11_MODULE(_ext, m) {
         for(int i = 0; i < len; i++){
         jk += css[i]->inclusive_jets(min_pt).size();
         }
-        auto px = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
-        auto bufpx = px.request();
-        double *ptrpx = (double *)bufpx.ptr;
+        auto px = empty_array<double>(jk);
+        auto &bufpx = px;
+        double *ptrpx = bufpx.data();
 
-        auto py = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
-        auto bufpy = py.request();
-        double *ptrpy = (double *)bufpy.ptr;
+        auto py = empty_array<double>(jk);
+        auto &bufpy = py;
+        double *ptrpy = bufpy.data();
 
-        auto pz = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
-        auto bufpz = pz.request();
-        double *ptrpz = (double *)bufpz.ptr;
+        auto pz = empty_array<double>(jk);
+        auto &bufpz = pz;
+        double *ptrpz = bufpz.data();
 
-        auto E = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
-        auto bufE = E.request();
-        double *ptrE = (double *)bufE.ptr;
+        auto E = empty_array<double>(jk);
+        auto &bufE = E;
+        double *ptrE = bufE.data();
 
-        auto off = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len+1}, {sizeof(int)}));
-        auto bufoff = off.request();
-        int *ptroff = (int *)bufoff.ptr;
+        auto off = empty_array<int>(len+1);
+        auto &bufoff = off;
+        int *ptroff = bufoff.data();
         size_t idxe = 0;
         *ptroff = 0;
         ptroff++;
@@ -234,21 +274,21 @@ PYBIND11_MODULE(_ext, m) {
         }
         jk++;
 
-        auto parid = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {sizepar}, {sizeof(int)}));
-        auto bufparid = parid.request();
-        int *ptrid = (int *)bufparid.ptr;
+        auto parid = empty_array<int>(sizepar);
+        auto &bufparid = parid;
+        int *ptrid = bufparid.data();
 
-        auto eventoffsets = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len+1}, {sizeof(int)}));
-        auto bufeventoffsets = eventoffsets.request();
-        int *ptreventoffsets = (int *)bufeventoffsets.ptr;
+        auto eventoffsets = empty_array<int>(len+1);
+        auto &bufeventoffsets = eventoffsets;
+        int *ptreventoffsets = bufeventoffsets.data();
         size_t eventidx = 0;
 
         ptreventoffsets[eventidx] = 0;
         eventidx++;
 
-        auto jetoffsets = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {jk}, {sizeof(int)}));
-        auto bufjetoffsets = jetoffsets.request();
-        int *ptrjetoffsets = (int *)bufjetoffsets.ptr;
+        auto jetoffsets = empty_array<int>(jk);
+        auto &bufjetoffsets = jetoffsets;
+        int *ptrjetoffsets = bufjetoffsets.data();
         size_t jetidx = 0;
 
         size_t idxh = 0;
@@ -304,25 +344,25 @@ PYBIND11_MODULE(_ext, m) {
         jk += css[i]->exclusive_jets(n_jets).size();
         }
 
-        auto px = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
-        auto bufpx = px.request();
-        double *ptrpx = (double *)bufpx.ptr;
+        auto px = empty_array<double>(jk);
+        auto &bufpx = px;
+        double *ptrpx = bufpx.data();
 
-        auto py = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
-        auto bufpy = py.request();
-        double *ptrpy = (double *)bufpy.ptr;
+        auto py = empty_array<double>(jk);
+        auto &bufpy = py;
+        double *ptrpy = bufpy.data();
 
-        auto pz = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
-        auto bufpz = pz.request();
-        double *ptrpz = (double *)bufpz.ptr;
+        auto pz = empty_array<double>(jk);
+        auto &bufpz = pz;
+        double *ptrpz = bufpz.data();
 
-        auto E = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
-        auto bufE = E.request();
-        double *ptrE = (double *)bufE.ptr;
+        auto E = empty_array<double>(jk);
+        auto &bufE = E;
+        double *ptrE = bufE.data();
 
-        auto off = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len+1}, {sizeof(int)}));
-        auto bufoff = off.request();
-        int *ptroff = (int *)bufoff.ptr;
+        auto off = empty_array<int>(len+1);
+        auto &bufoff = off;
+        int *ptroff = bufoff.data();
         size_t idxe = 0;
         *ptroff = 0;
         ptroff++;
@@ -363,25 +403,25 @@ PYBIND11_MODULE(_ext, m) {
         jk += css[i]->exclusive_jets_up_to(n_jets).size();
         }
 
-        auto px = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
-        auto bufpx = px.request();
-        double *ptrpx = (double *)bufpx.ptr;
+        auto px = empty_array<double>(jk);
+        auto &bufpx = px;
+        double *ptrpx = bufpx.data();
 
-        auto py = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
-        auto bufpy = py.request();
-        double *ptrpy = (double *)bufpy.ptr;
+        auto py = empty_array<double>(jk);
+        auto &bufpy = py;
+        double *ptrpy = bufpy.data();
 
-        auto pz = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
-        auto bufpz = pz.request();
-        double *ptrpz = (double *)bufpz.ptr;
+        auto pz = empty_array<double>(jk);
+        auto &bufpz = pz;
+        double *ptrpz = bufpz.data();
 
-        auto E = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
-        auto bufE = E.request();
-        double *ptrE = (double *)bufE.ptr;
+        auto E = empty_array<double>(jk);
+        auto &bufE = E;
+        double *ptrE = bufE.data();
 
-        auto off = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len+1}, {sizeof(int)}));
-        auto bufoff = off.request();
-        int *ptroff = (int *)bufoff.ptr;
+        auto off = empty_array<int>(len+1);
+        auto &bufoff = off;
+        int *ptroff = bufoff.data();
         size_t idxe = 0;
         *ptroff = 0;
         ptroff++;
@@ -425,21 +465,21 @@ PYBIND11_MODULE(_ext, m) {
         }
         jk++;
 
-        auto parid = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {sizepar}, {sizeof(int)}));
-        auto bufparid = parid.request();
-        int *ptrid = (int *)bufparid.ptr;
+        auto parid = empty_array<int>(sizepar);
+        auto &bufparid = parid;
+        int *ptrid = bufparid.data();
 
-        auto eventoffsets = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len+1}, {sizeof(int)}));
-        auto bufeventoffsets = eventoffsets.request();
-        int *ptreventoffsets = (int *)bufeventoffsets.ptr;
+        auto eventoffsets = empty_array<int>(len+1);
+        auto &bufeventoffsets = eventoffsets;
+        int *ptreventoffsets = bufeventoffsets.data();
         size_t eventidx = 0;
 
         ptreventoffsets[eventidx] = 0;
         eventidx++;
 
-        auto jetoffsets = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {jk}, {sizeof(int)}));
-        auto bufjetoffsets = jetoffsets.request();
-        int *ptrjetoffsets = (int *)bufjetoffsets.ptr;
+        auto jetoffsets = empty_array<int>(jk);
+        auto &bufjetoffsets = jetoffsets;
+        int *ptrjetoffsets = bufjetoffsets.data();
         size_t jetidx = 0;
 
         size_t idxh = 0;
@@ -494,25 +534,25 @@ PYBIND11_MODULE(_ext, m) {
         jk += css[i]->exclusive_jets(dcut).size();
         }
 
-        auto px = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
-        auto bufpx = px.request();
-        double *ptrpx = (double *)bufpx.ptr;
+        auto px = empty_array<double>(jk);
+        auto &bufpx = px;
+        double *ptrpx = bufpx.data();
 
-        auto py = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
-        auto bufpy = py.request();
-        double *ptrpy = (double *)bufpy.ptr;
+        auto py = empty_array<double>(jk);
+        auto &bufpy = py;
+        double *ptrpy = bufpy.data();
 
-        auto pz = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
-        auto bufpz = pz.request();
-        double *ptrpz = (double *)bufpz.ptr;
+        auto pz = empty_array<double>(jk);
+        auto &bufpz = pz;
+        double *ptrpz = bufpz.data();
 
-        auto E = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
-        auto bufE = E.request();
-        double *ptrE = (double *)bufE.ptr;
+        auto E = empty_array<double>(jk);
+        auto &bufE = E;
+        double *ptrE = bufE.data();
 
-        auto off = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len+1}, {sizeof(int)}));
-        auto bufoff = off.request();
-        int *ptroff = (int *)bufoff.ptr;
+        auto off = empty_array<int>(len+1);
+        auto &bufoff = off;
+        int *ptroff = bufoff.data();
         size_t idxe = 0;
         *ptroff = 0;
         ptroff++;
@@ -552,25 +592,25 @@ PYBIND11_MODULE(_ext, m) {
         for(int i = 0; i < len; i++){
         jk += css[i]->exclusive_jets_ycut(ycut).size();
         }
-        auto px = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
-        auto bufpx = px.request();
-        double *ptrpx = (double *)bufpx.ptr;
+        auto px = empty_array<double>(jk);
+        auto &bufpx = px;
+        double *ptrpx = bufpx.data();
 
-        auto py = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
-        auto bufpy = py.request();
-        double *ptrpy = (double *)bufpy.ptr;
+        auto py = empty_array<double>(jk);
+        auto &bufpy = py;
+        double *ptrpy = bufpy.data();
 
-        auto pz = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
-        auto bufpz = pz.request();
-        double *ptrpz = (double *)bufpz.ptr;
+        auto pz = empty_array<double>(jk);
+        auto &bufpz = pz;
+        double *ptrpz = bufpz.data();
 
-        auto E = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
-        auto bufE = E.request();
-        double *ptrE = (double *)bufE.ptr;
+        auto E = empty_array<double>(jk);
+        auto &bufE = E;
+        double *ptrE = bufE.data();
 
-        auto off = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len+1}, {sizeof(int)}));
-        auto bufoff = off.request();
-        int *ptroff = (int *)bufoff.ptr;
+        auto off = empty_array<int>(len+1);
+        auto &bufoff = off;
+        int *ptroff = bufoff.data();
         size_t idxe = 0;
         *ptroff = 0;
         ptroff++;
@@ -605,13 +645,13 @@ PYBIND11_MODULE(_ext, m) {
         auto css = ow.cse;
         int64_t len = css.size();
 
-        auto parid = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {len}, {sizeof(double)}));
-        auto bufparid = parid.request();
-        double *ptrid = (double *)bufparid.ptr;
+        auto parid = empty_array<double>(len);
+        auto &bufparid = parid;
+        double *ptrid = bufparid.data();
 
-        auto eventoffsets = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len}, {sizeof(int)}));
-        auto bufeventoffsets = eventoffsets.request();
-        int *ptreventoffsets = (int *)bufeventoffsets.ptr;
+        auto eventoffsets = empty_array<int>(len);
+        auto &bufeventoffsets = eventoffsets;
+        int *ptreventoffsets = bufeventoffsets.data();
         size_t eventidx = 0;
         size_t idxh = 0;
         auto eventprev = 0;
@@ -639,13 +679,13 @@ PYBIND11_MODULE(_ext, m) {
         auto css = ow.cse;
         auto len = css.size();
 
-        auto parid = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {len}, {sizeof(double)}));
-        auto bufparid = parid.request();
-        double *ptrid = (double *)bufparid.ptr;
+        auto parid = empty_array<double>(len);
+        auto &bufparid = parid;
+        double *ptrid = bufparid.data();
 
-        auto eventoffsets = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len}, {sizeof(int)}));
-        auto bufeventoffsets = eventoffsets.request();
-        int *ptreventoffsets = (int *)bufeventoffsets.ptr;
+        auto eventoffsets = empty_array<int>(len);
+        auto &bufeventoffsets = eventoffsets;
+        int *ptreventoffsets = bufeventoffsets.data();
         size_t eventidx = 0;
         size_t idxh = 0;
         auto eventprev = 0;
@@ -673,13 +713,13 @@ PYBIND11_MODULE(_ext, m) {
         auto css = ow.cse;
         auto len = css.size();
 
-        auto parid = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {len}, {sizeof(double)}));
-        auto bufparid = parid.request();
-        double *ptrid = (double *)bufparid.ptr;
+        auto parid = empty_array<double>(len);
+        auto &bufparid = parid;
+        double *ptrid = bufparid.data();
 
-        auto eventoffsets = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len}, {sizeof(int)}));
-        auto bufeventoffsets = eventoffsets.request();
-        int *ptreventoffsets = (int *)bufeventoffsets.ptr;
+        auto eventoffsets = empty_array<int>(len);
+        auto &bufeventoffsets = eventoffsets;
+        int *ptreventoffsets = bufeventoffsets.data();
         size_t eventidx = 0;
         size_t idxh = 0;
         auto eventprev = 0;
@@ -707,13 +747,13 @@ PYBIND11_MODULE(_ext, m) {
         auto css = ow.cse;
         auto len = css.size();
 
-        auto parid = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {len}, {sizeof(double)}));
-        auto bufparid = parid.request();
-        double *ptrid = (double *)bufparid.ptr;
+        auto parid = empty_array<double>(len);
+        auto &bufparid = parid;
+        double *ptrid = bufparid.data();
 
-        auto eventoffsets = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len}, {sizeof(int)}));
-        auto bufeventoffsets = eventoffsets.request();
-        int *ptreventoffsets = (int *)bufeventoffsets.ptr;
+        auto eventoffsets = empty_array<int>(len);
+        auto &bufeventoffsets = eventoffsets;
+        int *ptreventoffsets = bufeventoffsets.data();
         size_t eventidx = 0;
         size_t idxh = 0;
         auto eventprev = 0;
@@ -741,13 +781,13 @@ PYBIND11_MODULE(_ext, m) {
         auto css = ow.cse;
         auto len = css.size();
 
-        auto parid = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {len}, {sizeof(double)}));
-        auto bufparid = parid.request();
-        double *ptrid = (double *)bufparid.ptr;
+        auto parid = empty_array<double>(len);
+        auto &bufparid = parid;
+        double *ptrid = bufparid.data();
 
-        auto eventoffsets = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len}, {sizeof(int)}));
-        auto bufeventoffsets = eventoffsets.request();
-        int *ptreventoffsets = (int *)bufeventoffsets.ptr;
+        auto eventoffsets = empty_array<int>(len);
+        auto &bufeventoffsets = eventoffsets;
+        int *ptreventoffsets = bufeventoffsets.data();
         size_t eventidx = 0;
         size_t idxh = 0;
         auto eventprev = 0;
@@ -775,13 +815,13 @@ PYBIND11_MODULE(_ext, m) {
         auto css = ow.cse;
         auto len = css.size();
 
-        auto parid = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {len}, {sizeof(double)}));
-        auto bufparid = parid.request();
-        double *ptrid = (double *)bufparid.ptr;
+        auto parid = empty_array<double>(len);
+        auto &bufparid = parid;
+        double *ptrid = bufparid.data();
 
-        auto eventoffsets = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len}, {sizeof(int)}));
-        auto bufeventoffsets = eventoffsets.request();
-        int *ptreventoffsets = (int *)bufeventoffsets.ptr;
+        auto eventoffsets = empty_array<int>(len);
+        auto &bufeventoffsets = eventoffsets;
+        int *ptreventoffsets = bufeventoffsets.data();
         size_t eventidx = 0;
         size_t idxh = 0;
         auto eventprev = 0;
@@ -807,23 +847,23 @@ PYBIND11_MODULE(_ext, m) {
       .def("to_numpy_exclusive_subjets_dcut",
       [](
           const output_wrapper ow,
-          py::array_t<double, py::array::c_style | py::array::forcecast> pxi,
-          py::array_t<double, py::array::c_style | py::array::forcecast> pyi,
-          py::array_t<double, py::array::c_style | py::array::forcecast> pzi,
-          py::array_t<double, py::array::c_style | py::array::forcecast> Ei,
+          nb::handle pxi,
+          nb::handle pyi,
+          nb::handle pzi,
+          nb::handle Ei,
           double dcut = 0
         ) {
-        py::buffer_info infopx = pxi.request();
-        py::buffer_info infopy = pyi.request();  // requesting buffer information of the input
-        py::buffer_info infopz = pzi.request();
-        py::buffer_info infoE = Ei.request();
+        auto infopx = forcecast<double>(pxi);
+        auto infopy = forcecast<double>(pyi);  // requesting buffer information of the input
+        auto infopz = forcecast<double>(pzi);
+        auto infoE = forcecast<double>(Ei);
 
-        auto pxptr = static_cast<double *>(infopx.ptr);
-        auto pyptr = static_cast<double *>(infopy.ptr);  // pointer to the initial value
-        auto pzptr = static_cast<double *>(infopz.ptr);
-        auto Eptr = static_cast<double *>(infoE.ptr);
+        auto pxptr = infopx.data();
+        auto pyptr = infopy.data();  // pointer to the initial value
+        auto pzptr = infopz.data();
+        auto Eptr = infoE.data();
 
-        int dimpx = infopx.shape[0];
+        int dimpx = infopx.shape(0);
         auto css = ow.cse;
         int64_t len = css.size();
         // Don't specify the size if using push_back.
@@ -856,25 +896,25 @@ PYBIND11_MODULE(_ext, m) {
         auto jets = ow.cse[i]->inclusive_jets();
         jk += css[i]->exclusive_subjets(jets[indices[i]],dcut).size();
         }
-        auto px = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
-        auto bufpx = px.request();
-        double *ptrpx = (double *)bufpx.ptr;
+        auto px = empty_array<double>(jk);
+        auto &bufpx = px;
+        double *ptrpx = bufpx.data();
 
-        auto py = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
-        auto bufpy = py.request();
-        double *ptrpy = (double *)bufpy.ptr;
+        auto py = empty_array<double>(jk);
+        auto &bufpy = py;
+        double *ptrpy = bufpy.data();
 
-        auto pz = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
-        auto bufpz = pz.request();
-        double *ptrpz = (double *)bufpz.ptr;
+        auto pz = empty_array<double>(jk);
+        auto &bufpz = pz;
+        double *ptrpz = bufpz.data();
 
-        auto E = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
-        auto bufE = E.request();
-        double *ptrE = (double *)bufE.ptr;
+        auto E = empty_array<double>(jk);
+        auto &bufE = E;
+        double *ptrE = bufE.data();
 
-        auto off = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len+1}, {sizeof(int)}));
-        auto bufoff = off.request();
-        int *ptroff = (int *)bufoff.ptr;
+        auto off = empty_array<int>(len+1);
+        auto &bufoff = off;
+        int *ptroff = bufoff.data();
 
         size_t idxe = 0;
         *ptroff = 0;
@@ -910,23 +950,23 @@ PYBIND11_MODULE(_ext, m) {
       .def("to_numpy_exclusive_subjets_nsub",
       [](
           const output_wrapper ow,
-          py::array_t<double, py::array::c_style | py::array::forcecast> pxi,
-          py::array_t<double, py::array::c_style | py::array::forcecast> pyi,
-          py::array_t<double, py::array::c_style | py::array::forcecast> pzi,
-          py::array_t<double, py::array::c_style | py::array::forcecast> Ei,
+          nb::handle pxi,
+          nb::handle pyi,
+          nb::handle pzi,
+          nb::handle Ei,
           int nsub = 0
         ) {
-        py::buffer_info infopx = pxi.request();
-        py::buffer_info infopy = pyi.request();  // requesting buffer information of the input
-        py::buffer_info infopz = pzi.request();
-        py::buffer_info infoE = Ei.request();
+        auto infopx = forcecast<double>(pxi);
+        auto infopy = forcecast<double>(pyi);  // requesting buffer information of the input
+        auto infopz = forcecast<double>(pzi);
+        auto infoE = forcecast<double>(Ei);
 
-        auto pxptr = static_cast<double *>(infopx.ptr);
-        auto pyptr = static_cast<double *>(infopy.ptr);  // pointer to the initial value
-        auto pzptr = static_cast<double *>(infopz.ptr);
-        auto Eptr = static_cast<double *>(infoE.ptr);
+        auto pxptr = infopx.data();
+        auto pyptr = infopy.data();  // pointer to the initial value
+        auto pzptr = infopz.data();
+        auto Eptr = infoE.data();
 
-        int dimpx = infopx.shape[0];
+        int dimpx = infopx.shape(0);
         auto css = ow.cse;
         int64_t len = css.size();
         // Don't specify the size if using push_back.
@@ -959,25 +999,25 @@ PYBIND11_MODULE(_ext, m) {
         auto jets = ow.cse[i]->inclusive_jets();
         jk += css[i]->exclusive_subjets(jets[indices[i]],nsub).size();
         }
-        auto px = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
-        auto bufpx = px.request();
-        double *ptrpx = (double *)bufpx.ptr;
+        auto px = empty_array<double>(jk);
+        auto &bufpx = px;
+        double *ptrpx = bufpx.data();
 
-        auto py = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
-        auto bufpy = py.request();
-        double *ptrpy = (double *)bufpy.ptr;
+        auto py = empty_array<double>(jk);
+        auto &bufpy = py;
+        double *ptrpy = bufpy.data();
 
-        auto pz = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
-        auto bufpz = pz.request();
-        double *ptrpz = (double *)bufpz.ptr;
+        auto pz = empty_array<double>(jk);
+        auto &bufpz = pz;
+        double *ptrpz = bufpz.data();
 
-        auto E = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
-        auto bufE = E.request();
-        double *ptrE = (double *)bufE.ptr;
+        auto E = empty_array<double>(jk);
+        auto &bufE = E;
+        double *ptrE = bufE.data();
 
-        auto off = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len+1}, {sizeof(int)}));
-        auto bufoff = off.request();
-        int *ptroff = (int *)bufoff.ptr;
+        auto off = empty_array<int>(len+1);
+        auto &bufoff = off;
+        int *ptroff = bufoff.data();
 
         size_t idxe = 0;
         *ptroff = 0;
@@ -1013,23 +1053,23 @@ PYBIND11_MODULE(_ext, m) {
       .def("to_numpy_exclusive_subjets_up_to",
       [](
           const output_wrapper ow,
-          py::array_t<double, py::array::c_style | py::array::forcecast> pxi,
-          py::array_t<double, py::array::c_style | py::array::forcecast> pyi,
-          py::array_t<double, py::array::c_style | py::array::forcecast> pzi,
-          py::array_t<double, py::array::c_style | py::array::forcecast> Ei,
+          nb::handle pxi,
+          nb::handle pyi,
+          nb::handle pzi,
+          nb::handle Ei,
           int nsub = 0
         ) {
-        py::buffer_info infopx = pxi.request();
-        py::buffer_info infopy = pyi.request();  // requesting buffer information of the input
-        py::buffer_info infopz = pzi.request();
-        py::buffer_info infoE = Ei.request();
+        auto infopx = forcecast<double>(pxi);
+        auto infopy = forcecast<double>(pyi);  // requesting buffer information of the input
+        auto infopz = forcecast<double>(pzi);
+        auto infoE = forcecast<double>(Ei);
 
-        auto pxptr = static_cast<double *>(infopx.ptr);
-        auto pyptr = static_cast<double *>(infopy.ptr);  // pointer to the initial value
-        auto pzptr = static_cast<double *>(infopz.ptr);
-        auto Eptr = static_cast<double *>(infoE.ptr);
+        auto pxptr = infopx.data();
+        auto pyptr = infopy.data();  // pointer to the initial value
+        auto pzptr = infopz.data();
+        auto Eptr = infoE.data();
 
-        int dimpx = infopx.shape[0];
+        int dimpx = infopx.shape(0);
         auto css = ow.cse;
         int64_t len = css.size();
         // Don't specify the size if using push_back.
@@ -1062,25 +1102,25 @@ PYBIND11_MODULE(_ext, m) {
         auto jets = ow.cse[i]->inclusive_jets();
         jk += css[i]->exclusive_subjets_up_to(jets[indices[i]],nsub).size();
         }
-        auto px = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
-        auto bufpx = px.request();
-        double *ptrpx = (double *)bufpx.ptr;
+        auto px = empty_array<double>(jk);
+        auto &bufpx = px;
+        double *ptrpx = bufpx.data();
 
-        auto py = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
-        auto bufpy = py.request();
-        double *ptrpy = (double *)bufpy.ptr;
+        auto py = empty_array<double>(jk);
+        auto &bufpy = py;
+        double *ptrpy = bufpy.data();
 
-        auto pz = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
-        auto bufpz = pz.request();
-        double *ptrpz = (double *)bufpz.ptr;
+        auto pz = empty_array<double>(jk);
+        auto &bufpz = pz;
+        double *ptrpz = bufpz.data();
 
-        auto E = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
-        auto bufE = E.request();
-        double *ptrE = (double *)bufE.ptr;
+        auto E = empty_array<double>(jk);
+        auto &bufE = E;
+        double *ptrE = bufE.data();
 
-        auto off = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len+1}, {sizeof(int)}));
-        auto bufoff = off.request();
-        int *ptroff = (int *)bufoff.ptr;
+        auto off = empty_array<int>(len+1);
+        auto &bufoff = off;
+        int *ptroff = bufoff.data();
 
         size_t idxe = 0;
         *ptroff = 0;
@@ -1116,24 +1156,24 @@ PYBIND11_MODULE(_ext, m) {
       .def("to_numpy_exclusive_subdmerge",
       [](
           const output_wrapper ow,
-          py::array_t<double, py::array::c_style | py::array::forcecast> pxi,
-          py::array_t<double, py::array::c_style | py::array::forcecast> pyi,
-          py::array_t<double, py::array::c_style | py::array::forcecast> pzi,
-          py::array_t<double, py::array::c_style | py::array::forcecast> Ei,
+          nb::handle pxi,
+          nb::handle pyi,
+          nb::handle pzi,
+          nb::handle Ei,
           int nsub = 0
         ) {
-        py::buffer_info infopx = pxi.request();
-        py::buffer_info infopy = pyi.request();  // requesting buffer information of the input
-        py::buffer_info infopz = pzi.request();
-        py::buffer_info infoE = Ei.request();
+        auto infopx = forcecast<double>(pxi);
+        auto infopy = forcecast<double>(pyi);  // requesting buffer information of the input
+        auto infopz = forcecast<double>(pzi);
+        auto infoE = forcecast<double>(Ei);
 
-        auto pxptr = static_cast<double *>(infopx.ptr);
-        auto pyptr = static_cast<double *>(infopy.ptr);  // pointer to the initial value
-        auto pzptr = static_cast<double *>(infopz.ptr);
-        auto Eptr = static_cast<double *>(infoE.ptr);
+        auto pxptr = infopx.data();
+        auto pyptr = infopy.data();  // pointer to the initial value
+        auto pzptr = infopz.data();
+        auto Eptr = infoE.data();
 
-        int dimpx = infopx.shape[0];
-        int dimpy = infopy.shape[0];
+        int dimpx = infopx.shape(0);
+        int dimpy = infopy.shape(0);
         auto css = ow.cse;
         int64_t len = css.size();
         // Don't specify the size if using push_back.
@@ -1161,13 +1201,13 @@ PYBIND11_MODULE(_ext, m) {
           }
           indices.push_back(got->second);
         }
-        auto out_value = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {dimpy}, {sizeof(double)}));
-        auto bufpx = out_value.request();
-        double *ptrpx = (double *)bufpx.ptr;
+        auto out_value = empty_array<double>(dimpy);
+        auto &bufpx = out_value;
+        double *ptrpx = bufpx.data();
 
-        auto off = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len+1}, {sizeof(int)}));
-        auto bufoff = off.request();
-        int *ptroff = (int *)bufoff.ptr;
+        auto off = empty_array<int>(len+1);
+        auto &bufoff = off;
+        int *ptroff = bufoff.data();
 
         size_t idxe = 0;
         *ptroff = 0;
@@ -1194,24 +1234,24 @@ PYBIND11_MODULE(_ext, m) {
       .def("to_numpy_exclusive_subdmerge_max",
       [](
           const output_wrapper ow,
-          py::array_t<double, py::array::c_style | py::array::forcecast> pxi,
-          py::array_t<double, py::array::c_style | py::array::forcecast> pyi,
-          py::array_t<double, py::array::c_style | py::array::forcecast> pzi,
-          py::array_t<double, py::array::c_style | py::array::forcecast> Ei,
+          nb::handle pxi,
+          nb::handle pyi,
+          nb::handle pzi,
+          nb::handle Ei,
           int nsub = 0
         ) {
-        py::buffer_info infopx = pxi.request();
-        py::buffer_info infopy = pyi.request();  // requesting buffer information of the input
-        py::buffer_info infopz = pzi.request();
-        py::buffer_info infoE = Ei.request();
+        auto infopx = forcecast<double>(pxi);
+        auto infopy = forcecast<double>(pyi);  // requesting buffer information of the input
+        auto infopz = forcecast<double>(pzi);
+        auto infoE = forcecast<double>(Ei);
 
-        auto pxptr = static_cast<double *>(infopx.ptr);
-        auto pyptr = static_cast<double *>(infopy.ptr);  // pointer to the initial value
-        auto pzptr = static_cast<double *>(infopz.ptr);
-        auto Eptr = static_cast<double *>(infoE.ptr);
+        auto pxptr = infopx.data();
+        auto pyptr = infopy.data();  // pointer to the initial value
+        auto pzptr = infopz.data();
+        auto Eptr = infoE.data();
 
-        int dimpx = infopx.shape[0];
-        int dimpy = infopy.shape[0];
+        int dimpx = infopx.shape(0);
+        int dimpy = infopy.shape(0);
         auto css = ow.cse;
         int64_t len = css.size();
         // Don't specify the size if using push_back.
@@ -1239,13 +1279,13 @@ PYBIND11_MODULE(_ext, m) {
           }
           indices.push_back(got->second);
         }
-        auto out_value = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {dimpy}, {sizeof(double)}));
-        auto bufpx = out_value.request();
-        double *ptrpx = (double *)bufpx.ptr;
+        auto out_value = empty_array<double>(dimpy);
+        auto &bufpx = out_value;
+        double *ptrpx = bufpx.data();
 
-        auto off = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len+1}, {sizeof(int)}));
-        auto bufoff = off.request();
-        int *ptroff = (int *)bufoff.ptr;
+        auto off = empty_array<int>(len+1);
+        auto &bufoff = off;
+        int *ptroff = bufoff.data();
 
         size_t idxe = 0;
         *ptroff = 0;
@@ -1272,24 +1312,24 @@ PYBIND11_MODULE(_ext, m) {
       .def("to_numpy_n_exclusive_subjets",
       [](
           const output_wrapper ow,
-          py::array_t<double, py::array::c_style | py::array::forcecast> pxi,
-          py::array_t<double, py::array::c_style | py::array::forcecast> pyi,
-          py::array_t<double, py::array::c_style | py::array::forcecast> pzi,
-          py::array_t<double, py::array::c_style | py::array::forcecast> Ei,
+          nb::handle pxi,
+          nb::handle pyi,
+          nb::handle pzi,
+          nb::handle Ei,
           double dcut = 0
         ) {
-        py::buffer_info infopx = pxi.request();
-        py::buffer_info infopy = pyi.request();  // requesting buffer information of the input
-        py::buffer_info infopz = pzi.request();
-        py::buffer_info infoE = Ei.request();
+        auto infopx = forcecast<double>(pxi);
+        auto infopy = forcecast<double>(pyi);  // requesting buffer information of the input
+        auto infopz = forcecast<double>(pzi);
+        auto infoE = forcecast<double>(Ei);
 
-        auto pxptr = static_cast<double *>(infopx.ptr);
-        auto pyptr = static_cast<double *>(infopy.ptr);  // pointer to the initial value
-        auto pzptr = static_cast<double *>(infopz.ptr);
-        auto Eptr = static_cast<double *>(infoE.ptr);
+        auto pxptr = infopx.data();
+        auto pyptr = infopy.data();  // pointer to the initial value
+        auto pzptr = infopz.data();
+        auto Eptr = infoE.data();
 
-        int dimpx = infopx.shape[0];
-        int dimpy = infopy.shape[0];
+        int dimpx = infopx.shape(0);
+        int dimpy = infopy.shape(0);
         auto css = ow.cse;
         int64_t len = css.size();
         // Don't specify the size if using push_back.
@@ -1317,13 +1357,13 @@ PYBIND11_MODULE(_ext, m) {
           }
           indices.push_back(got->second);
         }
-        auto out_value = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {dimpy}, {sizeof(int)}));
-        auto bufpx = out_value.request();
-        int *ptrpx = (int *)bufpx.ptr;
+        auto out_value = empty_array<int>(dimpy);
+        auto &bufpx = out_value;
+        int *ptrpx = bufpx.data();
 
-        auto off = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len+1}, {sizeof(int)}));
-        auto bufoff = off.request();
-        int *ptroff = (int *)bufoff.ptr;
+        auto off = empty_array<int>(len+1);
+        auto &bufoff = off;
+        int *ptroff = bufoff.data();
 
         size_t idxe = 0;
         *ptroff = 0;
@@ -1350,23 +1390,23 @@ PYBIND11_MODULE(_ext, m) {
       .def("to_numpy_has_parents",
       [](
           const output_wrapper ow,
-          py::array_t<double, py::array::c_style | py::array::forcecast> pxi,
-          py::array_t<double, py::array::c_style | py::array::forcecast> pyi,
-          py::array_t<double, py::array::c_style | py::array::forcecast> pzi,
-          py::array_t<double, py::array::c_style | py::array::forcecast> Ei
+          nb::handle pxi,
+          nb::handle pyi,
+          nb::handle pzi,
+          nb::handle Ei
         ) {
-        py::buffer_info infopx = pxi.request();
-        py::buffer_info infopy = pyi.request();  // requesting buffer information of the input
-        py::buffer_info infopz = pzi.request();
-        py::buffer_info infoE = Ei.request();
+        auto infopx = forcecast<double>(pxi);
+        auto infopy = forcecast<double>(pyi);  // requesting buffer information of the input
+        auto infopz = forcecast<double>(pzi);
+        auto infoE = forcecast<double>(Ei);
 
-        auto pxptr = static_cast<double *>(infopx.ptr);
-        auto pyptr = static_cast<double *>(infopy.ptr);  // pointer to the initial value
-        auto pzptr = static_cast<double *>(infopz.ptr);
-        auto Eptr = static_cast<double *>(infoE.ptr);
+        auto pxptr = infopx.data();
+        auto pyptr = infopy.data();  // pointer to the initial value
+        auto pzptr = infopz.data();
+        auto Eptr = infoE.data();
 
-        int dimpx = infopx.shape[0];
-        int dimpy = infopy.shape[0];
+        int dimpx = infopx.shape(0);
+        int dimpy = infopy.shape(0);
         auto css = ow.cse;
         int64_t len = css.size();
         // Don't specify the size if using push_back.
@@ -1394,13 +1434,13 @@ PYBIND11_MODULE(_ext, m) {
           }
           indices.push_back(got->second);
         }
-        auto out_value = py::array(py::buffer_info(nullptr, sizeof(bool), py::format_descriptor<bool>::value, 1, {dimpy}, {sizeof(bool)}));
-        auto bufpx = out_value.request();
-        bool *ptrpx = (bool *)bufpx.ptr;
+        auto out_value = empty_array<bool>(dimpy);
+        auto &bufpx = out_value;
+        bool *ptrpx = bufpx.data();
 
-        auto off = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len+1}, {sizeof(int)}));
-        auto bufoff = off.request();
-        int *ptroff = (int *)bufoff.ptr;
+        auto off = empty_array<int>(len+1);
+        auto &bufoff = off;
+        int *ptroff = bufoff.data();
 
         size_t idxe = 0;
         *ptroff = 0;
@@ -1429,23 +1469,23 @@ PYBIND11_MODULE(_ext, m) {
       .def("to_numpy_has_child",
       [](
           const output_wrapper ow,
-          py::array_t<double, py::array::c_style | py::array::forcecast> pxi,
-          py::array_t<double, py::array::c_style | py::array::forcecast> pyi,
-          py::array_t<double, py::array::c_style | py::array::forcecast> pzi,
-          py::array_t<double, py::array::c_style | py::array::forcecast> Ei
+          nb::handle pxi,
+          nb::handle pyi,
+          nb::handle pzi,
+          nb::handle Ei
         ) {
-        py::buffer_info infopx = pxi.request();
-        py::buffer_info infopy = pyi.request();  // requesting buffer information of the input
-        py::buffer_info infopz = pzi.request();
-        py::buffer_info infoE = Ei.request();
+        auto infopx = forcecast<double>(pxi);
+        auto infopy = forcecast<double>(pyi);  // requesting buffer information of the input
+        auto infopz = forcecast<double>(pzi);
+        auto infoE = forcecast<double>(Ei);
 
-        auto pxptr = static_cast<double *>(infopx.ptr);
-        auto pyptr = static_cast<double *>(infopy.ptr);  // pointer to the initial value
-        auto pzptr = static_cast<double *>(infopz.ptr);
-        auto Eptr = static_cast<double *>(infoE.ptr);
+        auto pxptr = infopx.data();
+        auto pyptr = infopy.data();  // pointer to the initial value
+        auto pzptr = infopz.data();
+        auto Eptr = infoE.data();
 
-        int dimpx = infopx.shape[0];
-        int dimpy = infopy.shape[0];
+        int dimpx = infopx.shape(0);
+        int dimpy = infopy.shape(0);
         auto css = ow.cse;
         int64_t len = css.size();
         // Don't specify the size if using push_back.
@@ -1473,13 +1513,13 @@ PYBIND11_MODULE(_ext, m) {
           }
           indices.push_back(got->second);
         }
-        auto out_value = py::array(py::buffer_info(nullptr, sizeof(bool), py::format_descriptor<bool>::value, 1, {dimpy}, {sizeof(bool)}));
-        auto bufpx = out_value.request();
-        bool *ptrpx = (bool *)bufpx.ptr;
+        auto out_value = empty_array<bool>(dimpy);
+        auto &bufpx = out_value;
+        bool *ptrpx = bufpx.data();
 
-        auto off = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len+1}, {sizeof(int)}));
-        auto bufoff = off.request();
-        int *ptroff = (int *)bufoff.ptr;
+        auto off = empty_array<int>(len+1);
+        auto &bufoff = off;
+        int *ptroff = bufoff.data();
 
         size_t idxe = 0;
         *ptroff = 0;
@@ -1507,24 +1547,23 @@ PYBIND11_MODULE(_ext, m) {
     .def("to_numpy_jet_scale_for_algorithm",
       [](
           const output_wrapper ow,
-          py::array_t<double,
-          py::array::c_style | py::array::forcecast> pxi,
-          py::array_t<double, py::array::c_style | py::array::forcecast> pyi,
-          py::array_t<double, py::array::c_style | py::array::forcecast> pzi,
-          py::array_t<double, py::array::c_style | py::array::forcecast> Ei
+          nb::handle pxi,
+          nb::handle pyi,
+          nb::handle pzi,
+          nb::handle Ei
         ) {
-        py::buffer_info infopx = pxi.request();
-        py::buffer_info infopy = pyi.request();  // requesting buffer information of the input
-        py::buffer_info infopz = pzi.request();
-        py::buffer_info infoE = Ei.request();
+        auto infopx = forcecast<double>(pxi);
+        auto infopy = forcecast<double>(pyi);  // requesting buffer information of the input
+        auto infopz = forcecast<double>(pzi);
+        auto infoE = forcecast<double>(Ei);
 
-        auto pxptr = static_cast<double *>(infopx.ptr);
-        auto pyptr = static_cast<double *>(infopy.ptr);  // pointer to the initial value
-        auto pzptr = static_cast<double *>(infopz.ptr);
-        auto Eptr = static_cast<double *>(infoE.ptr);
+        auto pxptr = infopx.data();
+        auto pyptr = infopy.data();  // pointer to the initial value
+        auto pzptr = infopz.data();
+        auto Eptr = infoE.data();
 
-        int dimpx = infopx.shape[0];
-        int dimpy = infopy.shape[0];
+        int dimpx = infopx.shape(0);
+        int dimpy = infopy.shape(0);
         auto css = ow.cse;
         int64_t len = css.size();
         // Don't specify the size if using push_back.
@@ -1552,13 +1591,13 @@ PYBIND11_MODULE(_ext, m) {
           }
           indices.push_back(got->second);
         }
-        auto out_value = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {dimpy}, {sizeof(double)}));
-        auto bufpx = out_value.request();
-        double *ptrpx = (double *)bufpx.ptr;
+        auto out_value = empty_array<double>(dimpy);
+        auto &bufpx = out_value;
+        double *ptrpx = bufpx.data();
 
-        auto off = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len+1}, {sizeof(int)}));
-        auto bufoff = off.request();
-        int *ptroff = (int *)bufoff.ptr;
+        auto off = empty_array<int>(len+1);
+        auto &bufoff = off;
+        int *ptroff = bufoff.data();
 
         size_t idxe = 0;
         *ptroff = 0;
@@ -1591,12 +1630,12 @@ PYBIND11_MODULE(_ext, m) {
 
           jk += css[i]->unique_history_order().size();
         }
-        auto parid = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {jk}, {sizeof(int)}));
-        auto bufparid = parid.request();
-        int *ptrid = (int *)bufparid.ptr;
-        auto eventoffsets = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len+1}, {sizeof(int)}));
-        auto bufeventoffsets = eventoffsets.request();
-        int *ptreventoffsets = (int *)bufeventoffsets.ptr;
+        auto parid = empty_array<int>(jk);
+        auto &bufparid = parid;
+        int *ptrid = bufparid.data();
+        auto eventoffsets = empty_array<int>(len+1);
+        auto &bufeventoffsets = eventoffsets;
+        int *ptreventoffsets = bufeventoffsets.data();
         size_t eventidx = 0;
         ptreventoffsets[eventidx] = 0;
         eventidx++;
@@ -1627,13 +1666,13 @@ PYBIND11_MODULE(_ext, m) {
         auto css = ow.cse;
         int64_t len = css.size();
 
-        auto parid = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len}, {sizeof(int)}));
-        auto bufparid = parid.request();
-        int *ptrid = (int *)bufparid.ptr;
+        auto parid = empty_array<int>(len);
+        auto &bufparid = parid;
+        int *ptrid = bufparid.data();
 
-        auto eventoffsets = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len}, {sizeof(int)}));
-        auto bufeventoffsets = eventoffsets.request();
-        int *ptreventoffsets = (int *)bufeventoffsets.ptr;
+        auto eventoffsets = empty_array<int>(len);
+        auto &bufeventoffsets = eventoffsets;
+        int *ptreventoffsets = bufeventoffsets.data();
         size_t eventidx = 0;
         size_t idxh = 0;
         auto eventprev = 0;
@@ -1661,13 +1700,13 @@ PYBIND11_MODULE(_ext, m) {
         auto css = ow.cse;
         int64_t len = css.size();
 
-        auto parid = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len}, {sizeof(int)}));
-        auto bufparid = parid.request();
-        int *ptrid = (int *)bufparid.ptr;
+        auto parid = empty_array<int>(len);
+        auto &bufparid = parid;
+        int *ptrid = bufparid.data();
 
-        auto eventoffsets = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len}, {sizeof(int)}));
-        auto bufeventoffsets = eventoffsets.request();
-        int *ptreventoffsets = (int *)bufeventoffsets.ptr;
+        auto eventoffsets = empty_array<int>(len);
+        auto &bufeventoffsets = eventoffsets;
+        int *ptreventoffsets = bufeventoffsets.data();
         size_t eventidx = 0;
         size_t idxh = 0;
         auto eventprev = 0;
@@ -1783,19 +1822,19 @@ PYBIND11_MODULE(_ext, m) {
           }
         }
 
-        auto consts_px = py::array(consts_groomed_px.size(), consts_groomed_px.data());
-        auto consts_py = py::array(consts_groomed_py.size(), consts_groomed_py.data());
-        auto consts_pz = py::array(consts_groomed_pz.size(), consts_groomed_pz.data());
-        auto consts_E = py::array(consts_groomed_E.size(), consts_groomed_E.data());
-        auto eventsize = py::array(nconstituents.size(), nconstituents.data());
-        auto jet_pt = py::array(jet_groomed_pt.size(), jet_groomed_pt.data());
-        auto jet_eta = py::array(jet_groomed_eta.size(), jet_groomed_eta.data());
-        auto jet_phi = py::array(jet_groomed_phi.size(), jet_groomed_phi.data());
-        auto jet_m = py::array(jet_groomed_m.size(), jet_groomed_m.data());
-        auto jet_E = py::array(jet_groomed_E.size(), jet_groomed_E.data());
-        auto jet_pz = py::array(jet_groomed_pz.size(), jet_groomed_pz.data());
-        auto jet_delta_R = py::array(jet_groomed_delta_R.size(), jet_groomed_delta_R.data());
-        auto jet_symmetry = py::array(jet_groomed_symmetry.size(), jet_groomed_symmetry.data());
+        auto consts_px = to_array(consts_groomed_px);
+        auto consts_py = to_array(consts_groomed_py);
+        auto consts_pz = to_array(consts_groomed_pz);
+        auto consts_E = to_array(consts_groomed_E);
+        auto eventsize = to_array(nconstituents);
+        auto jet_pt = to_array(jet_groomed_pt);
+        auto jet_eta = to_array(jet_groomed_eta);
+        auto jet_phi = to_array(jet_groomed_phi);
+        auto jet_m = to_array(jet_groomed_m);
+        auto jet_E = to_array(jet_groomed_E);
+        auto jet_pz = to_array(jet_groomed_pz);
+        auto jet_delta_R = to_array(jet_groomed_delta_R);
+        auto jet_symmetry = to_array(jet_groomed_symmetry);
 
         return std::make_tuple(
             consts_px,
@@ -1882,7 +1921,7 @@ PYBIND11_MODULE(_ext, m) {
           }
         }
 
-        auto ECF = py::array(ECF_vec.size(), ECF_vec.data());
+        auto ECF = to_array(ECF_vec);
 
         return ECF;
       }, R"pbdoc(
@@ -1912,17 +1951,17 @@ PYBIND11_MODULE(_ext, m) {
         std::vector<double> Delta_vec;
         std::vector<double> kt_vec;
 
-        auto eventoffsets = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len+1}, {sizeof(int)}));
-        auto bufeventoffsets = eventoffsets.request();
-        int *ptreventoffsets = (int *)bufeventoffsets.ptr;
+        auto eventoffsets = empty_array<int>(len+1);
+        auto &bufeventoffsets = eventoffsets;
+        int *ptreventoffsets = bufeventoffsets.data();
         size_t eventidx = 0;
 
         ptreventoffsets[eventidx] = 0;
         eventidx++;
 
-        auto jetoffsets = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {jk}, {sizeof(int)}));
-        auto bufjetoffsets = jetoffsets.request();
-        int *ptrjetoffsets = (int *)bufjetoffsets.ptr;
+        auto jetoffsets = empty_array<int>(jk);
+        auto &bufjetoffsets = jetoffsets;
+        int *ptrjetoffsets = bufjetoffsets.data();
         size_t jetidx = 0;
 
         ptrjetoffsets[jetidx] = 0;
@@ -1951,8 +1990,8 @@ PYBIND11_MODULE(_ext, m) {
           eventidx++;
         }
 
-        auto Deltas = py::array(Delta_vec.size(), Delta_vec.data());
-        auto kts = py::array(kt_vec.size(), kt_vec.data());
+        auto Deltas = to_array(Delta_vec);
+        auto kts = to_array(kt_vec);
 
         return std::make_tuple(
             jetoffsets,
@@ -1976,25 +2015,25 @@ PYBIND11_MODULE(_ext, m) {
         for(int i = 0; i < len; i++){
         jk += css[i]->unclustered_particles().size();
         }
-        auto px = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
-        auto bufpx = px.request();
-        double *ptrpx = (double *)bufpx.ptr;
+        auto px = empty_array<double>(jk);
+        auto &bufpx = px;
+        double *ptrpx = bufpx.data();
 
-        auto py = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
-        auto bufpy = py.request();
-        double *ptrpy = (double *)bufpy.ptr;
+        auto py = empty_array<double>(jk);
+        auto &bufpy = py;
+        double *ptrpy = bufpy.data();
 
-        auto pz = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
-        auto bufpz = pz.request();
-        double *ptrpz = (double *)bufpz.ptr;
+        auto pz = empty_array<double>(jk);
+        auto &bufpz = pz;
+        double *ptrpz = bufpz.data();
 
-        auto E = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
-        auto bufE = E.request();
-        double *ptrE = (double *)bufE.ptr;
+        auto E = empty_array<double>(jk);
+        auto &bufE = E;
+        double *ptrE = bufE.data();
 
-        auto off = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len+1}, {sizeof(int)}));
-        auto bufoff = off.request();
-        int *ptroff = (int *)bufoff.ptr;
+        auto off = empty_array<int>(len+1);
+        auto &bufoff = off;
+        int *ptroff = bufoff.data();
         size_t idxe = 0;
         *ptroff = 0;
         ptroff++;
@@ -2034,25 +2073,25 @@ PYBIND11_MODULE(_ext, m) {
         for(int i = 0; i < len; i++){
         jk += css[i]->childless_pseudojets().size();
         }
-        auto px = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
-        auto bufpx = px.request();
-        double *ptrpx = (double *)bufpx.ptr;
+        auto px = empty_array<double>(jk);
+        auto &bufpx = px;
+        double *ptrpx = bufpx.data();
 
-        auto py = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
-        auto bufpy = py.request();
-        double *ptrpy = (double *)bufpy.ptr;
+        auto py = empty_array<double>(jk);
+        auto &bufpy = py;
+        double *ptrpy = bufpy.data();
 
-        auto pz = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
-        auto bufpz = pz.request();
-        double *ptrpz = (double *)bufpz.ptr;
+        auto pz = empty_array<double>(jk);
+        auto &bufpz = pz;
+        double *ptrpz = bufpz.data();
 
-        auto E = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
-        auto bufE = E.request();
-        double *ptrE = (double *)bufE.ptr;
+        auto E = empty_array<double>(jk);
+        auto &bufE = E;
+        double *ptrE = bufE.data();
 
-        auto off = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len+1}, {sizeof(int)}));
-        auto bufoff = off.request();
-        int *ptroff = (int *)bufoff.ptr;
+        auto off = empty_array<int>(len+1);
+        auto &bufoff = off;
+        int *ptroff = bufoff.data();
         size_t idxe = 0;
         *ptroff = 0;
         ptroff++;
@@ -2092,25 +2131,25 @@ PYBIND11_MODULE(_ext, m) {
         for(int i = 0; i < len; i++){
         jk += css[i]->jets().size();
         }
-        auto px = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
-        auto bufpx = px.request();
-        double *ptrpx = (double *)bufpx.ptr;
+        auto px = empty_array<double>(jk);
+        auto &bufpx = px;
+        double *ptrpx = bufpx.data();
 
-        auto py = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
-        auto bufpy = py.request();
-        double *ptrpy = (double *)bufpy.ptr;
+        auto py = empty_array<double>(jk);
+        auto &bufpy = py;
+        double *ptrpy = bufpy.data();
 
-        auto pz = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
-        auto bufpz = pz.request();
-        double *ptrpz = (double *)bufpz.ptr;
+        auto pz = empty_array<double>(jk);
+        auto &bufpz = pz;
+        double *ptrpz = bufpz.data();
 
-        auto E = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
-        auto bufE = E.request();
-        double *ptrE = (double *)bufE.ptr;
+        auto E = empty_array<double>(jk);
+        auto &bufE = E;
+        double *ptrE = bufE.data();
 
-        auto off = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len+1}, {sizeof(int)}));
-        auto bufoff = off.request();
-        int *ptroff = (int *)bufoff.ptr;
+        auto off = empty_array<int>(len+1);
+        auto &bufoff = off;
+        int *ptroff = bufoff.data();
         size_t idxe = 0;
         *ptroff = 0;
         ptroff++;
@@ -2144,22 +2183,22 @@ PYBIND11_MODULE(_ext, m) {
       .def("to_numpy_get_parents",
       [](
           const output_wrapper ow,
-          py::array_t<double, py::array::c_style | py::array::forcecast> pxi,
-          py::array_t<double, py::array::c_style | py::array::forcecast> pyi,
-          py::array_t<double, py::array::c_style | py::array::forcecast> pzi,
-          py::array_t<double, py::array::c_style | py::array::forcecast> Ei
+          nb::handle pxi,
+          nb::handle pyi,
+          nb::handle pzi,
+          nb::handle Ei
         ) {
-        py::buffer_info infopx = pxi.request();
-        py::buffer_info infopy = pyi.request();  // requesting buffer information of the input
-        py::buffer_info infopz = pzi.request();
-        py::buffer_info infoE = Ei.request();
+        auto infopx = forcecast<double>(pxi);
+        auto infopy = forcecast<double>(pyi);  // requesting buffer information of the input
+        auto infopz = forcecast<double>(pzi);
+        auto infoE = forcecast<double>(Ei);
 
-        auto pxptr = static_cast<double *>(infopx.ptr);
-        auto pyptr = static_cast<double *>(infopy.ptr);  // pointer to the initial value
-        auto pzptr = static_cast<double *>(infopz.ptr);
-        auto Eptr = static_cast<double *>(infoE.ptr);
+        auto pxptr = infopx.data();
+        auto pyptr = infopy.data();  // pointer to the initial value
+        auto pzptr = infopz.data();
+        auto Eptr = infoE.data();
 
-        int dimpx = infopx.shape[0];
+        int dimpx = infopx.shape(0);
         auto css = ow.cse;
         int64_t len = css.size();
         // Don't specify the size if using push_back.
@@ -2198,25 +2237,25 @@ PYBIND11_MODULE(_ext, m) {
         if(value == true){
         jk += 2;}
         }
-        auto px = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
-        auto bufpx = px.request();
-        double *ptrpx = (double *)bufpx.ptr;
+        auto px = empty_array<double>(jk);
+        auto &bufpx = px;
+        double *ptrpx = bufpx.data();
 
-        auto py = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
-        auto bufpy = py.request();
-        double *ptrpy = (double *)bufpy.ptr;
+        auto py = empty_array<double>(jk);
+        auto &bufpy = py;
+        double *ptrpy = bufpy.data();
 
-        auto pz = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
-        auto bufpz = pz.request();
-        double *ptrpz = (double *)bufpz.ptr;
+        auto pz = empty_array<double>(jk);
+        auto &bufpz = pz;
+        double *ptrpz = bufpz.data();
 
-        auto E = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
-        auto bufE = E.request();
-        double *ptrE = (double *)bufE.ptr;
+        auto E = empty_array<double>(jk);
+        auto &bufE = E;
+        double *ptrE = bufE.data();
 
-        auto off = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len+1}, {sizeof(int)}));
-        auto bufoff = off.request();
-        int *ptroff = (int *)bufoff.ptr;
+        auto off = empty_array<int>(len+1);
+        auto &bufoff = off;
+        int *ptroff = bufoff.data();
         size_t idxe = 0;
         *ptroff = 0;
         ptroff++;
@@ -2260,22 +2299,22 @@ PYBIND11_MODULE(_ext, m) {
     .def("to_numpy_get_child",
       [](
           const output_wrapper ow,
-          py::array_t<double, py::array::c_style | py::array::forcecast> pxi,
-          py::array_t<double, py::array::c_style | py::array::forcecast> pyi,
-          py::array_t<double, py::array::c_style | py::array::forcecast> pzi,
-          py::array_t<double, py::array::c_style | py::array::forcecast> Ei
+          nb::handle pxi,
+          nb::handle pyi,
+          nb::handle pzi,
+          nb::handle Ei
         ) {
-        py::buffer_info infopx = pxi.request();
-        py::buffer_info infopy = pyi.request();  // requesting buffer information of the input
-        py::buffer_info infopz = pzi.request();
-        py::buffer_info infoE = Ei.request();
+        auto infopx = forcecast<double>(pxi);
+        auto infopy = forcecast<double>(pyi);  // requesting buffer information of the input
+        auto infopz = forcecast<double>(pzi);
+        auto infoE = forcecast<double>(Ei);
 
-        auto pxptr = static_cast<double *>(infopx.ptr);
-        auto pyptr = static_cast<double *>(infopy.ptr);  // pointer to the initial value
-        auto pzptr = static_cast<double *>(infopz.ptr);
-        auto Eptr = static_cast<double *>(infoE.ptr);
+        auto pxptr = infopx.data();
+        auto pyptr = infopy.data();  // pointer to the initial value
+        auto pzptr = infopz.data();
+        auto Eptr = infoE.data();
 
-        int dimpx = infopx.shape[0];
+        int dimpx = infopx.shape(0);
         auto css = ow.cse;
         int64_t len = css.size();
         // Don't specify the size if using push_back.
@@ -2313,25 +2352,25 @@ PYBIND11_MODULE(_ext, m) {
         if(value == true){
         jk += 1;}
         }
-        auto px = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
-        auto bufpx = px.request();
-        double *ptrpx = (double *)bufpx.ptr;
+        auto px = empty_array<double>(jk);
+        auto &bufpx = px;
+        double *ptrpx = bufpx.data();
 
-        auto py = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
-        auto bufpy = py.request();
-        double *ptrpy = (double *)bufpy.ptr;
+        auto py = empty_array<double>(jk);
+        auto &bufpy = py;
+        double *ptrpy = bufpy.data();
 
-        auto pz = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
-        auto bufpz = pz.request();
-        double *ptrpz = (double *)bufpz.ptr;
+        auto pz = empty_array<double>(jk);
+        auto &bufpz = pz;
+        double *ptrpz = bufpz.data();
 
-        auto E = py::array(py::buffer_info(nullptr, sizeof(double), py::format_descriptor<double>::value, 1, {jk}, {sizeof(double)}));
-        auto bufE = E.request();
-        double *ptrE = (double *)bufE.ptr;
+        auto E = empty_array<double>(jk);
+        auto &bufE = E;
+        double *ptrE = bufE.data();
 
-        auto off = py::array(py::buffer_info(nullptr, sizeof(int), py::format_descriptor<int>::value, 1, {len+1}, {sizeof(int)}));
-        auto bufoff = off.request();
-        int *ptroff = (int *)bufoff.ptr;
+        auto off = empty_array<int>(len+1);
+        auto &bufoff = off;
+        int *ptroff = bufoff.data();
         size_t idxe = 0;
         *ptroff = 0;
         ptroff++;
@@ -2440,8 +2479,7 @@ PYBIND11_MODULE(_ext, m) {
             }
         }
 
-        auto taus_out = py::array(taus.size(), taus.data());
-        taus_out.resize({taus.size()/njets.size(), njets.size()});
+        auto taus_out = to_array(taus, njets.size());
 
         return std::make_tuple(
           taus_out
@@ -2453,8 +2491,8 @@ PYBIND11_MODULE(_ext, m) {
         Returns:
           the <njets>-tuple of njettiness values for all found jets, and their offsets
       )pbdoc");
-  py::class_<ClusterSequence>(m, "ClusterSequence")
-      .def(py::init<const std::vector<PseudoJet> &, const JetDefinition &,
+  nb::class_<ClusterSequence>(m, "ClusterSequence")
+      .def(nb::init<const std::vector<PseudoJet> &, const JetDefinition &,
                     const bool &>(),
            "pseudojets"_a, "jet_definition"_a,
            "write_out_combinations"_a = false,

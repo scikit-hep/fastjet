@@ -22,7 +22,9 @@ set(PKG_INSTALL "fastjet") ## python package name
 
 include(FetchContent)
 
-find_package(pybind11 REQUIRED)
+# Before add_subdirectory so the Python targets (incl. SABIModule in abi3 builds) are visible to the SWIG module.
+find_package(Python 3.11 REQUIRED COMPONENTS Interpreter Development.Module ${SKBUILD_SABI_COMPONENT})
+find_package(nanobind CONFIG REQUIRED)
 
 if (SKHEPFJ_USE_INSTALLED_FASTJET)
   find_package(fastjet REQUIRED)
@@ -40,7 +42,8 @@ if (SKHEPFJ_PASSTHRU_FASTJET_SWIG)
   file(WRITE ${CMAKE_INSTALL_PREFIX}/_swig.py "from ${SKHEPFJ_FASTJET_LIB_PYMODULE_NAME} import *\n")
 endif()
 
-pybind11_add_module(_ext MODULE src/_ext.cpp)
+# NB_DOMAIN keeps the catch-all exception translator private to fastjet; MUSL_DYNAMIC_LIBCPP shares libstdc++ with libfastjet.
+nanobind_add_module(_ext STABLE_ABI NB_DOMAIN fastjet MUSL_DYNAMIC_LIBCPP src/_ext.cpp)
 target_link_libraries(_ext
                       PRIVATE
                         fastjet::fastjet
