@@ -29,6 +29,10 @@ namespace fj = fastjet;
 namespace py = pybind11;
 using namespace pybind11::literals;
 
+// clang-format only parses the binding lambdas when their parameter types have no '|'.
+using array_d = py::array_t<double, py::array::c_style | py::array::forcecast>;
+using array_i = py::array_t<int, py::array::c_style | py::array::forcecast>;
+
 // adapted from
 // https://github.com/cms-svj/SVJProduction/blob/Run3/interface/NjettinessHelper.h
 namespace njettiness {
@@ -110,12 +114,12 @@ public:
 };
 
 output_wrapper interfacemulti(
-    py::array_t<double, py::array::c_style | py::array::forcecast> pxi,
-    py::array_t<double, py::array::c_style | py::array::forcecast> pyi,
-    py::array_t<double, py::array::c_style | py::array::forcecast> pzi,
-    py::array_t<double, py::array::c_style | py::array::forcecast> Ei,
-    py::array_t<int, py::array::c_style | py::array::forcecast> starts,
-    py::array_t<int, py::array::c_style | py::array::forcecast> stops,
+    array_d pxi,
+    array_d pyi,
+    array_d pzi,
+    array_d Ei,
+    array_i starts,
+    array_i stops,
     py::object jetdef) {
   // requesting buffer information of the input
   py::buffer_info infostarts = starts.request();
@@ -807,10 +811,10 @@ PYBIND11_MODULE(_ext, m) {
       .def("to_numpy_exclusive_subjets_dcut",
       [](
           const output_wrapper ow,
-          py::array_t<double, py::array::c_style | py::array::forcecast> pxi,
-          py::array_t<double, py::array::c_style | py::array::forcecast> pyi,
-          py::array_t<double, py::array::c_style | py::array::forcecast> pzi,
-          py::array_t<double, py::array::c_style | py::array::forcecast> Ei,
+          array_d pxi,
+          array_d pyi,
+          array_d pzi,
+          array_d Ei,
           double dcut = 0
         ) {
         py::buffer_info infopx = pxi.request();
@@ -910,10 +914,10 @@ PYBIND11_MODULE(_ext, m) {
       .def("to_numpy_exclusive_subjets_nsub",
       [](
           const output_wrapper ow,
-          py::array_t<double, py::array::c_style | py::array::forcecast> pxi,
-          py::array_t<double, py::array::c_style | py::array::forcecast> pyi,
-          py::array_t<double, py::array::c_style | py::array::forcecast> pzi,
-          py::array_t<double, py::array::c_style | py::array::forcecast> Ei,
+          array_d pxi,
+          array_d pyi,
+          array_d pzi,
+          array_d Ei,
           int nsub = 0
         ) {
         py::buffer_info infopx = pxi.request();
@@ -1013,10 +1017,10 @@ PYBIND11_MODULE(_ext, m) {
       .def("to_numpy_exclusive_subjets_up_to",
       [](
           const output_wrapper ow,
-          py::array_t<double, py::array::c_style | py::array::forcecast> pxi,
-          py::array_t<double, py::array::c_style | py::array::forcecast> pyi,
-          py::array_t<double, py::array::c_style | py::array::forcecast> pzi,
-          py::array_t<double, py::array::c_style | py::array::forcecast> Ei,
+          array_d pxi,
+          array_d pyi,
+          array_d pzi,
+          array_d Ei,
           int nsub = 0
         ) {
         py::buffer_info infopx = pxi.request();
@@ -1116,10 +1120,10 @@ PYBIND11_MODULE(_ext, m) {
       .def("to_numpy_exclusive_subdmerge",
       [](
           const output_wrapper ow,
-          py::array_t<double, py::array::c_style | py::array::forcecast> pxi,
-          py::array_t<double, py::array::c_style | py::array::forcecast> pyi,
-          py::array_t<double, py::array::c_style | py::array::forcecast> pzi,
-          py::array_t<double, py::array::c_style | py::array::forcecast> Ei,
+          array_d pxi,
+          array_d pyi,
+          array_d pzi,
+          array_d Ei,
           int nsub = 0
         ) {
         py::buffer_info infopx = pxi.request();
@@ -1194,10 +1198,10 @@ PYBIND11_MODULE(_ext, m) {
       .def("to_numpy_exclusive_subdmerge_max",
       [](
           const output_wrapper ow,
-          py::array_t<double, py::array::c_style | py::array::forcecast> pxi,
-          py::array_t<double, py::array::c_style | py::array::forcecast> pyi,
-          py::array_t<double, py::array::c_style | py::array::forcecast> pzi,
-          py::array_t<double, py::array::c_style | py::array::forcecast> Ei,
+          array_d pxi,
+          array_d pyi,
+          array_d pzi,
+          array_d Ei,
           int nsub = 0
         ) {
         py::buffer_info infopx = pxi.request();
@@ -1272,10 +1276,10 @@ PYBIND11_MODULE(_ext, m) {
       .def("to_numpy_n_exclusive_subjets",
       [](
           const output_wrapper ow,
-          py::array_t<double, py::array::c_style | py::array::forcecast> pxi,
-          py::array_t<double, py::array::c_style | py::array::forcecast> pyi,
-          py::array_t<double, py::array::c_style | py::array::forcecast> pzi,
-          py::array_t<double, py::array::c_style | py::array::forcecast> Ei,
+          array_d pxi,
+          array_d pyi,
+          array_d pzi,
+          array_d Ei,
           double dcut = 0
         ) {
         py::buffer_info infopx = pxi.request();
@@ -1350,10 +1354,10 @@ PYBIND11_MODULE(_ext, m) {
       .def("to_numpy_has_parents",
       [](
           const output_wrapper ow,
-          py::array_t<double, py::array::c_style | py::array::forcecast> pxi,
-          py::array_t<double, py::array::c_style | py::array::forcecast> pyi,
-          py::array_t<double, py::array::c_style | py::array::forcecast> pzi,
-          py::array_t<double, py::array::c_style | py::array::forcecast> Ei
+          array_d pxi,
+          array_d pyi,
+          array_d pzi,
+          array_d Ei
         ) {
         py::buffer_info infopx = pxi.request();
         py::buffer_info infopy = pyi.request();  // requesting buffer information of the input
@@ -1429,10 +1433,10 @@ PYBIND11_MODULE(_ext, m) {
       .def("to_numpy_has_child",
       [](
           const output_wrapper ow,
-          py::array_t<double, py::array::c_style | py::array::forcecast> pxi,
-          py::array_t<double, py::array::c_style | py::array::forcecast> pyi,
-          py::array_t<double, py::array::c_style | py::array::forcecast> pzi,
-          py::array_t<double, py::array::c_style | py::array::forcecast> Ei
+          array_d pxi,
+          array_d pyi,
+          array_d pzi,
+          array_d Ei
         ) {
         py::buffer_info infopx = pxi.request();
         py::buffer_info infopy = pyi.request();  // requesting buffer information of the input
@@ -1509,9 +1513,9 @@ PYBIND11_MODULE(_ext, m) {
           const output_wrapper ow,
           py::array_t<double,
           py::array::c_style | py::array::forcecast> pxi,
-          py::array_t<double, py::array::c_style | py::array::forcecast> pyi,
-          py::array_t<double, py::array::c_style | py::array::forcecast> pzi,
-          py::array_t<double, py::array::c_style | py::array::forcecast> Ei
+          array_d pyi,
+          array_d pzi,
+          array_d Ei
         ) {
         py::buffer_info infopx = pxi.request();
         py::buffer_info infopy = pyi.request();  // requesting buffer information of the input
@@ -2144,10 +2148,10 @@ PYBIND11_MODULE(_ext, m) {
       .def("to_numpy_get_parents",
       [](
           const output_wrapper ow,
-          py::array_t<double, py::array::c_style | py::array::forcecast> pxi,
-          py::array_t<double, py::array::c_style | py::array::forcecast> pyi,
-          py::array_t<double, py::array::c_style | py::array::forcecast> pzi,
-          py::array_t<double, py::array::c_style | py::array::forcecast> Ei
+          array_d pxi,
+          array_d pyi,
+          array_d pzi,
+          array_d Ei
         ) {
         py::buffer_info infopx = pxi.request();
         py::buffer_info infopy = pyi.request();  // requesting buffer information of the input
@@ -2260,10 +2264,10 @@ PYBIND11_MODULE(_ext, m) {
     .def("to_numpy_get_child",
       [](
           const output_wrapper ow,
-          py::array_t<double, py::array::c_style | py::array::forcecast> pxi,
-          py::array_t<double, py::array::c_style | py::array::forcecast> pyi,
-          py::array_t<double, py::array::c_style | py::array::forcecast> pzi,
-          py::array_t<double, py::array::c_style | py::array::forcecast> Ei
+          array_d pxi,
+          array_d pyi,
+          array_d pzi,
+          array_d Ei
         ) {
         py::buffer_info infopx = pxi.request();
         py::buffer_info infopy = pyi.request();  // requesting buffer information of the input
