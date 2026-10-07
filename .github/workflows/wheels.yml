@@ -106,7 +106,7 @@ jobs:
           path: dist
           merge-multiple: true
 
-      # An abi3 build needs SWIG >= 4.3; apt ships 4.2.0 (same step as ci.yml checks).
+      # An abi3 build needs SWIG >= 4.3; apt ships 4.2.0.
       - name: Install SWIG
         shell: bash
         run: |
